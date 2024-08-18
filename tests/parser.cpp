@@ -2,14 +2,20 @@
 
 #include "parser.hpp"
 
-TEST_CASE("Parsing elements name", "[parser]")
+TEST_CASE("Parsing simple xml strings", "[parser]")
 {
-    
-}
+    SECTION("Simple")
+    {
+        std::string tooEasy = "<root></root>";
+        auto elem = myxml::Parser(tooEasy).ParseElement().value();
+        REQUIRE(elem->GetName() == "root");
+    }
 
-TEST_CASE("Parsing a simple xml string", "[parser]")
-{
-    std::string tooEasy = "<root></root>";
-    auto elem = myxml::Parser(tooEasy).ParseElement();
-    REQUIRE(elem != std::nullopt);
+    SECTION("text")
+    {
+        std::string withText = "<root>Hello</root>";
+        auto elem = myxml::Parser(withText).ParseElement().value();
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->GetText().value().Export() == "Hello");
+    }
 }

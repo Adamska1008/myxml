@@ -163,6 +163,11 @@ namespace myxml
         return this->closingType;
     }
 
+    std::optional<Text> Element::GetText()
+    {
+        return this->text;
+    }
+
     void Element::SetClosingType(ClosingType type)
     {
         this->closingType = type;

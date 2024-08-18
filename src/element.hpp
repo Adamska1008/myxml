@@ -51,6 +51,7 @@ namespace myxml
         std::optional<std::string_view> GetAttribute(std::string_view name);
         std::string_view GetName();
         ClosingType GetClosingType();
+        std::optional<Text> GetText();
 
         // Manipulate
         std::shared_ptr<Element> InsertAtFront(const std::shared_ptr<Element> &);

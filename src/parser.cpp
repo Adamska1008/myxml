@@ -68,6 +68,7 @@ namespace myxml
         { // break due to length limit
             return std::nullopt;
         }
+        this->offset += len;
         return Text(this->buffer.substr(begin, len));
     }
 
@@ -125,7 +126,7 @@ namespace myxml
     }
 
     Parser::Parser(std::string_view buffer)
-        : buffer(buffer) {}
+        : buffer(buffer), offset(0) {}
 
     bool util::isValidXmlChar(char ch)
     {
