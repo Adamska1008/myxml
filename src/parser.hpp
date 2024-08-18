@@ -17,6 +17,8 @@ namespace myxml
 
     public:
         std::optional<std::shared_ptr<Element>> ParseElement();
+        Parser() = delete;
+        explicit Parser(std::string_view);
     };
 
     namespace util

@@ -39,13 +39,13 @@ namespace myxml
             return std::nullopt;
         std::size_t begin = this->offset;
         // validate heading character
-        if (auto head = this->peekChar().value(); !std::isalpha(head) || head != '_')
+        if (auto head = this->peekChar().value(); !std::isalpha(head) && head != '_')
         {
             return std::nullopt;
         }
-        std::size_t len = 1;
-        while (begin + len <= this->buffer.length() &&
-               util::isValidXmlChar(this->buffer[begin + len - 1]))
+        std::size_t len = 0;
+        while (begin + len < this->buffer.length() &&
+               util::isValidXmlChar(this->buffer[begin + len]))
         {
             len++;
         }
@@ -59,12 +59,12 @@ namespace myxml
             return std::nullopt;
         std::size_t begin = this->offset;
         std::size_t len = 0;
-        while (begin + len <= this->buffer.length() &&
-               this->buffer[begin + len - 1] != '<')
+        while (begin + len < this->buffer.length() &&
+               this->buffer[begin + len] != '<')
         {
             len++;
         }
-        if (this->buffer[begin + len - 1] != '<')
+        if (this->buffer[begin + len] != '<')
         { // break due to length limit
             return std::nullopt;
         }
@@ -123,6 +123,9 @@ namespace myxml
         }
         return elem;
     }
+
+    Parser::Parser(std::string_view buffer)
+        : buffer(buffer) {}
 
     bool util::isValidXmlChar(char ch)
     {

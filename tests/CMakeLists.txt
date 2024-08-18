@@ -12,9 +12,13 @@ include(CTest)
 
 
 add_executable(element element.cpp)
+add_executable(parser parser.cpp)
 
 target_link_libraries(element Catch2::Catch2WithMain myxml)
+target_link_libraries(parser Catch2::Catch2WithMain myxml)
 
 target_compile_features(element PRIVATE cxx_std_17)
+target_compile_features(parser PRIVATE cxx_std_17)
 
 add_test(NAME element COMMAND element)
+add_test(NAME parser COMMAND parser)
