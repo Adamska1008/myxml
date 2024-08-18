@@ -3,11 +3,10 @@
 namespace myxml
 {
     Element::Element(std::string_view name)
-        : name(name) {}
+        : name(name), closingType(ClosingType::Closing) {}
 
     std::shared_ptr<Element> Element::New(std::string_view name)
     {
-
         return std::shared_ptr<Element>(new Element(name));
     }
 
@@ -61,7 +60,7 @@ namespace myxml
         return this->parent;
     }
 
-    std::optional<std::string_view> Element::getAttribute(std::string_view name)
+    std::optional<std::string_view> Element::GetAttribute(std::string_view name)
     {
         if (auto attr = this->attributes.find(name); attr != this->attributes.end())
         {
@@ -126,8 +125,18 @@ namespace myxml
         return elem;
     }
 
+    std::shared_ptr<Element> Element::InsertAtEnd(Element &&elem)
+    {
+        auto ptr = std::make_shared<Element>(elem);
+        return this->InsertAtEnd(ptr);
+    }
+
     void Element::Unlink(const std::shared_ptr<Element> &elem)
     {
+        if (elem->parent.get() != this)
+        {
+            return;
+        }
         if (elem == this->firstChild)
         {
             this->firstChild = this->firstChild->next;
@@ -147,5 +156,20 @@ namespace myxml
         elem->next = nullptr;
         elem->prev = nullptr;
         elem->parent = nullptr;
+    }
+
+    Element::ClosingType Element::GetClosingType()
+    {
+        return this->closingType;
+    }
+
+    void Element::SetClosingType(ClosingType type)
+    {
+        this->closingType = type;
+    }
+
+    void Element::SetText(Text text)
+    {
+        this->text = text;
     }
 }

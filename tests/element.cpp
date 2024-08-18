@@ -17,6 +17,8 @@ TEST_CASE("Element Functionality", "[element]")
     {
         root->InsertAtFront(child);
         REQUIRE(root->FirstChild()->GetName() == "child");
+        REQUIRE(root->LastChild()->GetName() == "child");
+        REQUIRE(root->FirstChild()->Parent()->GetName() == "root");
     }
 
     SECTION("Get child by name after insert it")
@@ -34,5 +36,14 @@ TEST_CASE("Element Functionality", "[element]")
         root->InsertAtEnd(sibiling);
         REQUIRE(root->Child("child")->GetName() == "child");
         REQUIRE(root->Child("child")->NextSibiling()->GetName() == "sibiling");
+        REQUIRE(root->Child("sibiling")->PrevSibiling()->GetName() == "child");
+    }
+
+    SECTION("Moving insertion")
+    {
+        myxml::Element s = *sibiling;
+        root->InsertAtFront(child);
+        root->InsertAtFront(move(s));
+        REQUIRE(root->Child("sibiling")->GetName() == "sibiling");
     }
 }

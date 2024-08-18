@@ -10,6 +10,13 @@ namespace myxml
 {
     class Element : public std::enable_shared_from_this<Element>
     {
+    public:
+        enum class ClosingType
+        {
+            Closed,
+            Closing,
+        };
+
     private:
         // list node
         std::shared_ptr<Element> parent;
@@ -21,18 +28,12 @@ namespace myxml
         std::string name;
         std::map<std::string, std::string, std::less<>> attributes;
         std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
-        Text text;
+        std::optional<Text> text;
+        ClosingType closingType;
 
         Element(std::string_view name);
 
     public:
-        enum class ClosingType
-        {
-            Open,
-            Closed,
-            Closing,
-        };
-
         // Initializer
         Element() = delete;
 
@@ -47,13 +48,17 @@ namespace myxml
         std::shared_ptr<Element> NextSibiling();
         std::shared_ptr<Element> PrevSibiling();
         std::shared_ptr<Element> Parent();
-        std::optional<std::string_view> getAttribute(std::string_view name);
+        std::optional<std::string_view> GetAttribute(std::string_view name);
         std::string_view GetName();
+        ClosingType GetClosingType();
 
         // Manipulate
         std::shared_ptr<Element> InsertAtFront(const std::shared_ptr<Element> &);
         std::shared_ptr<Element> InsertAtFront(Element &&);
         std::shared_ptr<Element> InsertAtEnd(const std::shared_ptr<Element> &);
+        std::shared_ptr<Element> InsertAtEnd(Element &&);
         void Unlink(const std::shared_ptr<Element> &);
+        void SetClosingType(ClosingType);
+        void SetText(Text);
     };
 }
