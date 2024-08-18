@@ -2,7 +2,14 @@
 
 namespace myxml
 {
-    Element::Element() {}
+    Element::Element(std::string_view name)
+        : name(name) {}
+
+    std::shared_ptr<Element> Element::New(std::string_view name)
+    {
+
+        return std::shared_ptr<Element>(new Element(name));
+    }
 
     std::shared_ptr<Element> Element::FirstChild()
     {
@@ -64,6 +71,11 @@ namespace myxml
         {
             return std::nullopt;
         }
+    }
+
+    std::string_view Element::GetName()
+    {
+        return this->name;
     }
 
     std::shared_ptr<Element> Element::InsertAtFront(const std::shared_ptr<Element> &elem)

@@ -23,10 +23,7 @@ namespace myxml
         std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
         Text text;
 
-        /**
-         * Set parent and sibilings to nullptr.
-         */
-        void detach();
+        Element(std::string_view name);
 
     public:
         enum class ClosingType
@@ -37,7 +34,11 @@ namespace myxml
         };
 
         // Initializer
-        Element();
+        Element() = delete;
+
+        // Builder
+        // Wraps creating shared_ptr
+        static std::shared_ptr<Element> New(std::string_view name);
 
         // Query
         std::shared_ptr<Element> FirstChild();
@@ -47,6 +48,7 @@ namespace myxml
         std::shared_ptr<Element> PrevSibiling();
         std::shared_ptr<Element> Parent();
         std::optional<std::string_view> getAttribute(std::string_view name);
+        std::string_view GetName();
 
         // Manipulate
         std::shared_ptr<Element> InsertAtFront(const std::shared_ptr<Element> &);

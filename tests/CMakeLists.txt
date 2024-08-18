@@ -10,10 +10,11 @@ FetchContent_MakeAvailable(catch2)
 
 include(CTest)
 
+
 add_executable(element element.cpp)
 
-target_link_libraries(element Catch2)
+target_link_libraries(element Catch2::Catch2WithMain myxml)
 
 target_compile_features(element PRIVATE cxx_std_17)
 
-add_test(NAME basic COMMAND element)
+add_test(NAME element COMMAND element)
