@@ -6,6 +6,7 @@ TEST_CASE("Element Functionality", "[element]")
 {
     auto root = myxml::Element::New("root");
     auto child = myxml::Element::New("child");
+    auto sibiling = myxml::Element::New("sibiling");
 
     SECTION("GetName")
     {
@@ -22,8 +23,16 @@ TEST_CASE("Element Functionality", "[element]")
     {
         root->InsertAtFront(child);
         // Unbuffered
-        REQUIRE(root->FirstChild("child")->GetName() == "child");
+        REQUIRE(root->Child("child")->GetName() == "child");
         // Buffered
-        REQUIRE(root->FirstChild("child")->GetName() == "child");
+        REQUIRE(root->Child("child")->GetName() == "child");
+    }
+
+    SECTION("Multi child")
+    {
+        root->InsertAtFront(child);
+        root->InsertAtEnd(sibiling);
+        REQUIRE(root->Child("child")->GetName() == "child");
+        REQUIRE(root->Child("child")->NextSibiling()->GetName() == "sibiling");
     }
 }

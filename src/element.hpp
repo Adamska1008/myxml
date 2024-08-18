@@ -42,7 +42,7 @@ namespace myxml
 
         // Query
         std::shared_ptr<Element> FirstChild();
-        std::shared_ptr<Element> FirstChild(std::string_view name);
+        std::shared_ptr<Element> Child(std::string_view name);
         std::shared_ptr<Element> LastChild();
         std::shared_ptr<Element> NextSibiling();
         std::shared_ptr<Element> PrevSibiling();

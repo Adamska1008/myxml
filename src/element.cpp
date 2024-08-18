@@ -16,7 +16,7 @@ namespace myxml
         return this->firstChild;
     }
 
-    std::shared_ptr<Element> Element::FirstChild(std::string_view name)
+    std::shared_ptr<Element> Element::Child(std::string_view name)
     {
         if (auto buf = this->nameToElemBuffer.find(name); buf != this->nameToElemBuffer.end())
         {
@@ -92,6 +92,7 @@ namespace myxml
         }
         else
         {
+            this->firstChild->prev = elem;
             elem->next = this->firstChild;
             this->firstChild = elem;
         }
@@ -118,9 +119,11 @@ namespace myxml
         }
         else
         {
+            this->lastChild->next = elem;
             elem->prev = this->lastChild;
             this->lastChild = elem;
         }
+        return elem;
     }
 
     void Element::Unlink(const std::shared_ptr<Element> &elem)
