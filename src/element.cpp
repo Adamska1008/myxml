@@ -1,13 +1,24 @@
 #include "element.hpp"
+#include "parser.cpp"
 
 namespace myxml
 {
     Element::Element(std::string_view name)
-        : name(name), closingType(ClosingType::Closing) {}
+        : name(name) {}
 
     std::shared_ptr<Element> Element::New(std::string_view name)
     {
         return std::shared_ptr<Element>(new Element(name));
+    }
+
+    std::shared_ptr<Element> Element::New()
+    {
+        return std::shared_ptr<Element>(new Element());
+    }
+
+    std::shared_ptr<Element> Element::Parse(std::string_view buf)
+    {
+        return Parser(buf).ParseElement().value();
     }
 
     std::shared_ptr<Element> Element::FirstChild()
@@ -158,23 +169,18 @@ namespace myxml
         elem->parent = nullptr;
     }
 
-    Element::ClosingType Element::GetClosingType()
-    {
-        return this->closingType;
-    }
-
     std::optional<Text> Element::GetText()
     {
         return this->text;
     }
 
-    void Element::SetClosingType(ClosingType type)
-    {
-        this->closingType = type;
-    }
-
     void Element::SetText(Text text)
     {
         this->text = text;
+    }
+
+    void Element::SetName(std::string_view name)
+    {
+        this->name = name;
     }
 }

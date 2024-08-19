@@ -29,17 +29,18 @@ namespace myxml
         std::map<std::string, std::string, std::less<>> attributes;
         std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
         std::optional<Text> text;
-        ClosingType closingType;
 
         Element(std::string_view name);
 
     public:
         // Initializer
-        Element() = delete;
+        Element() = default;
 
         // Builder
         // Wraps creating shared_ptr
         static std::shared_ptr<Element> New(std::string_view name);
+        static std::shared_ptr<Element> New();
+        static std::shared_ptr<Element> Parse(std::string_view buf);
 
         // Query
         std::shared_ptr<Element> FirstChild();
@@ -50,7 +51,6 @@ namespace myxml
         std::shared_ptr<Element> Parent();
         std::optional<std::string_view> GetAttribute(std::string_view name);
         std::string_view GetName();
-        ClosingType GetClosingType();
         std::optional<Text> GetText();
 
         // Manipulate
@@ -59,7 +59,7 @@ namespace myxml
         std::shared_ptr<Element> InsertAtEnd(const std::shared_ptr<Element> &);
         std::shared_ptr<Element> InsertAtEnd(Element &&);
         void Unlink(const std::shared_ptr<Element> &);
-        void SetClosingType(ClosingType);
         void SetText(Text);
+        void SetName(std::string_view);
     };
 }

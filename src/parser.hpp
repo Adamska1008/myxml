@@ -3,6 +3,19 @@
 
 namespace myxml
 {
+    struct Tag
+    {
+        enum class ClosingType
+        {
+            Open,   // <tag>
+            Closed, // <tag/>
+            Closing // </tag>
+        };
+
+        std::string name;
+        Tag::ClosingType type = ClosingType::Open;
+    };
+
     class Parser
     {
     private:
@@ -17,6 +30,7 @@ namespace myxml
 
     public:
         std::optional<std::shared_ptr<Element>> ParseElement();
+        std::optional<Tag> ParseTag();
         Parser() = delete;
         explicit Parser(std::string_view);
     };
