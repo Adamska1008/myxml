@@ -19,6 +19,7 @@ namespace myxml
 
     std::optional<std::shared_ptr<Text>> Text::AsText()
     {
+        Text *test = dynamic_cast<Text *>(this);
         return std::dynamic_pointer_cast<Text>(this->shared_from_this());
     }
 

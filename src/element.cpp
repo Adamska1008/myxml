@@ -40,7 +40,7 @@ namespace myxml
                 this->nameToElemBuffer.erase(buf);
             }
         }
-        for (auto &child = this->firstChild; child != nullptr; child = child->Next())
+        for (auto child = this->firstChild; child != nullptr; child = child->Next())
         {
             if (child->Type() != NodeType::Element)
             {
@@ -166,7 +166,7 @@ namespace myxml
     {
         return std::dynamic_pointer_cast<Element>(this->shared_from_this());
     }
-    
+
     std::optional<std::shared_ptr<Text>> Element::AsText()
     {
         return std::nullopt;

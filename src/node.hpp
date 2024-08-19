@@ -23,9 +23,9 @@ namespace myxml
         std::shared_ptr<Node> next;
 
     public:
-        std::shared_ptr<Element> Parent();
-        std::shared_ptr<Node> Next();
-        std::shared_ptr<Node> Prev();
+        std::shared_ptr<Element> &Parent();
+        std::shared_ptr<Node> &Next();
+        std::shared_ptr<Node> &Prev();
 
         virtual NodeType Type() = 0;
         virtual bool isType(NodeType) = 0;

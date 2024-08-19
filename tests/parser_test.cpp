@@ -1,5 +1,5 @@
+#include <iostream>
 #include <catch2/catch_test_macros.hpp>
-
 #include "parser.hpp"
 
 TEST_CASE("Parsing tag", "parser")
@@ -47,5 +47,17 @@ TEST_CASE("Parsing simple xml strings", "[parser]")
         auto elem = myxml::Element::Parse(nested);
         REQUIRE(elem->GetName() == "root");
         REQUIRE(elem->Elem("child")->GetName() == "child");
+        REQUIRE(elem->Elem("child")->FirstChild()->AsText().value()->Export() == "hello");
+    }
+
+    SECTION("Mixed")
+    {
+        std::string mixed = "<root>hello<child></child></root>";
+        auto elem = myxml::Element::Parse(mixed);
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->Elem("child")->GetName() == "child");
+        auto type = elem->FirstChild()->Type();
+        auto text = elem->FirstChild()->AsElement();
+        // REQUIRE(text.value()->Export() == "hello");
     }
 }

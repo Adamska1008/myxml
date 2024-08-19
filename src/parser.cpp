@@ -71,7 +71,7 @@ namespace myxml
             return std::nullopt;
         }
         this->offset += len;
-        return std::make_shared<Text>(this->buffer.substr(begin, len));
+        return std::shared_ptr<Text>(new Text(this->buffer.substr(begin, len)));
     }
 
     std::optional<std::shared_ptr<Element>> Parser::parseElementWithHeader(Tag header)
@@ -91,7 +91,7 @@ namespace myxml
                 case Tag::ClosingType::Open:
                     if (auto child = this->parseElementWithHeader(*tag); child)
                     {
-                        elem->InsertAtEnd(std::move(*child));
+                        elem->InsertAtEnd(*child);
                     }
                     else
                     {
@@ -119,7 +119,7 @@ namespace myxml
             default:
                 if (auto text = this->parseText(); text)
                 {
-                    elem->InsertAtEnd(std::move(*text));
+                    elem->InsertAtEnd(*text);
                 }
                 else
                 {

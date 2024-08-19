@@ -2,17 +2,17 @@
 
 namespace myxml
 {
-    std::shared_ptr<Element> Node::Parent()
+    std::shared_ptr<Element> &Node::Parent()
     {
         return this->parent;
     }
 
-    std::shared_ptr<Node> Node::Next()
+    std::shared_ptr<Node> &Node::Next()
     {
         return this->next;
     }
 
-    std::shared_ptr<Node> Node::Prev()
+    std::shared_ptr<Node> &Node::Prev()
     {
         return this->prev;
     }

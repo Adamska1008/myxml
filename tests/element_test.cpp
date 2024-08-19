@@ -17,7 +17,6 @@ TEST_CASE("Element Functionality", "[element]")
         root->InsertAtFront(child);
         REQUIRE(root->FirstChild()->AsElement().value()->GetName() == "child");
         REQUIRE(root->LastChild()->AsElement().value()->GetName() == "child");
-        REQUIRE(root->FirstChild()->AsElement().value()->GetName() == "root");
     }
 
     SECTION("Get child by name after insert it")
@@ -31,7 +30,7 @@ TEST_CASE("Element Functionality", "[element]")
 
     SECTION("Multi child")
     {
-        root->InsertAtFront(child);
+        root->InsertAtEnd(child);
         root->InsertAtEnd(sibiling);
         REQUIRE(root->Elem("child")->GetName() == "child");
         REQUIRE(root->Elem("child")->Next()->AsElement().value()->GetName() == "sibiling");
