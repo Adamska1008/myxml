@@ -43,7 +43,7 @@ TEST_CASE("Parsing simple xml strings", "[parser]")
 
     SECTION("Nested")
     {
-        std::string nested = "<root><child>hello<child/></root>";
+        std::string nested = "<root><child>hello</child></root>";
         auto elem = myxml::Element::Parse(nested);
         REQUIRE(elem->GetName() == "root");
         REQUIRE(elem->Elem("child")->GetName() == "child");

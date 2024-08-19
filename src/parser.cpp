@@ -111,7 +111,6 @@ namespace myxml
                         return std::nullopt;
                     }
                     return elem;
-                    break;
                 default:
                     return std::nullopt;
                 }
@@ -154,60 +153,6 @@ namespace myxml
             return std::nullopt;
         }
     }
-
-    // std::optional<std::shared_ptr<Element>> Parser::ParseElement()
-    // {
-    //     this->skipWhiteSpaces();
-    //     auto elem = Element::New();
-    //     if (auto tag = this->ParseTag(); tag)
-    //     {
-    //         elem->SetName(tag->name);
-    //         if (tag->type == Tag::ClosingType::Closed)
-    //         {
-    //             return elem;
-    //         }
-    //         else if (tag->type == Tag::ClosingType::Closing)
-    //         {
-    //             return std::nullopt;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         return std::nullopt;
-    //     }
-    //     this->skipWhiteSpaces();
-    //     while (auto ch = this->peekChar())
-    //     {
-    //         switch (*ch)
-    //         {
-    //         case '<':
-
-    //         default:
-    //             if (auto text = this->parseText(); text)
-    //             {
-    //                 elem->InsertAtEnd(std::move(*text));
-    //             }
-    //             else
-    //             {
-    //                 return std::nullopt;
-    //             }
-    //             break;
-    //         }
-    //     }
-
-    //     if (auto tag = this->ParseTag(); tag)
-    //     {
-    //         if (tag->name != elem->GetName() || tag->type != Tag::ClosingType::Closing)
-    //         {
-    //             return std::nullopt;
-    //         }
-    //         return elem;
-    //     }
-    //     else
-    //     {
-    //         return std::nullopt;
-    //     }
-    // }
 
     std::optional<Tag> Parser::ParseTag()
     {
