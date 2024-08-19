@@ -6,7 +6,6 @@
 
 #include "text.hpp"
 
-
 namespace myxml
 {
     class Element : public std::enable_shared_from_this<Element>, public Node

@@ -1,15 +1,4 @@
-include(FetchContent)
-
-FetchContent_Declare(
-    catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v3.7.0
-)
-
-FetchContent_MakeAvailable(catch2)
-
 include(CTest)
-
 
 add_executable(element_test element_test.cpp)
 add_executable(parser_test parser_test.cpp)

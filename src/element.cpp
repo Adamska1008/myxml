@@ -40,17 +40,12 @@ namespace myxml
                 this->nameToElemBuffer.erase(buf);
             }
         }
-        for (auto child = this->firstChild; child != nullptr; child = child->Next())
+        for (auto child = this->firstChild; child != nullptr; child = child->next)
         {
-            if (child->Type() != NodeType::Element)
+            if (auto elem = child->AsElement(); elem && (*elem)->name == name)
             {
-                continue;
-            }
-            auto elem = std::dynamic_pointer_cast<Element>(child);
-            if (elem->name == name)
-            {
-                this->nameToElemBuffer.emplace(name, elem);
-                return elem;
+                this->nameToElemBuffer.emplace(name, *elem);
+                return *elem;
             }
         }
         return nullptr;
@@ -80,11 +75,11 @@ namespace myxml
 
     std::shared_ptr<Node> Element::InsertAtFront(const std::shared_ptr<Node> &elem)
     {
-        if (elem->Parent() != nullptr)
+        if (elem->parent != nullptr)
         {
-            elem->Parent()->Unlink(elem);
+            elem->parent->Unlink(elem);
         }
-        elem->Parent() = this->shared_from_this();
+        elem->parent = this->shared_from_this();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -92,8 +87,8 @@ namespace myxml
         }
         else
         {
-            this->firstChild->Prev() = elem;
-            elem->Next() = this->firstChild;
+            this->firstChild->prev = elem;
+            elem->next = this->firstChild;
             this->firstChild = elem;
         }
         return elem;
@@ -101,11 +96,11 @@ namespace myxml
 
     std::shared_ptr<Node> Element::InsertAtEnd(const std::shared_ptr<Node> &elem)
     {
-        if (elem->Parent() != nullptr)
+        if (elem->parent != nullptr)
         {
-            elem->Parent()->Unlink(elem);
+            elem->parent->Unlink(elem);
         }
-        elem->Parent() = this->shared_from_this();
+        elem->parent = this->shared_from_this();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -113,8 +108,8 @@ namespace myxml
         }
         else
         {
-            this->lastChild->Next() = elem;
-            elem->Prev() = this->lastChild;
+            this->lastChild->next = elem;
+            elem->prev = this->lastChild;
             this->lastChild = elem;
         }
         return elem;
@@ -122,29 +117,29 @@ namespace myxml
 
     void Element::Unlink(const std::shared_ptr<Node> &elem)
     {
-        if (elem->Parent().get() != this)
+        if (elem->parent.get() != this)
         {
             return;
         }
         if (elem == this->firstChild)
         {
-            this->firstChild = this->firstChild->Next();
+            this->firstChild = this->firstChild->next;
         }
         if (elem == this->lastChild)
         {
-            this->lastChild = this->lastChild->Prev();
+            this->lastChild = this->lastChild->prev;
         }
-        if (elem->Prev() != nullptr)
+        if (elem->prev != nullptr)
         {
-            elem->Prev()->Next() = elem->Next();
+            elem->prev->next = elem->next;
         }
-        if (elem->Next() != nullptr)
+        if (elem->next != nullptr)
         {
-            elem->Next()->Prev() = elem->Prev();
+            elem->next->prev = elem->prev;
         }
-        elem->Next() = nullptr;
-        elem->Prev() = nullptr;
-        elem->Parent() = nullptr;
+        elem->next = nullptr;
+        elem->prev = nullptr;
+        elem->parent = nullptr;
     }
 
     void Element::SetName(std::string_view name)

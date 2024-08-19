@@ -33,7 +33,7 @@ TEST_CASE("Element Functionality", "[element]")
         root->InsertAtEnd(child);
         root->InsertAtEnd(sibiling);
         REQUIRE(root->Elem("child")->GetName() == "child");
-        REQUIRE(root->Elem("child")->Next()->AsElement().value()->GetName() == "sibiling");
-        REQUIRE(root->Elem("sibiling")->Prev()->AsElement().value()->GetName() == "child");
+        REQUIRE(root->Elem("child")->next->AsElement().value()->GetName() == "sibiling");
+        REQUIRE(root->Elem("sibiling")->prev->AsElement().value()->GetName() == "child");
     }
 }
