@@ -31,6 +31,7 @@ namespace myxml
         std::optional<std::string> parseElementName();
         // return and consume pcdata
         std::optional<std::shared_ptr<Text>> parseText();
+        std::optional<std::shared_ptr<Element>> parseElementWithHeader(Tag header);
 
     public:
         // return and consume current element

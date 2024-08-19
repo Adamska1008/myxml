@@ -161,10 +161,12 @@ namespace myxml
     {
         return type == NodeType::Element;
     }
+
     std::optional<std::shared_ptr<Element>> Element::AsElement()
     {
         return std::dynamic_pointer_cast<Element>(this->shared_from_this());
     }
+    
     std::optional<std::shared_ptr<Text>> Element::AsText()
     {
         return std::nullopt;

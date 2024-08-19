@@ -13,6 +13,7 @@ namespace myxml
         explicit Text(std::string_view str);
         std::string Export();
 
+        // implement node
         virtual NodeType Type() override;
         virtual bool isType(NodeType) override;
         virtual std::optional<std::shared_ptr<Element>> AsElement() override;

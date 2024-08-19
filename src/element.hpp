@@ -55,6 +55,7 @@ namespace myxml
         void Unlink(const std::shared_ptr<Node> &);
         void SetName(std::string_view);
 
+        // implement node
         virtual NodeType Type() override;
         virtual bool isType(NodeType) override;
         virtual std::optional<std::shared_ptr<Element>> AsElement() override;

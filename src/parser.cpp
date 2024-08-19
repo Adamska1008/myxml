@@ -74,48 +74,140 @@ namespace myxml
         return std::make_shared<Text>(this->buffer.substr(begin, len));
     }
 
-    std::optional<std::shared_ptr<Element>> Parser::ParseElement()
+    std::optional<std::shared_ptr<Element>> Parser::parseElementWithHeader(Tag header)
     {
         this->skipWhiteSpaces();
         auto elem = Element::New();
+        elem->SetName(header.name);
+        while (auto ch = this->peekChar())
+        {
+            switch (*ch)
+            {
+            case '<':
+            {
+                auto tag = this->ParseTag();
+                switch (tag->type)
+                {
+                case Tag::ClosingType::Open:
+                    if (auto child = this->parseElementWithHeader(*tag); child)
+                    {
+                        elem->InsertAtEnd(std::move(*child));
+                    }
+                    else
+                    {
+                        return std::nullopt;
+                    }
+                    break;
+                case Tag::ClosingType::Closed:
+                {
+                    auto child = Element::New();
+                    child->SetName(tag->name);
+                    elem->InsertAtEnd(child);
+                    break;
+                }
+                case Tag::ClosingType::Closing:
+                    if (tag->name != elem->GetName())
+                    {
+                        return std::nullopt;
+                    }
+                    return elem;
+                    break;
+                default:
+                    return std::nullopt;
+                }
+                break;
+            }
+            default:
+                if (auto text = this->parseText(); text)
+                {
+                    elem->InsertAtEnd(std::move(*text));
+                }
+                else
+                {
+                    return std::nullopt;
+                }
+                break;
+            }
+        }
+        return std::nullopt;
+    }
+
+    std::optional<std::shared_ptr<Element>> Parser::ParseElement()
+    {
+        this->skipWhiteSpaces();
         if (auto tag = this->ParseTag(); tag)
         {
-            elem->SetName(tag->name);
             if (tag->type == Tag::ClosingType::Closed)
             {
+                auto elem = Element::New();
+                elem->SetName(tag->name);
                 return elem;
             }
             else if (tag->type == Tag::ClosingType::Closing)
             {
                 return std::nullopt;
             }
-        }
-        else
-        {
-            return std::nullopt;
-        }
-        this->skipWhiteSpaces();
-        if (auto text = this->parseText(); text)
-        {
-            elem->InsertAtEnd(std::move(*text));
-        }
-        else
-        {
-            return std::nullopt;
-        }
-        if (auto tag = this->ParseTag(); tag)
-        {
-            if (tag->name != elem->GetName() || tag->type != Tag::ClosingType::Closing)
-            {
-                return std::nullopt;
-            }
-            return elem;
+            return this->parseElementWithHeader(*tag);
         }
         else
         {
             return std::nullopt;
         }
     }
+
+    // std::optional<std::shared_ptr<Element>> Parser::ParseElement()
+    // {
+    //     this->skipWhiteSpaces();
+    //     auto elem = Element::New();
+    //     if (auto tag = this->ParseTag(); tag)
+    //     {
+    //         elem->SetName(tag->name);
+    //         if (tag->type == Tag::ClosingType::Closed)
+    //         {
+    //             return elem;
+    //         }
+    //         else if (tag->type == Tag::ClosingType::Closing)
+    //         {
+    //             return std::nullopt;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         return std::nullopt;
+    //     }
+    //     this->skipWhiteSpaces();
+    //     while (auto ch = this->peekChar())
+    //     {
+    //         switch (*ch)
+    //         {
+    //         case '<':
+
+    //         default:
+    //             if (auto text = this->parseText(); text)
+    //             {
+    //                 elem->InsertAtEnd(std::move(*text));
+    //             }
+    //             else
+    //             {
+    //                 return std::nullopt;
+    //             }
+    //             break;
+    //         }
+    //     }
+
+    //     if (auto tag = this->ParseTag(); tag)
+    //     {
+    //         if (tag->name != elem->GetName() || tag->type != Tag::ClosingType::Closing)
+    //         {
+    //             return std::nullopt;
+    //         }
+    //         return elem;
+    //     }
+    //     else
+    //     {
+    //         return std::nullopt;
+    //     }
+    // }
 
     std::optional<Tag> Parser::ParseTag()
     {
