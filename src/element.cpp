@@ -21,12 +21,12 @@ namespace myxml
         return Parser(buf).ParseElement().value();
     }
 
-    std::shared_ptr<Element> Element::FirstChild()
+    std::shared_ptr<Node> Element::FirstChild()
     {
         return this->firstChild;
     }
 
-    std::shared_ptr<Element> Element::Child(std::string_view name)
+    std::shared_ptr<Element> Element::Elem(std::string_view name)
     {
         if (auto buf = this->nameToElemBuffer.find(name); buf != this->nameToElemBuffer.end())
         {
@@ -40,8 +40,13 @@ namespace myxml
                 this->nameToElemBuffer.erase(buf);
             }
         }
-        for (auto &elem = this->firstChild; elem != nullptr; elem = elem->next)
+        for (auto &child = this->firstChild; child != nullptr; child = child->Next())
         {
+            if (child->Type() != NodeType::Element)
+            {
+                continue;
+            }
+            auto elem = std::dynamic_pointer_cast<Element>(child);
             if (elem->name == name)
             {
                 this->nameToElemBuffer.emplace(name, elem);
@@ -51,24 +56,9 @@ namespace myxml
         return nullptr;
     }
 
-    std::shared_ptr<Element> Element::LastChild()
+    std::shared_ptr<Node> Element::LastChild()
     {
         return this->lastChild;
-    }
-
-    std::shared_ptr<Element> Element::NextSibiling()
-    {
-        return this->next;
-    }
-
-    std::shared_ptr<Element> Element::PrevSibiling()
-    {
-        return this->prev;
-    }
-
-    std::shared_ptr<Element> Element::Parent()
-    {
-        return this->parent;
     }
 
     std::optional<std::string_view> Element::GetAttribute(std::string_view name)
@@ -88,13 +78,13 @@ namespace myxml
         return this->name;
     }
 
-    std::shared_ptr<Element> Element::InsertAtFront(const std::shared_ptr<Element> &elem)
+    std::shared_ptr<Node> Element::InsertAtFront(const std::shared_ptr<Node> &elem)
     {
-        if (elem->parent != nullptr)
+        if (elem->Parent() != nullptr)
         {
-            elem->parent->Unlink(elem);
+            elem->Parent()->Unlink(elem);
         }
-        elem->parent = this->shared_from_this();
+        elem->Parent() = this->shared_from_this();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -102,26 +92,20 @@ namespace myxml
         }
         else
         {
-            this->firstChild->prev = elem;
-            elem->next = this->firstChild;
+            this->firstChild->Prev() = elem;
+            elem->Next() = this->firstChild;
             this->firstChild = elem;
         }
         return elem;
     }
 
-    std::shared_ptr<Element> Element::InsertAtFront(Element &&elem)
+    std::shared_ptr<Node> Element::InsertAtEnd(const std::shared_ptr<Node> &elem)
     {
-        auto ptr = std::make_shared<Element>(elem);
-        return this->InsertAtFront(ptr);
-    }
-
-    std::shared_ptr<Element> Element::InsertAtEnd(const std::shared_ptr<Element> &elem)
-    {
-        if (elem->parent != nullptr)
+        if (elem->Parent() != nullptr)
         {
-            elem->parent->Unlink(elem);
+            elem->Parent()->Unlink(elem);
         }
-        elem->parent = this->shared_from_this();
+        elem->Parent() = this->shared_from_this();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -129,58 +113,60 @@ namespace myxml
         }
         else
         {
-            this->lastChild->next = elem;
-            elem->prev = this->lastChild;
+            this->lastChild->Next() = elem;
+            elem->Prev() = this->lastChild;
             this->lastChild = elem;
         }
         return elem;
     }
 
-    std::shared_ptr<Element> Element::InsertAtEnd(Element &&elem)
+    void Element::Unlink(const std::shared_ptr<Node> &elem)
     {
-        auto ptr = std::make_shared<Element>(elem);
-        return this->InsertAtEnd(ptr);
-    }
-
-    void Element::Unlink(const std::shared_ptr<Element> &elem)
-    {
-        if (elem->parent.get() != this)
+        if (elem->Parent().get() != this)
         {
             return;
         }
         if (elem == this->firstChild)
         {
-            this->firstChild = this->firstChild->next;
+            this->firstChild = this->firstChild->Next();
         }
         if (elem == this->lastChild)
         {
-            this->lastChild = this->lastChild->prev;
+            this->lastChild = this->lastChild->Prev();
         }
-        if (elem->prev != nullptr)
+        if (elem->Prev() != nullptr)
         {
-            elem->prev->next = elem->next;
+            elem->Prev()->Next() = elem->Next();
         }
-        if (elem->next != nullptr)
+        if (elem->Next() != nullptr)
         {
-            elem->next->prev = elem->prev;
+            elem->Next()->Prev() = elem->Prev();
         }
-        elem->next = nullptr;
-        elem->prev = nullptr;
-        elem->parent = nullptr;
-    }
-
-    std::optional<Text> Element::GetText()
-    {
-        return this->text;
-    }
-
-    void Element::SetText(Text text)
-    {
-        this->text = text;
+        elem->Next() = nullptr;
+        elem->Prev() = nullptr;
+        elem->Parent() = nullptr;
     }
 
     void Element::SetName(std::string_view name)
     {
         this->name = name;
+    }
+
+    NodeType Element::Type()
+    {
+        return NodeType::Element;
+    }
+
+    bool Element::isType(NodeType type)
+    {
+        return type == NodeType::Element;
+    }
+    std::optional<std::shared_ptr<Element>> Element::AsElement()
+    {
+        return std::dynamic_pointer_cast<Element>(this->shared_from_this());
+    }
+    std::optional<std::shared_ptr<Text>> Element::AsText()
+    {
+        return std::nullopt;
     }
 }

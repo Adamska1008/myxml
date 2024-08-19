@@ -39,7 +39,7 @@ namespace myxml
             return std::nullopt;
         std::size_t begin = this->offset;
         // validate heading character
-        if (auto head = this->peekChar().value(); !std::isalpha(head) && head != '_')
+        if (auto head = this->peekChar(); !head || (!std::isalpha(*head) && head != '_'))
         {
             return std::nullopt;
         }
@@ -53,10 +53,12 @@ namespace myxml
         return this->buffer.substr(begin, len);
     }
 
-    std::optional<Text> Parser::parseText()
+    std::optional<std::shared_ptr<Text>> Parser::parseText()
     {
-        if (this->peekChar() == std::nullopt)
+        if (!this->peekChar())
+        {
             return std::nullopt;
+        }
         std::size_t begin = this->offset;
         std::size_t len = 0;
         while (begin + len < this->buffer.length() &&
@@ -65,26 +67,25 @@ namespace myxml
             len++;
         }
         if (this->buffer[begin + len] != '<')
-        { // break due to length limit
+        { // if jump out of while loop due to length limit
             return std::nullopt;
         }
         this->offset += len;
-        return Text(this->buffer.substr(begin, len));
+        return std::make_shared<Text>(this->buffer.substr(begin, len));
     }
 
     std::optional<std::shared_ptr<Element>> Parser::ParseElement()
     {
         this->skipWhiteSpaces();
         auto elem = Element::New();
-        if (auto opt = this->ParseTag(); opt != std::nullopt)
+        if (auto tag = this->ParseTag(); tag)
         {
-            auto tag = opt.value();
-            elem->SetName(tag.name);
-            if (tag.type == Tag::ClosingType::Closed)
+            elem->SetName(tag->name);
+            if (tag->type == Tag::ClosingType::Closed)
             {
                 return elem;
             }
-            else if (tag.type == Tag::ClosingType::Closing)
+            else if (tag->type == Tag::ClosingType::Closing)
             {
                 return std::nullopt;
             }
@@ -93,18 +94,18 @@ namespace myxml
         {
             return std::nullopt;
         }
-        if (auto text = this->parseText(); text != std::nullopt)
+        this->skipWhiteSpaces();
+        if (auto text = this->parseText(); text)
         {
-            elem->SetText(text.value());
+            elem->InsertAtEnd(std::move(*text));
         }
         else
         {
             return std::nullopt;
         }
-        if (auto opt = this->ParseTag(); opt != std::nullopt)
+        if (auto tag = this->ParseTag(); tag)
         {
-            auto tag = opt.value();
-            if (tag.name != elem->GetName() || tag.type != Tag::ClosingType::Closing)
+            if (tag->name != elem->GetName() || tag->type != Tag::ClosingType::Closing)
             {
                 return std::nullopt;
             }
@@ -129,9 +130,9 @@ namespace myxml
             this->nextChar();
         }
         this->skipWhiteSpaces();
-        if (auto name = this->parseElementName(); name != std::nullopt)
+        if (auto name = this->parseElementName(); name)
         {
-            tag.name = name.value();
+            tag.name = *name;
         }
         else
         {
@@ -141,7 +142,9 @@ namespace myxml
         if (this->peekChar() == '/')
         {
             if (tag.type != Tag::ClosingType::Open)
+            {
                 return std::nullopt;
+            }
             tag.type = Tag::ClosingType::Closed;
             this->nextChar();
         }

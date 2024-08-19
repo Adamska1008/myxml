@@ -6,9 +6,10 @@
 
 #include "text.hpp"
 
+
 namespace myxml
 {
-    class Element : public std::enable_shared_from_this<Element>
+    class Element : public std::enable_shared_from_this<Element>, public Node
     {
     public:
         enum class ClosingType
@@ -19,23 +20,22 @@ namespace myxml
 
     private:
         // list node
-        std::shared_ptr<Element> parent;
-        std::shared_ptr<Element> next;
-        std::shared_ptr<Element> prev;
-        std::shared_ptr<Element> firstChild;
-        std::shared_ptr<Element> lastChild;
+        // std::shared_ptr<Element> parent;
+        // std::shared_ptr<Node> next;
+        // std::shared_ptr<Node> prev;
+
         // element
+        std::shared_ptr<Node> firstChild;
+        std::shared_ptr<Node> lastChild;
         std::string name;
         std::map<std::string, std::string, std::less<>> attributes;
         std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
-        std::optional<Text> text;
 
-        Element(std::string_view name);
-
-    public:
         // Initializer
+        Element(std::string_view name);
         Element() = default;
 
+    public:
         // Builder
         // Wraps creating shared_ptr
         static std::shared_ptr<Element> New(std::string_view name);
@@ -43,23 +43,21 @@ namespace myxml
         static std::shared_ptr<Element> Parse(std::string_view buf);
 
         // Query
-        std::shared_ptr<Element> FirstChild();
-        std::shared_ptr<Element> Child(std::string_view name);
-        std::shared_ptr<Element> LastChild();
-        std::shared_ptr<Element> NextSibiling();
-        std::shared_ptr<Element> PrevSibiling();
-        std::shared_ptr<Element> Parent();
+        std::shared_ptr<Node> FirstChild();
+        std::shared_ptr<Node> LastChild();
+        std::shared_ptr<Element> Elem(std::string_view name);
         std::optional<std::string_view> GetAttribute(std::string_view name);
         std::string_view GetName();
-        std::optional<Text> GetText();
 
         // Manipulate
-        std::shared_ptr<Element> InsertAtFront(const std::shared_ptr<Element> &);
-        std::shared_ptr<Element> InsertAtFront(Element &&);
-        std::shared_ptr<Element> InsertAtEnd(const std::shared_ptr<Element> &);
-        std::shared_ptr<Element> InsertAtEnd(Element &&);
-        void Unlink(const std::shared_ptr<Element> &);
-        void SetText(Text);
+        std::shared_ptr<Node> InsertAtFront(const std::shared_ptr<Node> &);
+        std::shared_ptr<Node> InsertAtEnd(const std::shared_ptr<Node> &);
+        void Unlink(const std::shared_ptr<Node> &);
         void SetName(std::string_view);
+
+        virtual NodeType Type() override;
+        virtual bool isType(NodeType) override;
+        virtual std::optional<std::shared_ptr<Element>> AsElement() override;
+        virtual std::optional<std::shared_ptr<Text>> AsText() override;
     };
 }

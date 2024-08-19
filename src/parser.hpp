@@ -23,13 +23,19 @@ namespace myxml
         std::size_t offset;
 
         void skipWhiteSpaces();
+        // return and not consume current character
         std::optional<char> peekChar();
+        // return and consume current character
         std::optional<char> nextChar();
+        // return and consume a string literal
         std::optional<std::string> parseElementName();
-        std::optional<Text> parseText();
+        // return and consume pcdata
+        std::optional<std::shared_ptr<Text>> parseText();
 
     public:
+        // return and consume current element
         std::optional<std::shared_ptr<Element>> ParseElement();
+        // return and consume current tag
         std::optional<Tag> ParseTag();
         Parser() = delete;
         explicit Parser(std::string_view);

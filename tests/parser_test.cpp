@@ -34,7 +34,11 @@ TEST_CASE("Parsing simple xml strings", "[parser]")
         std::string withText = "<root>Hello</root>";
         auto elem = myxml::Parser(withText).ParseElement().value();
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->GetText().value().Export() == "Hello");
+        // REQUIRE(elem->FirstChild().value().Export() == "Hello");
+        {
+            auto text = std::dynamic_pointer_cast<myxml::Text>(elem->FirstChild());
+            REQUIRE(text->Export() == "Hello");
+        }
     }
 
     SECTION("Nested")
@@ -42,6 +46,6 @@ TEST_CASE("Parsing simple xml strings", "[parser]")
         std::string nested = "<root><child>hello<child/></root>";
         auto elem = myxml::Element::Parse(nested);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->Child("child")->GetName() == "child");
+        REQUIRE(elem->Elem("child")->GetName() == "child");
     }
 }
