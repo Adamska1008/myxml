@@ -22,42 +22,115 @@ TEST_CASE("Parsing tag", "parser")
 
 TEST_CASE("Parsing simple xml strings", "[parser]")
 {
-    SECTION("Simple")
+    SECTION("Basic")
     {
-        std::string tooEasy = "<root></root>";
-        auto elem = myxml::Parser(tooEasy).ParseElement().value();
+        std::string tooEasy = R"(<root>
+</root>)";
+        auto elem = myxml::Element::Parse(tooEasy);
         REQUIRE(elem->GetName() == "root");
     }
 
-    SECTION("text")
+    SECTION("Text")
     {
-        std::string withText = "<root>Hello</root>";
-        auto elem = myxml::Parser(withText).ParseElement().value();
+        std::string withText = R"(<root>
+    <child>Hello, world!</child>
+</root>)";
+        auto elem = myxml::Element::Parse(withText);
         REQUIRE(elem->GetName() == "root");
-        // REQUIRE(elem->FirstChild().value().Export() == "Hello");
-        {
-            auto text = std::dynamic_pointer_cast<myxml::Text>(elem->FirstChild());
-            REQUIRE(text->Export() == "Hello");
-        }
+        REQUIRE(elem->FirstChild()->AsText().value()->Export() == "\n    ");
+        auto child = elem->FirstChild()->next->AsElement().value();
+        REQUIRE(child->GetName() == "child");
+        REQUIRE(child->FirstChild()->AsText().value()->Export() == "Hello, world!");
+        REQUIRE(child->next->AsText().value()->Export() == "\n");
     }
 
     SECTION("Nested")
     {
-        std::string nested = "<root><child>hello</child></root>";
+        std::string nested = R"(<root>
+    <parent>
+        <child></child>
+    </parent>
+</root>)";
         auto elem = myxml::Element::Parse(nested);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->Elem("child")->GetName() == "child");
-        REQUIRE(elem->Elem("child")->FirstChild()->AsText().value()->Export() == "hello");
+        REQUIRE(elem->FirstChild()->AsText().value()->Export() == "\n    ");
+
+        auto parent = elem->FirstChild()->next->AsElement().value();
+        REQUIRE(parent->GetName() == "parent");
+        REQUIRE(parent->FirstChild()->AsText().value()->Export() == "\n        ");
+
+        auto child = parent->FirstChild()->next->AsElement().value();
+        REQUIRE(child->GetName() == "child");
+        REQUIRE(child->FirstChild() == nullptr); // 因为 <child></child> 是空的，没有文本子节点
+
+        REQUIRE(parent->FirstChild()->next->next->AsText().value()->Export() == "\n    ");
+        REQUIRE(elem->FirstChild()->next->next->AsText().value()->Export() == "\n");
+    }
+
+    SECTION("Mutli-Level")
+    {
+        std::string multiLevel = R"(<root>
+    <item>First</item>
+    <item>Second</item>
+    <item>Third</item>
+</root>)";
+        auto elem = myxml::Element::Parse(multiLevel);
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->FirstChild()->AsText().value()->Export() == "\n    ");
+
+        // 验证第一个 <item> 节点
+        auto item1 = elem->FirstChild()->next->AsElement().value();
+        REQUIRE(item1->GetName() == "item");
+        REQUIRE(item1->FirstChild()->AsText().value()->Export() == "First");
+
+        // 验证第二个 <item> 节点
+        auto item2 = item1->next->next->AsElement().value();
+        REQUIRE(item2->GetName() == "item");
+        REQUIRE(item2->FirstChild()->AsText().value()->Export() == "Second");
+
+        // 验证第三个 <item> 节点
+        auto item3 = item2->next->next->AsElement().value();
+        REQUIRE(item3->GetName() == "item");
+        REQUIRE(item3->FirstChild()->AsText().value()->Export() == "Third");
+
+        // 验证 root 节点的最后文本
+        REQUIRE(item3->next->AsText().value()->Export() == "\n");
+    }
+
+    SECTION("Closed Element")
+    {
+        std::string closed = R"(<root>
+    <empty />
+</root>)";
+        auto elem = myxml::Element::Parse(closed);
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->FirstChild()->AsText().value()->Export() == "\n    ");
+
+        // 验证 <empty /> 节点
+        auto emptyElement = elem->FirstChild()->next->AsElement().value();
+        REQUIRE(emptyElement->GetName() == "empty");
+        REQUIRE(emptyElement->FirstChild() == nullptr); // 自闭合标签没有子节点
+
+        // 验证 root 节点的最后文本
+        REQUIRE(emptyElement->next->AsText().value()->Export() == "\n");
     }
 
     SECTION("Mixed")
     {
-        std::string mixed = "<root>hello<child></child></root>";
+        std::string mixed = R"(<root>
+    hello
+    <child></child>
+</root>)";
         auto elem = myxml::Element::Parse(mixed);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->Elem("child")->GetName() == "child");
-        auto type = elem->FirstChild()->Type();
-        auto text = elem->FirstChild()->AsElement();
-        // REQUIRE(text.value()->Export() == "hello");
+        REQUIRE(elem->FirstChild()->AsText().value()->Export() == "\n    hello\n    ");
+
+        // 验证 <child> 节点
+        auto child = elem->FirstChild()->next->AsElement().value();
+        REQUIRE(child->GetName() == "child");
+        REQUIRE(child->FirstChild() == nullptr); // <child></child> 是空的，没有文本子节点
+
+        // 验证 root 节点的最后文本
+        REQUIRE(child->next->AsText().value()->Export() == "\n");
     }
 }

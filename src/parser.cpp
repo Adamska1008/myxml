@@ -76,7 +76,6 @@ namespace myxml
 
     std::optional<std::shared_ptr<Element>> Parser::parseElementWithHeader(Tag header)
     {
-        this->skipWhiteSpaces();
         auto elem = Element::New();
         elem->SetName(header.name);
         while (auto ch = this->peekChar())
