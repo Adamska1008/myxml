@@ -33,7 +33,7 @@ namespace myxml
             return std::nullopt;
     }
 
-    std::optional<std::string> Parser::parseElementName()
+    std::optional<std::string> Parser::parseIdent()
     {
         if (this->peekChar() == std::nullopt)
             return std::nullopt;
@@ -51,6 +51,42 @@ namespace myxml
         }
         this->offset += len;
         return this->buffer.substr(begin, len);
+    }
+
+    std::optional<std::string> Parser::parseStringLiteral()
+    {
+        if (this->peekChar() != '"')
+        {
+            return std::nullopt;
+        }
+        std::size_t cur = this->offset; // this->offset points to `"`
+        while (cur + 1 < this->buffer.length() && this->buffer[cur + 1] != '"')
+        {
+            cur++;
+        }
+        if (cur + 1 >= this->buffer.length())
+        { // if jump out due to length limit
+            return std::nullopt;
+        }
+        auto literal = this->buffer.substr(this->offset + 1, cur - this->offset);
+        this->offset = cur + 2; // cur + 1 -> `"`
+        return literal;
+    }
+
+    std::optional<std::pair<std::string, std::string>> Parser::parseAttribute()
+    {
+        this->skipWhiteSpaces();
+        std::pair<std::string, std::string> attri;
+        if (auto key = this->parseIdent(); key && this->nextChar() == '=')
+        {
+            attri.first = *key;
+            if (auto value = this->parseStringLiteral(); value)
+            {
+                attri.second = *value;
+                return attri;
+            }
+        }
+        return std::nullopt;
     }
 
     std::optional<std::shared_ptr<Text>> Parser::parseText()
@@ -101,6 +137,10 @@ namespace myxml
                 {
                     auto child = Element::New();
                     child->SetName(tag->name);
+                    if (!tag->attris.empty())
+                    {
+                        child->ExtendAttributes(tag->attris);
+                    }
                     elem->InsertAtEnd(child);
                     break;
                 }
@@ -108,6 +148,10 @@ namespace myxml
                     if (tag->name != elem->GetName())
                     {
                         return std::nullopt;
+                    }
+                    if (!header.attris.empty())
+                    {
+                        elem->ExtendAttributes(header.attris);
                     }
                     return elem;
                 default:
@@ -139,18 +183,18 @@ namespace myxml
             {
                 auto elem = Element::New();
                 elem->SetName(tag->name);
+                if (!tag->attris.empty())
+                {
+                    elem->ExtendAttributes(tag->attris);
+                }
                 return elem;
             }
-            else if (tag->type == Tag::ClosingType::Closing)
+            else if (tag->type == Tag::ClosingType::Open)
             {
-                return std::nullopt;
+                return this->parseElementWithHeader(*tag);
             }
-            return this->parseElementWithHeader(*tag);
         }
-        else
-        {
-            return std::nullopt;
-        }
+        return std::nullopt;
     }
 
     std::optional<Tag> Parser::ParseTag()
@@ -166,7 +210,7 @@ namespace myxml
             this->nextChar();
         }
         this->skipWhiteSpaces();
-        if (auto name = this->parseElementName(); name)
+        if (auto name = this->parseIdent(); name)
         {
             tag.name = *name;
         }
@@ -175,6 +219,10 @@ namespace myxml
             return std::nullopt;
         }
         this->skipWhiteSpaces();
+        while (auto attri = this->parseAttribute())
+        {
+            tag.attris.insert(*attri);
+        }
         if (this->peekChar() == '/')
         {
             if (tag.type != Tag::ClosingType::Open)

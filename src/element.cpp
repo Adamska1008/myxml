@@ -147,6 +147,16 @@ namespace myxml
         this->name = name;
     }
 
+    void Element::SetAttribute(std::string key, std::string value)
+    {
+        this->attributes.emplace(key, value);
+    }
+
+    void Element::ExtendAttributes(std::map<std::string, std::string> attris)
+    {
+        this->attributes.insert(attris.begin(), attris.end());
+    }
+
     NodeType Element::Type()
     {
         return NodeType::Element;

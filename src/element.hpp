@@ -53,6 +53,8 @@ namespace myxml
         std::shared_ptr<Node> InsertAtEnd(const std::shared_ptr<Node> &);
         void Unlink(const std::shared_ptr<Node> &);
         void SetName(std::string_view);
+        void SetAttribute(std::string key, std::string value);
+        void ExtendAttributes(std::map<std::string, std::string>);
 
         // implement node
         virtual NodeType Type() override;

@@ -20,7 +20,7 @@ TEST_CASE("Parsing tag", "parser")
     REQUIRE(tag.type == myxml::Tag::ClosingType::Closing);
 }
 
-TEST_CASE("Parsing simple xml strings", "[parser]")
+TEST_CASE("Parsing simple xml elements", "[parser]")
 {
     SECTION("Basic")
     {
@@ -132,5 +132,57 @@ TEST_CASE("Parsing simple xml strings", "[parser]")
 
         // 验证 root 节点的最后文本
         REQUIRE(child->next->AsText().value()->Export() == "\n");
+    }
+
+    SECTION("With attributes")
+    {
+        std::string attri = R"(<root hello="world"></root>)";
+        auto elem = myxml::Element::Parse(attri);
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->GetAttribute("hello") == "world");
+    }
+
+    SECTION("Empty With Attributes")
+    {
+        std::string attri = R"(<root hello="world"/>)";
+        auto elem = myxml::Element::Parse(attri);
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->GetAttribute("hello") == "world");
+    }
+
+    SECTION("Multiple Attributes")
+    {
+        std::string multipleAttributes = R"(<root attr1="value1" attr2="value2" attr3="value3"></root>)";
+        auto elem = myxml::Element::Parse(multipleAttributes);
+
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->GetAttribute("attr1") == "value1");
+        REQUIRE(elem->GetAttribute("attr2") == "value2");
+        REQUIRE(elem->GetAttribute("attr3") == "value3");
+    }
+
+    SECTION("Empty Attributes")
+    {
+        std::string emptyAttribute = R"(<root attr=""></root>)";
+        auto elem = myxml::Element::Parse(emptyAttribute);
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->GetAttribute("attr") == "");
+    }
+
+    SECTION("Attributes And Children")
+    {
+        std::string attributesAndChildren = R"(<root attr="value"><child>Text</child></root>)";
+        auto elem = myxml::Element::Parse(attributesAndChildren);
+
+        // 检查根元素的名称和属性
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->GetAttribute("attr") == "value");
+
+        // 检查根元素的第一个子元素
+        auto child = elem->FirstChild()->AsElement().value();
+        REQUIRE(child->GetName() == "child");
+
+        // 检查子元素的文本内容
+        REQUIRE(child->FirstChild()->AsText().value()->Export() == "Text");
     }
 }

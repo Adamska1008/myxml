@@ -14,6 +14,7 @@ namespace myxml
 
         std::string name;
         Tag::ClosingType type = ClosingType::Open;
+        std::map<std::string, std::string> attris;
     };
 
     class Parser
@@ -27,16 +28,27 @@ namespace myxml
         std::optional<char> peekChar();
         // return and consume current character
         std::optional<char> nextChar();
-        // return and consume a string literal
-        std::optional<std::string> parseElementName();
+        // return and consume a ident
+        // will not consume ident if failed
+        std::optional<std::string> parseIdent();
+        // return and consume a string `"..."`
+        // will not consume string if failed
+        std::optional<std::string> parseStringLiteral();
+        // return and consume an attribute `key="value"`
+        std::optional<std::pair<std::string, std::string>> parseAttribute();
         // return and consume pcdata
+        // will not consume pcdate if failed
         std::optional<std::shared_ptr<Text>> parseText();
+        // return the entire element
+        // will consume buffer if failed
         std::optional<std::shared_ptr<Element>> parseElementWithHeader(Tag header);
 
     public:
         // return and consume current element
+        // will consume buffer if failed
         std::optional<std::shared_ptr<Element>> ParseElement();
         // return and consume current tag
+        // will consume buffer if failed
         std::optional<Tag> ParseTag();
         Parser() = delete;
         explicit Parser(std::string_view);
