@@ -11,12 +11,18 @@ namespace myxml
 
     public:
         explicit Text(std::string_view str);
-        std::string Export();
 
-        // implement node
+        /* Used in Export*/
+        bool isAllSpace() const;
+
+        /* implement Node */
         virtual NodeType Type() override;
         virtual bool isType(NodeType) override;
         virtual std::optional<std::shared_ptr<Element>> AsElement() override;
         virtual std::optional<std::shared_ptr<Text>> AsText() override;
+
+        /* Implment Exportable*/
+        virtual std::string ExportRaw() const override;
+        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
     };
 }

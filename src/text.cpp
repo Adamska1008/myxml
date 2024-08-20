@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "text.hpp"
 
 namespace myxml
@@ -26,8 +27,20 @@ namespace myxml
     Text::Text(std::string_view str)
         : inner(str) {}
 
-    std::string Text::Export()
+    bool Text::isAllSpace() const
+    {
+        return std::all_of(this->inner.begin(), this->inner.end(), isspace);
+    }
+
+    std::string Text::ExportRaw() const
     {
         return this->inner;
     }
+
+    std::string Text::ExportFormatted(int indentLevel, int indentSize) const
+    {
+        // TODO: better implementation
+        return std::string(indentLevel * indentSize, ' ') + this->inner + '\n';
+    }
+
 }

@@ -2,6 +2,8 @@
 #include <memory>
 #include <optional>
 
+#include "exportable.hpp"
+
 namespace myxml
 {
     // defined in element.hpp
@@ -15,9 +17,11 @@ namespace myxml
         Element,
     };
 
-    class Node
+    class Node : public Exportable
     {
     public:
+        virtual ~Node() = default;
+
         std::shared_ptr<Element> parent;
         std::shared_ptr<Node> prev;
         std::shared_ptr<Node> next;

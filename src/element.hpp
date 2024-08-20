@@ -5,6 +5,7 @@
 #include <map>
 
 #include "text.hpp"
+#include "exportable.hpp"
 
 namespace myxml
 {
@@ -35,20 +36,20 @@ namespace myxml
         Element() = default;
 
     public:
-        // Builder
+        /* Builder */
         // Wraps creating shared_ptr
         static std::shared_ptr<Element> New(std::string_view name);
         static std::shared_ptr<Element> New();
         static std::shared_ptr<Element> Parse(std::string_view buf);
 
-        // Query
+        /* Query */
         std::shared_ptr<Node> FirstChild();
         std::shared_ptr<Node> LastChild();
         std::shared_ptr<Element> Elem(std::string_view name);
         std::optional<std::string_view> GetAttribute(std::string_view name);
-        std::string_view GetName();
+        std::string_view GetName() const;
 
-        // Manipulate
+        /* Manipulate */
         std::shared_ptr<Node> InsertAtFront(const std::shared_ptr<Node> &);
         std::shared_ptr<Node> InsertAtEnd(const std::shared_ptr<Node> &);
         void Unlink(const std::shared_ptr<Node> &);
@@ -56,10 +57,14 @@ namespace myxml
         void SetAttribute(std::string key, std::string value);
         void ExtendAttributes(std::map<std::string, std::string>);
 
-        // implement node
+        /* Implement Node */
         virtual NodeType Type() override;
         virtual bool isType(NodeType) override;
         virtual std::optional<std::shared_ptr<Element>> AsElement() override;
         virtual std::optional<std::shared_ptr<Text>> AsText() override;
+
+        /* Implement Exportable */
+        virtual std::string ExportRaw() const override;
+        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
     };
 }

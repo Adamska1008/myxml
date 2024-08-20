@@ -68,7 +68,7 @@ namespace myxml
         }
     }
 
-    std::string_view Element::GetName()
+    std::string_view Element::GetName() const
     {
         return this->name;
     }
@@ -175,5 +175,49 @@ namespace myxml
     std::optional<std::shared_ptr<Text>> Element::AsText()
     {
         return std::nullopt;
+    }
+
+    std::string Element::ExportRaw() const
+    {
+
+        std::string builder = "<" + std::string(this->GetName());
+        for (const auto &[key, value] : this->attributes)
+        {
+            builder += "" + key + "=\"" + value + "\"";
+        }
+        if (this->firstChild == nullptr)
+        {
+            builder += " />";
+            return builder;
+        }
+        builder += ">";
+        for (auto node = this->firstChild; node != nullptr; node = node->next)
+        {
+            builder += node->ExportRaw();
+        }
+        builder += "</" + std::string(this->GetName()) + ">";
+        return builder;
+    }
+
+    std::string Element::ExportFormatted(int indentLevel, int indentSize) const
+    {
+        std::string indent(indentLevel * indentSize, ' ');
+        std::string builder = indent + "<" + std::string(this->GetName());
+        for (const auto &[key, value] : this->attributes)
+        {
+            builder += "" + key + "=\"" + value + "\"";
+        }
+        if (this->firstChild == nullptr)
+        {
+            builder += " />\n";
+            return builder;
+        }
+        builder += ">\n";
+        for (auto node = this->firstChild; node != nullptr; node = node->next)
+        {
+            builder += node->ExportFormatted(indentLevel + 1, indentSize);
+        }
+        builder += indent + "</" + std::string(this->GetName()) + ">\n";
+        return builder;
     }
 }
