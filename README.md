@@ -1,14 +1,14 @@
 # myxml
 
 >Extensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing arbitrary data. It defines a set of rules for encoding documents in a format that is both human-readable and machine-readable. The World Wide Web Consortium's XML 1.0 Specification of 1998 and several other related specifications—all of them free open standards—define XML.
-> 
+>
 > [Learn more about XML on Wikipedia](https://en.wikipedia.org/wiki/XML)
 
 **myxml** is a simple, stable, and user-friendly XML DOM parser designed to be easy to integrate and extend.
 
 ## Features
 
-The repo is still a work in progress and has not yet fully support XML features. Currently, it can parse xml element with attributes and PCDATA, including nested and multi-leveled elements. 
+The repo is still a work in progress and has not yet fully support XML features. Currently, it can parse xml element with attributes and PCDATA, including nested and multi-leveled elements.
 
 Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what we aims to accomplish next.
 
@@ -37,7 +37,7 @@ To compile the project, navigate to the project directory and run:
 ```bash
 cmake -S . -B build
 cmake --build build
-``` 
+```
 
 ### Running tests
 
