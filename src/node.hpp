@@ -15,6 +15,7 @@ namespace myxml
     {
         Text,
         Element,
+        Declaration,
     };
 
     class Node : public Exportable
