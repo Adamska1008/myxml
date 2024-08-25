@@ -21,7 +21,7 @@ namespace myxml
         Declaration,
     };
 
-    // Document, Element, Text, Declaration are Node.
+    // Element, Text are Node.
     class Node : public Exportable
     {
     public:
@@ -37,7 +37,7 @@ namespace myxml
         virtual std::optional<std::shared_ptr<Text>> AsText() = 0;
     };
 
-    // Doucment and Element are Composite Node.
+    // Element are Composite Node.
     class CompositeNode : public Node, public std::enable_shared_from_this<CompositeNode>
     {
     private:

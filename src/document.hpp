@@ -1,33 +1,37 @@
 #pragma once
+#include <map>
 #include "node.hpp"
 
+// Declaration and Documant are both NOT Node
 namespace myxml
 {
-    class Declaration : public Node
+    struct Declaration
     {
-    private:
         std::string version;
-        std::string encoding;
+        std::optional<std::string> encoding;
+        std::optional<std::string> standalone;
 
-    public:
-        /* Implement Node*/
-        virtual NodeType Type();
-        virtual bool isType(NodeType);
-        virtual std::optional<std::shared_ptr<Element>> AsElement();
-        virtual std::optional<std::shared_ptr<Text>> AsText();
-
-        /* Implement Exportable */
-        virtual std::string ExportRaw() const;
-        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
+        // return `std::nullopt` if declartion is in bad format
+        // TODO: use exception to distinguish each of bad format
+        static std::optional<Declaration> BuildFromAttrs(std::map<std::string, std::string> attrs);
     };
 
-    class Document : public Node
+    class Document
     {
     private:
         Declaration declaration;
         std::shared_ptr<Element> root;
 
     public:
-        
+        /* Manipulate */
+        void SetDeclaration(const Declaration &);
+        const Declaration &GetDeclartion() const;
     };
+
+    namespace util
+    {
+        bool isValidXmlVersion(std::string_view);
+        bool isValidXmlEncoding(std::string_view);
+        bool isValidXmlStandalone(std::string_view);
+    }
 }

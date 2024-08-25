@@ -1,9 +1,15 @@
 #pragma once
 #include "element.hpp"
+#include "document.hpp"
 
 namespace myxml
 {
+    // No effect currently. Just use it to mark what is a tag.
     struct Tag
+    {
+    };
+
+    struct ElementTag
     {
         enum class ClosingType
         {
@@ -13,8 +19,12 @@ namespace myxml
         };
 
         std::string name;
-        Tag::ClosingType type = ClosingType::Open;
+        ElementTag::ClosingType type = ClosingType::Open;
         std::map<std::string, std::string> attris;
+    };
+
+    struct ProcessingInstruction
+    {
     };
 
     class Parser
@@ -41,7 +51,7 @@ namespace myxml
         std::optional<std::shared_ptr<Text>> parseText();
         // return the entire element
         // will consume buffer if failed
-        std::optional<std::shared_ptr<Element>> parseElementWithHeader(Tag header);
+        std::optional<std::shared_ptr<Element>> parseElementWithHeader(ElementTag header);
 
     public:
         // return and consume current element
@@ -49,7 +59,9 @@ namespace myxml
         std::optional<std::shared_ptr<Element>> ParseElement();
         // return and consume current tag
         // will consume buffer if failed
-        std::optional<Tag> ParseTag();
+        std::optional<ElementTag> ParseTag();
+
+        std::optional<Document> ParseDocument();
         Parser() = delete;
         explicit Parser(std::string_view);
     };
