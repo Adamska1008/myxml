@@ -25,7 +25,13 @@ namespace myxml
     public:
         /* Manipulate */
         void SetDeclaration(const Declaration &);
+        void SetRoot(std::shared_ptr<Element> root);
+
+        /* Query */
         const Declaration &GetDeclartion() const;
+        Declaration &GetDeclartion();
+        const std::shared_ptr<Element> &GetRoot() const;
+        std::shared_ptr<Element> GetRoot();
     };
 
     namespace util

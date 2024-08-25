@@ -22,6 +22,18 @@ namespace myxml
         }
     }
 
+    std::optional<std::string_view> Parser::peekNextNChars(int n)
+    {
+        if (this->offset + n - 1 < this->buffer.length())
+        {
+            return this->buffer.substr(this->offset, n);
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+
     std::optional<char> Parser::nextChar()
     {
         if (auto peek = this->peekChar(); peek.has_value())
@@ -31,6 +43,13 @@ namespace myxml
         }
         else
             return std::nullopt;
+    }
+
+    std::optional<std::string_view> Parser::nextNChars(int n)
+    {
+        std::string_view nchars = this->buffer.substr(this->offset, this->offset + n);
+        this->offset += n;
+        return nchars;
     }
 
     std::optional<std::string> Parser::parseIdent()
@@ -174,6 +193,32 @@ namespace myxml
         return std::nullopt;
     }
 
+    std::optional<Declaration> Parser::parseDeclaration()
+    {
+        if (this->peekNextNChars(2) != "<?")
+        {
+            return std::nullopt;
+        }
+        this->nextNChars(2);
+        std::map<std::string, std::string> attrs;
+        while (auto attr = this->parseAttribute())
+        {
+            attrs.insert(*attr);
+        }
+        if (this->nextNChars(2) != "?>")
+        {
+            return std::nullopt;
+        }
+        if (auto decl = Declaration::BuildFromAttrs(attrs); decl)
+        {
+            return decl;
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+
     std::optional<std::shared_ptr<Element>> Parser::ParseElement()
     {
         this->skipWhiteSpaces();
@@ -241,7 +286,20 @@ namespace myxml
 
     std::optional<Document> Parser::ParseDocument()
     {
-        return std::optional<Document>();
+        Document document;
+        if (auto decl = this->parseDeclaration(); decl)
+        {
+            document.SetDeclaration(*decl);
+        }
+        if (auto root = this->ParseElement(); root)
+        {
+            document.SetRoot(*root);
+        }
+        else
+        {
+            return std::nullopt;
+        }
+        return document;
     }
 
     Parser::Parser(std::string_view buffer)

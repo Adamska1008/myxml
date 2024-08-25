@@ -8,9 +8,29 @@ namespace myxml
         this->declaration = declaration;
     }
 
+    void Document::SetRoot(std::shared_ptr<Element> root)
+    {
+        this->root = root;
+    }
+
     const Declaration &Document::GetDeclartion() const
     {
         return this->declaration;
+    }
+
+    Declaration &Document::GetDeclartion()
+    {
+        return this->declaration;
+    }
+
+    const std::shared_ptr<Element> &Document::GetRoot() const
+    {
+        return this->root;
+    }
+
+    std::shared_ptr<Element> Document::GetRoot()
+    {
+        return this->root;
     }
 
     std::optional<Declaration> Declaration::BuildFromAttrs(std::map<std::string, std::string> attrs)
