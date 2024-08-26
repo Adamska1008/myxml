@@ -1,5 +1,6 @@
 #include <set>
 #include "document.hpp"
+#include "parser.hpp"
 
 namespace myxml
 {
@@ -31,6 +32,11 @@ namespace myxml
     std::shared_ptr<Element> Document::GetRoot()
     {
         return this->root;
+    }
+
+    std::optional<Document> Document::Parse(std::string input)
+    {
+        return Parser(input).ParseDocument();
     }
 
     std::optional<Declaration> Declaration::BuildFromAttrs(std::map<std::string, std::string> attrs)
@@ -71,32 +77,12 @@ namespace myxml
 
         bool isValidXmlEncoding(std::string_view encoding)
         {
-            // Registered at iana.org
+            // FIXME: not cover all valid encoding
             static std::set<std::string, std::less<>> valid{
-                "US-ASCII",
-                "ISO-8859-1",
-                "ISO-8859-2",
-                "ISO-8859-3",
-                "ISO-8859-4",
-                "ISO-8859-5",
-                "ISO-8859-6",
-                "ISO-8859-7",
-                "ISO-8859-8",
-                "ISO-8859-9",
-                "ISO-8859-10",
-                "Shift_JIS",
-                "EUC-JP",
-                "ISO-2022-KR",
-                "EUC-KR",
-                "ISO-2022-JP",
-                "ISO-2022-JP-2",
-                "ISO-8859-6-E",
-                "ISO-8859-6-I",
-                "ISO-8859-8-E",
-                "ISO-8859-8-I",
-                "GB2312",
-                "Big5",
-                "KOI8-R",
+                "UTF-8",
+                "UTF-16",
+                "UTF-32",
+                "GBK",
             };
             return valid.count(encoding);
         }

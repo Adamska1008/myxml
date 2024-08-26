@@ -44,11 +44,11 @@ namespace myxml
         // return and not consume current character
         std::optional<char> peekChar();
         // return and not consume next n characters
-        std::optional<std::string_view> peekNextNChars(int);
+        std::optional<std::string> peekNextNChars(int);
         // return and consume current character
         std::optional<char> nextChar();
 
-        std::optional<std::string_view> nextNChars(int);
+        std::optional<std::string> nextNChars(int);
         // return and consume a ident
         // will not consume ident if failed
         std::optional<std::string> parseIdent();

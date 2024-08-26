@@ -22,7 +22,7 @@ namespace myxml
         }
     }
 
-    std::optional<std::string_view> Parser::peekNextNChars(int n)
+    std::optional<std::string> Parser::peekNextNChars(int n)
     {
         if (this->offset + n - 1 < this->buffer.length())
         {
@@ -45,9 +45,9 @@ namespace myxml
             return std::nullopt;
     }
 
-    std::optional<std::string_view> Parser::nextNChars(int n)
+    std::optional<std::string> Parser::nextNChars(int n)
     {
-        std::string_view nchars = this->buffer.substr(this->offset, this->offset + n);
+        auto nchars = this->buffer.substr(this->offset, n);
         this->offset += n;
         return nchars;
     }
@@ -195,16 +195,17 @@ namespace myxml
 
     std::optional<Declaration> Parser::parseDeclaration()
     {
-        if (this->peekNextNChars(2) != "<?")
+        if (this->peekNextNChars(5) != "<?xml")
         {
             return std::nullopt;
         }
-        this->nextNChars(2);
+        this->nextNChars(5);
         std::map<std::string, std::string> attrs;
         while (auto attr = this->parseAttribute())
         {
             attrs.insert(*attr);
         }
+        this->skipWhiteSpaces();
         if (this->nextNChars(2) != "?>")
         {
             return std::nullopt;

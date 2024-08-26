@@ -32,6 +32,8 @@ namespace myxml
         Declaration &GetDeclartion();
         const std::shared_ptr<Element> &GetRoot() const;
         std::shared_ptr<Element> GetRoot();
+
+        static std::optional<Document> Parse(std::string);
     };
 
     namespace util
