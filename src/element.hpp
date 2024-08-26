@@ -9,7 +9,7 @@
 
 namespace myxml
 {
-    class Element : public std::enable_shared_from_this<Element>, public Node
+    class Element : public CompositeNode // public std::enable_shared_from_this<Element>, public Node
     {
     public:
         enum class ClosingType
@@ -19,19 +19,13 @@ namespace myxml
         };
 
     private:
-        // list node
-        // std::shared_ptr<Element> parent;
-        // std::shared_ptr<Node> next;
-        // std::shared_ptr<Node> prev;
-
-        // element
-        std::shared_ptr<Node> firstChild;
-        std::shared_ptr<Node> lastChild;
+        // std::shared_ptr<Node> firstChild;
+        // std::shared_ptr<Node> lastChild;
         std::string name;
         std::map<std::string, std::string, std::less<>> attributes;
-        std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
+        // std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
 
-        // Initializer
+        /* Set nitializer as private to avoid using Element without share_ptr*/
         Element(std::string_view name);
         Element() = default;
 
@@ -43,16 +37,10 @@ namespace myxml
         static std::shared_ptr<Element> Parse(std::string_view buf);
 
         /* Query */
-        std::shared_ptr<Node> FirstChild();
-        std::shared_ptr<Node> LastChild();
-        std::shared_ptr<Element> Elem(std::string_view name);
         std::optional<std::string_view> GetAttribute(std::string_view name);
         std::string_view GetName() const;
 
         /* Manipulate */
-        std::shared_ptr<Node> InsertAtFront(const std::shared_ptr<Node> &);
-        std::shared_ptr<Node> InsertAtEnd(const std::shared_ptr<Node> &);
-        void Unlink(const std::shared_ptr<Node> &);
         void SetName(std::string_view);
         void SetAttribute(std::string key, std::string value);
         void ExtendAttributes(std::map<std::string, std::string>);

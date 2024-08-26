@@ -7,17 +7,17 @@ TEST_CASE("Parsing tag", "parser")
     std::string open = "<tag>";
     auto tag = myxml::Parser(open).ParseTag().value();
     REQUIRE(tag.name == "tag");
-    REQUIRE(tag.type == myxml::Tag::ClosingType::Open);
+    REQUIRE(tag.type == myxml::ElementTag::ClosingType::Open);
 
     std::string closed = "<tag/>";
     tag = myxml::Parser(closed).ParseTag().value();
     REQUIRE(tag.name == "tag");
-    REQUIRE(tag.type == myxml::Tag::ClosingType::Closed);
+    REQUIRE(tag.type == myxml::ElementTag::ClosingType::Closed);
 
     std::string closing = "</tag>";
     tag = myxml::Parser(closing).ParseTag().value();
     REQUIRE(tag.name == "tag");
-    REQUIRE(tag.type == myxml::Tag::ClosingType::Closing);
+    REQUIRE(tag.type == myxml::ElementTag::ClosingType::Closing);
 }
 
 TEST_CASE("Parsing simple xml elements", "[parser]")

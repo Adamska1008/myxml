@@ -1,9 +1,15 @@
 #pragma once
 #include "element.hpp"
+#include "document.hpp"
 
 namespace myxml
 {
+    // No effect currently. Just use it to mark what is a tag.
     struct Tag
+    {
+    };
+
+    struct ElementTag
     {
         enum class ClosingType
         {
@@ -13,8 +19,12 @@ namespace myxml
         };
 
         std::string name;
-        Tag::ClosingType type = ClosingType::Open;
+        ElementTag::ClosingType type = ClosingType::Open;
         std::map<std::string, std::string> attris;
+    };
+
+    struct ProcessingInstruction
+    {
     };
 
     class Parser
@@ -23,11 +33,22 @@ namespace myxml
         std::string buffer;
         std::size_t offset;
 
+        /**
+         * TODO:
+         * Define Exceptions , so for all parsing method,
+         * return std::nullopt means `not this one`,
+         * and throw exception means `parsing error`
+         */
+
         void skipWhiteSpaces();
         // return and not consume current character
         std::optional<char> peekChar();
+        // return and not consume next n characters
+        std::optional<std::string> peekNextNChars(int);
         // return and consume current character
         std::optional<char> nextChar();
+
+        std::optional<std::string> nextNChars(int);
         // return and consume a ident
         // will not consume ident if failed
         std::optional<std::string> parseIdent();
@@ -41,7 +62,10 @@ namespace myxml
         std::optional<std::shared_ptr<Text>> parseText();
         // return the entire element
         // will consume buffer if failed
-        std::optional<std::shared_ptr<Element>> parseElementWithHeader(Tag header);
+        std::optional<std::shared_ptr<Element>> parseElementWithHeader(ElementTag header);
+        // return the declartion
+        // will not consume buffer if failed
+        std::optional<Declaration> parseDeclaration();
 
     public:
         // return and consume current element
@@ -49,7 +73,10 @@ namespace myxml
         std::optional<std::shared_ptr<Element>> ParseElement();
         // return and consume current tag
         // will consume buffer if failed
-        std::optional<Tag> ParseTag();
+        std::optional<ElementTag> ParseTag();
+        // return and consume whole document
+        // will consume buffer if failed
+        std::optional<Document> ParseDocument();
         Parser() = delete;
         explicit Parser(std::string_view);
     };

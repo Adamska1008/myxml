@@ -22,6 +22,18 @@ namespace myxml
         }
     }
 
+    std::optional<std::string> Parser::peekNextNChars(int n)
+    {
+        if (this->offset + n - 1 < this->buffer.length())
+        {
+            return this->buffer.substr(this->offset, n);
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+
     std::optional<char> Parser::nextChar()
     {
         if (auto peek = this->peekChar(); peek.has_value())
@@ -31,6 +43,13 @@ namespace myxml
         }
         else
             return std::nullopt;
+    }
+
+    std::optional<std::string> Parser::nextNChars(int n)
+    {
+        auto nchars = this->buffer.substr(this->offset, n);
+        this->offset += n;
+        return nchars;
     }
 
     std::optional<std::string> Parser::parseIdent()
@@ -110,7 +129,7 @@ namespace myxml
         return std::shared_ptr<Text>(new Text(this->buffer.substr(begin, len)));
     }
 
-    std::optional<std::shared_ptr<Element>> Parser::parseElementWithHeader(Tag header)
+    std::optional<std::shared_ptr<Element>> Parser::parseElementWithHeader(ElementTag header)
     {
         auto elem = Element::New();
         elem->SetName(header.name);
@@ -123,7 +142,7 @@ namespace myxml
                 auto tag = this->ParseTag();
                 switch (tag->type)
                 {
-                case Tag::ClosingType::Open:
+                case ElementTag::ClosingType::Open:
                     if (auto child = this->parseElementWithHeader(*tag); child)
                     {
                         elem->InsertAtEnd(*child);
@@ -133,7 +152,7 @@ namespace myxml
                         return std::nullopt;
                     }
                     break;
-                case Tag::ClosingType::Closed:
+                case ElementTag::ClosingType::Closed:
                 {
                     auto child = Element::New();
                     child->SetName(tag->name);
@@ -144,7 +163,7 @@ namespace myxml
                     elem->InsertAtEnd(child);
                     break;
                 }
-                case Tag::ClosingType::Closing:
+                case ElementTag::ClosingType::Closing:
                     if (tag->name != elem->GetName())
                     {
                         return std::nullopt;
@@ -174,12 +193,39 @@ namespace myxml
         return std::nullopt;
     }
 
+    std::optional<Declaration> Parser::parseDeclaration()
+    {
+        if (this->peekNextNChars(5) != "<?xml")
+        {
+            return std::nullopt;
+        }
+        this->nextNChars(5);
+        std::map<std::string, std::string> attrs;
+        while (auto attr = this->parseAttribute())
+        {
+            attrs.insert(*attr);
+        }
+        this->skipWhiteSpaces();
+        if (this->nextNChars(2) != "?>")
+        {
+            return std::nullopt;
+        }
+        if (auto decl = Declaration::BuildFromAttrs(attrs); decl)
+        {
+            return decl;
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+
     std::optional<std::shared_ptr<Element>> Parser::ParseElement()
     {
         this->skipWhiteSpaces();
         if (auto tag = this->ParseTag(); tag)
         {
-            if (tag->type == Tag::ClosingType::Closed)
+            if (tag->type == ElementTag::ClosingType::Closed)
             {
                 auto elem = Element::New();
                 elem->SetName(tag->name);
@@ -189,7 +235,7 @@ namespace myxml
                 }
                 return elem;
             }
-            else if (tag->type == Tag::ClosingType::Open)
+            else if (tag->type == ElementTag::ClosingType::Open)
             {
                 return this->parseElementWithHeader(*tag);
             }
@@ -197,16 +243,16 @@ namespace myxml
         return std::nullopt;
     }
 
-    std::optional<Tag> Parser::ParseTag()
+    std::optional<ElementTag> Parser::ParseTag()
     {
         if (this->nextChar() != '<')
         {
             return std::nullopt;
         }
-        Tag tag;
+        ElementTag tag;
         if (this->peekChar() == '/')
         {
-            tag.type = Tag::ClosingType::Closing;
+            tag.type = ElementTag::ClosingType::Closing;
             this->nextChar();
         }
         this->skipWhiteSpaces();
@@ -225,11 +271,11 @@ namespace myxml
         }
         if (this->peekChar() == '/')
         {
-            if (tag.type != Tag::ClosingType::Open)
+            if (tag.type != ElementTag::ClosingType::Open)
             {
                 return std::nullopt;
             }
-            tag.type = Tag::ClosingType::Closed;
+            tag.type = ElementTag::ClosingType::Closed;
             this->nextChar();
         }
         if (this->nextChar() != '>')
@@ -237,6 +283,24 @@ namespace myxml
             return std::nullopt;
         }
         return tag;
+    }
+
+    std::optional<Document> Parser::ParseDocument()
+    {
+        Document document;
+        if (auto decl = this->parseDeclaration(); decl)
+        {
+            document.SetDeclaration(*decl);
+        }
+        if (auto root = this->ParseElement(); root)
+        {
+            document.SetRoot(*root);
+        }
+        else
+        {
+            return std::nullopt;
+        }
+        return document;
     }
 
     Parser::Parser(std::string_view buffer)
