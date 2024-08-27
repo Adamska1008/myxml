@@ -48,34 +48,43 @@ namespace myxml
 
         /**
          * Parse an identity.
-         * @return if find no identity, return `std::nullptr`
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError` if an invalid character occurs.
          */
-        std::optional<std::string> parseIdent();
-        // return and consume a string `"..."`
-        // will not consume string if failed
-        std::optional<std::string> parseStringLiteral();
-        // return and consume an attribute `key="value"`
+        std::string parseIdent();
+        /**
+         * Parse a string literal
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError` if missing any of `"`
+         */
+        std::string parseStringLiteral();
+        /**
+         * @returns std::nullopt if find no attribute 
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError` if the following chars do not confront to `key="value"` format
+         */
         std::optional<std::pair<std::string, std::string>> parseAttribute();
-        // return and consume pcdata
-        // will not consume pcdate if failed
-        std::optional<std::shared_ptr<Text>> parseText();
+        std::shared_ptr<Text> parseText();
         // return the entire element
         // will consume buffer if failed
-        std::optional<std::shared_ptr<Element>> parseElementWithHeader(ElementTag header);
-        // return the declartion
-        // will not consume buffer if failed
+        std::shared_ptr<Element> parseElementWithHeader(ElementTag header);
+        /**
+         * @returns std::nullopt if not starts with `<?xml`
+         * @throws `SyntaxError`
+         * @throws `SemanticError`
+         */
         std::optional<Declaration> parseDeclaration();
 
     public:
         // return and consume current element
         // will consume buffer if failed
         std::optional<std::shared_ptr<Element>> ParseElement();
-        // return and consume current tag
-        // will consume buffer if failed
+        /**
+         * @returns std::nullopt if no heading `<`
+         * @throws `SyntaxError` if the heading character is `<` and the trailing characters are in incorrect format 
+         */
         std::optional<ElementTag> ParseTag();
-        // return and consume whole document
-        // will consume buffer if failed
-        std::optional<Document> ParseDocument();
+        Document ParseDocument();
         Parser() = delete;
         explicit Parser(std::string_view);
     };

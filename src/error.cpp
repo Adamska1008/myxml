@@ -9,7 +9,13 @@ namespace myxml
 
     const char *ParseError::what() const noexcept
     {
-        return this->message.c_str();
+        this->fullMessage = this->prefix() + this->message;
+        return this->fullMessage.c_str();
+    }
+
+    const char *SyntaxError::prefix() const
+    {
+        return "Syntax Error: ";
     }
 
     SyntaxError::SyntaxError(std::string message)
@@ -17,20 +23,23 @@ namespace myxml
     {
     }
 
-    const char *SyntaxError::what() const noexcept
+    const char *SemanticError::prefix() const
     {
-        this->fullMessage = "SyntaxError: " + std::string(ParseError::what());
-        return this->fullMessage.c_str();
+        return "Sematic Error: ";
+    }
+
+    SemanticError::SemanticError(std::string message)
+        : ParseError(message)
+    {
+    }
+
+    const char *UnexpectedEndOfInput::prefix() const
+    {
+        return "Unexpected End of Input: ";
     }
 
     UnexpectedEndOfInput::UnexpectedEndOfInput()
         : ParseError("End of input")
     {
-    }
-
-    const char *UnexpectedEndOfInput::what() const noexcept
-    {
-        this->fullMessage = "UnexpectedEndOfInput: " + std::string(ParseError::what());
-        return this->fullMessage.c_str();
     }
 }

@@ -5,8 +5,13 @@ namespace myxml
 {
     class ParseError : public std::exception
     {
+    private:
+        virtual const char *prefix() const = 0;
+
     protected:
         std::string message;
+        // store message after being concated with prefix
+        mutable std::string fullMessage;
 
     public:
         ParseError(std::string message);
@@ -23,13 +28,22 @@ namespace myxml
     class SyntaxError : public ParseError
     {
     private:
-        // store message after being concated
-        mutable std::string fullMessage;
+        virtual const char *prefix() const;
 
     public:
         SyntaxError(std::string);
+    };
 
-        virtual const char *what() const noexcept override;
+    /**
+     *
+     */
+    class SemanticError : public ParseError
+    {
+    private:
+        virtual const char *prefix() const;
+
+    public:
+        SemanticError(std::string);
     };
 
     /**
@@ -38,12 +52,9 @@ namespace myxml
     class UnexpectedEndOfInput : public ParseError
     {
     private:
-        // store message after being concated
-        mutable std::string fullMessage;
+        virtual const char *prefix() const;
 
     public:
         UnexpectedEndOfInput();
-
-        virtual const char *what() const noexcept override;
     };
 }
