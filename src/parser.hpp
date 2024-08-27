@@ -41,16 +41,15 @@ namespace myxml
          */
 
         void skipWhiteSpaces();
-        // return and not consume current character
         std::optional<char> peekChar();
-        // return and not consume next n characters
         std::optional<std::string> peekNextNChars(int);
-        // return and consume current character
         std::optional<char> nextChar();
-
         std::optional<std::string> nextNChars(int);
-        // return and consume a ident
-        // will not consume ident if failed
+
+        /**
+         * Parse an identity.
+         * @return if find no identity, return `std::nullptr`
+         */
         std::optional<std::string> parseIdent();
         // return and consume a string `"..."`
         // will not consume string if failed

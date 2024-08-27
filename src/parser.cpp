@@ -1,4 +1,6 @@
+#include <fmt/core.h>
 #include "parser.hpp"
+#include "error.hpp"
 
 namespace myxml
 {
@@ -55,12 +57,12 @@ namespace myxml
     std::optional<std::string> Parser::parseIdent()
     {
         if (this->peekChar() == std::nullopt)
-            return std::nullopt;
+            throw UnexpectedEndOfInput();
         std::size_t begin = this->offset;
         // validate heading character
         if (auto head = this->peekChar(); !head || (!std::isalpha(*head) && head != '_'))
         {
-            return std::nullopt;
+            throw SyntaxError(fmt::format("element name which starts with {} is invalid.", *head));
         }
         std::size_t len = 0;
         while (begin + len < this->buffer.length() &&
