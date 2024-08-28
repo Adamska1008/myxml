@@ -58,7 +58,7 @@ namespace myxml
         return NodeType::Element;
     }
 
-    bool Element::isType(NodeType type)
+    bool Element::IsType(NodeType type)
     {
         return type == NodeType::Element;
     }

@@ -47,7 +47,7 @@ namespace myxml
 
         /* Implement Node */
         virtual NodeType Type() override;
-        virtual bool isType(NodeType) override;
+        virtual bool IsType(NodeType) override;
         virtual std::optional<std::shared_ptr<Element>> AsElement() override;
         virtual std::optional<std::shared_ptr<Text>> AsText() override;
 

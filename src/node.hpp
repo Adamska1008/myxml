@@ -32,7 +32,7 @@ namespace myxml
         std::shared_ptr<Node> next;
 
         virtual NodeType Type() = 0;
-        virtual bool isType(NodeType) = 0;
+        virtual bool IsType(NodeType) = 0;
         virtual std::optional<std::shared_ptr<Element>> AsElement() = 0;
         virtual std::optional<std::shared_ptr<Text>> AsText() = 0;
     };

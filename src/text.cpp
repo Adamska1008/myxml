@@ -8,7 +8,7 @@ namespace myxml
         return NodeType::Text;
     }
 
-    bool Text::isType(NodeType type)
+    bool Text::IsType(NodeType type)
     {
         return type == NodeType::Text;
     }
@@ -25,6 +25,7 @@ namespace myxml
     }
 
     Text::Text(std::string_view input)
+        : encodeOnExport(true)
     {
         // entity encoding
         static std::map<std::string, char, std::less<>> entityMap = {
@@ -56,9 +57,14 @@ namespace myxml
         this->inner += input.substr(start, len - start); // append the remaining
     }
 
-    bool Text::isAllSpace() const
+    bool Text::IsAllSpace() const
     {
         return std::all_of(this->inner.begin(), this->inner.end(), isspace);
+    }
+
+    void Text::SetEntityEncoding(bool flag)
+    {
+        this->encodeOnExport = flag;
     }
 
     std::string Text::ExportRaw() const

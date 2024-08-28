@@ -5,7 +5,7 @@
 // Declaration and Documant are both NOT Node
 namespace myxml
 {
-    struct Declaration
+    struct Declaration : public Exportable
     {
         std::string version;
         std::optional<std::string> encoding;
@@ -14,9 +14,13 @@ namespace myxml
         // return `std::nullopt` if declartion is in bad format
         // TODO: use exception to distinguish each of bad format
         static std::optional<Declaration> BuildFromAttrs(std::map<std::string, std::string> attrs);
+
+        /* Exportable */
+        virtual std::string ExportRaw() const;
+        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
     };
 
-    class Document
+    class Document : public Exportable
     {
     private:
         Declaration declaration;
@@ -34,6 +38,10 @@ namespace myxml
         std::shared_ptr<Element> GetRoot();
 
         static std::optional<Document> Parse(std::string);
+
+        /* Exportable */
+        virtual std::string ExportRaw() const;
+        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
     };
 
     namespace util
