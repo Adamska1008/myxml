@@ -83,7 +83,7 @@ namespace myxml
         }
         if (this->peekChar() != '"')
         {
-            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", this->peekChar()));
+            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peekChar()));
         }
         std::size_t cur = this->offset; // this->offset points to `"`
         while (cur + 1 < this->buffer.length() && this->buffer[cur + 1] != '"')
@@ -257,6 +257,10 @@ namespace myxml
             else if (tag->type == ElementTag::ClosingType::Open)
             {
                 return this->parseElementWithHeader(*tag);
+            }
+            else // Closing </tag>
+            {
+                throw SyntaxError(fmt::format("unexpected closing tag"));
             }
         }
         else
