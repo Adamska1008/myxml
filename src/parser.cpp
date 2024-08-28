@@ -103,14 +103,10 @@ namespace myxml
     {
         this->skipWhiteSpaces();
         std::pair<std::string, std::string> attr;
+        std::string key;
         try
         {
-            auto key = this->parseIdent();
-            if (this->nextChar() != '=')
-            {
-                throw SyntaxError(fmt::format("expected '=' after attribute name"));
-            }
-            attr.first = key;
+            key = this->parseIdent();
         }
         catch (SyntaxError e)
         { // Only SyntaxError in parseIdent is incorrect heading character
@@ -120,6 +116,11 @@ namespace myxml
         { // There must be `>` or else after all attributes
             throw e;
         }
+        if (this->nextChar() != '=')
+        {
+            throw SyntaxError(fmt::format("expected '=' after attribute name"));
+        }
+        attr.first = key;
         auto value = this->parseStringLiteral();
         attr.second = value;
         return attr;
