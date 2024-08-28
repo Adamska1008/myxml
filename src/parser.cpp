@@ -1,4 +1,7 @@
+#include <cassert>
+#include <fmt/core.h>
 #include "parser.hpp"
+#include "error.hpp"
 
 namespace myxml
 {
@@ -52,15 +55,15 @@ namespace myxml
         return nchars;
     }
 
-    std::optional<std::string> Parser::parseIdent()
+    std::string Parser::parseIdent()
     {
         if (this->peekChar() == std::nullopt)
-            return std::nullopt;
+            throw UnexpectedEndOfInput();
         std::size_t begin = this->offset;
         // validate heading character
         if (auto head = this->peekChar(); !head || (!std::isalpha(*head) && head != '_'))
         {
-            return std::nullopt;
+            throw SyntaxError(fmt::format("element name which starts with {} is invalid.", *head));
         }
         std::size_t len = 0;
         while (begin + len < this->buffer.length() &&
@@ -72,11 +75,15 @@ namespace myxml
         return this->buffer.substr(begin, len);
     }
 
-    std::optional<std::string> Parser::parseStringLiteral()
+    std::string Parser::parseStringLiteral()
     {
+        if (!this->peekChar())
+        {
+            throw UnexpectedEndOfInput();
+        }
         if (this->peekChar() != '"')
         {
-            return std::nullopt;
+            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peekChar()));
         }
         std::size_t cur = this->offset; // this->offset points to `"`
         while (cur + 1 < this->buffer.length() && this->buffer[cur + 1] != '"')
@@ -85,7 +92,7 @@ namespace myxml
         }
         if (cur + 1 >= this->buffer.length())
         { // if jump out due to length limit
-            return std::nullopt;
+            throw SyntaxError(fmt::format("missing closing double quote for string literal"));
         }
         auto literal = this->buffer.substr(this->offset + 1, cur - this->offset);
         this->offset = cur + 2; // cur + 1 -> `"`
@@ -95,24 +102,35 @@ namespace myxml
     std::optional<std::pair<std::string, std::string>> Parser::parseAttribute()
     {
         this->skipWhiteSpaces();
-        std::pair<std::string, std::string> attri;
-        if (auto key = this->parseIdent(); key && this->nextChar() == '=')
+        std::pair<std::string, std::string> attr;
+        std::string key;
+        try
         {
-            attri.first = *key;
-            if (auto value = this->parseStringLiteral(); value)
-            {
-                attri.second = *value;
-                return attri;
-            }
+            key = this->parseIdent();
         }
-        return std::nullopt;
+        catch (SyntaxError e)
+        { // Only SyntaxError in parseIdent is incorrect heading character
+            return std::nullopt;
+        }
+        catch (UnexpectedEndOfInput e)
+        { // There must be `>` or else after all attributes
+            throw e;
+        }
+        if (this->nextChar() != '=')
+        {
+            throw SyntaxError(fmt::format("expected '=' after attribute name"));
+        }
+        attr.first = key;
+        auto value = this->parseStringLiteral();
+        attr.second = value;
+        return attr;
     }
 
-    std::optional<std::shared_ptr<Text>> Parser::parseText()
+    std::shared_ptr<Text> Parser::parseText()
     {
         if (!this->peekChar())
         {
-            return std::nullopt;
+            throw UnexpectedEndOfInput();
         }
         std::size_t begin = this->offset;
         std::size_t len = 0;
@@ -123,13 +141,50 @@ namespace myxml
         }
         if (this->buffer[begin + len] != '<')
         { // if jump out of while loop due to length limit
-            return std::nullopt;
+            throw SyntaxError(fmt::format("expected '<' after text"));
         }
         this->offset += len;
         return std::shared_ptr<Text>(new Text(this->buffer.substr(begin, len)));
     }
 
-    std::optional<std::shared_ptr<Element>> Parser::parseElementWithHeader(ElementTag header)
+    std::optional<ElementTag> Parser::ParseTag()
+    {
+        if (this->nextChar() != '<')
+        {
+            return std::nullopt;
+        }
+        ElementTag tag;
+        if (this->peekChar() == '/')
+        {
+            tag.type = ElementTag::ClosingType::Closing;
+            this->nextChar();
+        }
+        this->skipWhiteSpaces();
+        auto name = this->parseIdent();
+        tag.name = name;
+        this->skipWhiteSpaces();
+        while (auto attr = this->parseAttribute())
+        {
+            tag.attris.insert(*attr);
+        }
+        this->skipWhiteSpaces();
+        if (this->peekChar() == '/')
+        {
+            if (tag.type != ElementTag::ClosingType::Open)
+            {
+                throw SyntaxError(fmt::format("unexpected ending '/' found in closing tag"));
+            }
+            tag.type = ElementTag::ClosingType::Closed;
+            this->nextChar();
+        }
+        if (this->nextChar() != '>')
+        {
+            throw SyntaxError(fmt::format("expected '>' at the end of the tag"));
+        }
+        return tag;
+    }
+
+    std::shared_ptr<Element> Parser::parseElementWithHeader(ElementTag header)
     {
         auto elem = Element::New();
         elem->SetName(header.name);
@@ -139,19 +194,16 @@ namespace myxml
             {
             case '<':
             {
-                auto tag = this->ParseTag();
+                auto tag = this->ParseTag(); // impossible to be std::nullopt
+                assert(tag);
                 switch (tag->type)
                 {
                 case ElementTag::ClosingType::Open:
-                    if (auto child = this->parseElementWithHeader(*tag); child)
-                    {
-                        elem->InsertAtEnd(*child);
-                    }
-                    else
-                    {
-                        return std::nullopt;
-                    }
+                {
+                    auto child = this->parseElementWithHeader(*tag);
+                    elem->InsertAtEnd(child);
                     break;
+                }
                 case ElementTag::ClosingType::Closed:
                 {
                     auto child = Element::New();
@@ -166,7 +218,7 @@ namespace myxml
                 case ElementTag::ClosingType::Closing:
                     if (tag->name != elem->GetName())
                     {
-                        return std::nullopt;
+                        throw SyntaxError(fmt::format(""));
                     }
                     if (!header.attris.empty())
                     {
@@ -174,50 +226,17 @@ namespace myxml
                     }
                     return elem;
                 default:
-                    return std::nullopt;
+                    assert(false && "Invalid ElementTag Type");
                 }
                 break;
             }
             default:
-                if (auto text = this->parseText(); text)
-                {
-                    elem->InsertAtEnd(*text);
-                }
-                else
-                {
-                    return std::nullopt;
-                }
+                auto text = this->parseText();
+                elem->InsertAtEnd(text);
                 break;
             }
         }
-        return std::nullopt;
-    }
-
-    std::optional<Declaration> Parser::parseDeclaration()
-    {
-        if (this->peekNextNChars(5) != "<?xml")
-        {
-            return std::nullopt;
-        }
-        this->nextNChars(5);
-        std::map<std::string, std::string> attrs;
-        while (auto attr = this->parseAttribute())
-        {
-            attrs.insert(*attr);
-        }
-        this->skipWhiteSpaces();
-        if (this->nextNChars(2) != "?>")
-        {
-            return std::nullopt;
-        }
-        if (auto decl = Declaration::BuildFromAttrs(attrs); decl)
-        {
-            return decl;
-        }
-        else
-        {
-            return std::nullopt;
-        }
+        throw UnexpectedEndOfInput();
     }
 
     std::optional<std::shared_ptr<Element>> Parser::ParseElement()
@@ -239,53 +258,45 @@ namespace myxml
             {
                 return this->parseElementWithHeader(*tag);
             }
-        }
-        return std::nullopt;
-    }
-
-    std::optional<ElementTag> Parser::ParseTag()
-    {
-        if (this->nextChar() != '<')
-        {
-            return std::nullopt;
-        }
-        ElementTag tag;
-        if (this->peekChar() == '/')
-        {
-            tag.type = ElementTag::ClosingType::Closing;
-            this->nextChar();
-        }
-        this->skipWhiteSpaces();
-        if (auto name = this->parseIdent(); name)
-        {
-            tag.name = *name;
+            else // Closing </tag>
+            {
+                throw SyntaxError(fmt::format("unexpected closing tag"));
+            }
         }
         else
         {
             return std::nullopt;
         }
-        this->skipWhiteSpaces();
-        while (auto attri = this->parseAttribute())
-        {
-            tag.attris.insert(*attri);
-        }
-        if (this->peekChar() == '/')
-        {
-            if (tag.type != ElementTag::ClosingType::Open)
-            {
-                return std::nullopt;
-            }
-            tag.type = ElementTag::ClosingType::Closed;
-            this->nextChar();
-        }
-        if (this->nextChar() != '>')
+    }
+
+    std::optional<Declaration> Parser::parseDeclaration()
+    {
+        if (this->peekNextNChars(5) != "<?xml")
         {
             return std::nullopt;
         }
-        return tag;
+        this->nextNChars(5);
+        std::map<std::string, std::string> attrs;
+        while (auto attr = this->parseAttribute())
+        {
+            attrs.insert(*attr);
+        }
+        this->skipWhiteSpaces();
+        if (this->nextNChars(2) != "?>")
+        {
+            throw SyntaxError(fmt::format("expected \"?>\" at end of xml declaration"));
+        }
+        if (auto decl = Declaration::BuildFromAttrs(attrs); decl)
+        {
+            return decl;
+        }
+        else
+        {
+            throw SemanticError(fmt::format("declaration has incorrect attributes"));
+        }
     }
 
-    std::optional<Document> Parser::ParseDocument()
+    Document Parser::ParseDocument()
     {
         Document document;
         if (auto decl = this->parseDeclaration(); decl)
@@ -298,7 +309,7 @@ namespace myxml
         }
         else
         {
-            return std::nullopt;
+            throw SemanticError(fmt::format("missing root element in xml document"));
         }
         return document;
     }

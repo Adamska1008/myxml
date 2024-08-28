@@ -33,50 +33,65 @@ namespace myxml
         std::string buffer;
         std::size_t offset;
 
+        void skipWhiteSpaces();
+        std::optional<char> peekChar();
+        std::optional<std::string> peekNextNChars(int);
+        std::optional<char> nextChar();
+        std::optional<std::string> nextNChars(int);
+
         /**
-         * TODO:
-         * Define Exceptions , so for all parsing method,
-         * return std::nullopt means `not this one`,
-         * and throw exception means `parsing error`
+         * For all parsing method,
+         * return std::nullopt means `not this one` and will not consume buffer.
+         * Throw exception means `parsing error` and should stop immediately
          */
 
-        void skipWhiteSpaces();
-        // return and not consume current character
-        std::optional<char> peekChar();
-        // return and not consume next n characters
-        std::optional<std::string> peekNextNChars(int);
-        // return and consume current character
-        std::optional<char> nextChar();
-
-        std::optional<std::string> nextNChars(int);
-        // return and consume a ident
-        // will not consume ident if failed
-        std::optional<std::string> parseIdent();
-        // return and consume a string `"..."`
-        // will not consume string if failed
-        std::optional<std::string> parseStringLiteral();
-        // return and consume an attribute `key="value"`
+        /**
+         * Parse an identity.
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError` if an invalid character occurs.
+         */
+        std::string parseIdent();
+        /**
+         * Parse a string literal
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError` if missing any of `"`
+         */
+        std::string parseStringLiteral();
+        /**
+         * @returns std::nullopt if find no attribute
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError` if the following chars do not confront to `key="value"` format
+         */
         std::optional<std::pair<std::string, std::string>> parseAttribute();
-        // return and consume pcdata
-        // will not consume pcdate if failed
-        std::optional<std::shared_ptr<Text>> parseText();
-        // return the entire element
-        // will consume buffer if failed
-        std::optional<std::shared_ptr<Element>> parseElementWithHeader(ElementTag header);
-        // return the declartion
-        // will not consume buffer if failed
+        std::shared_ptr<Text> parseText();
+        /**
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError`
+         * @throws `SemanticError`
+         */
+        std::shared_ptr<Element> parseElementWithHeader(ElementTag header);
+        /**
+         * @returns std::nullopt if not starts with `<?xml`
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError`
+         * @throws `SemanticError`
+         */
         std::optional<Declaration> parseDeclaration();
 
     public:
-        // return and consume current element
-        // will consume buffer if failed
         std::optional<std::shared_ptr<Element>> ParseElement();
-        // return and consume current tag
-        // will consume buffer if failed
+        /**
+         * @returns std::nullopt if no heading `<`
+         * @throws `SyntaxError` if the heading character is `<` and the trailing characters are in incorrect format
+         * @throws `UnexpectedEndOfInput` if missing name
+         */
         std::optional<ElementTag> ParseTag();
-        // return and consume whole document
-        // will consume buffer if failed
-        std::optional<Document> ParseDocument();
+        /**
+         * @throws `UnexpectedEndOfInput`
+         * @throws `SyntaxError`
+         * @throws `SemanticError`
+         */
+        Document ParseDocument();
         Parser() = delete;
         explicit Parser(std::string_view);
     };
