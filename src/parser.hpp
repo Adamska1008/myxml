@@ -23,10 +23,6 @@ namespace myxml
         std::map<std::string, std::string> attris;
     };
 
-    struct ProcessingInstruction
-    {
-    };
-
     class Parser
     {
     private:
