@@ -47,12 +47,13 @@ namespace myxml
 
         /* Implement Node */
         virtual NodeType Type() override;
-        virtual bool isType(NodeType) override;
+        virtual bool IsType(NodeType) override;
         virtual std::optional<std::shared_ptr<Element>> AsElement() override;
         virtual std::optional<std::shared_ptr<Text>> AsText() override;
 
         /* Implement Exportable */
         virtual std::string ExportRaw() const override;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
+        virtual void SetEntityEncoding(bool) override;
     };
 }

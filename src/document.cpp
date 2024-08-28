@@ -1,4 +1,5 @@
 #include <set>
+#include <fmt/core.h>
 #include "document.hpp"
 #include "parser.hpp"
 
@@ -39,6 +40,21 @@ namespace myxml
         return Parser(input).ParseDocument();
     }
 
+    std::string Document::ExportRaw() const
+    {
+        return this->declaration.ExportRaw() + this->root->ExportRaw();
+    }
+
+    std::string Document::ExportFormatted(int indentLevel, int indentSize) const
+    {
+        return this->declaration.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
+    }
+
+    void Document::SetEntityEncoding(bool flag)
+    {
+        this->root->SetEntityEncoding(flag);
+    }
+
     std::optional<Declaration> Declaration::BuildFromAttrs(std::map<std::string, std::string> attrs)
     {
         if (!attrs.count("version") || !util::isValidXmlVersion(attrs["version"]))
@@ -66,6 +82,29 @@ namespace myxml
             declaration.standalone = standalone;
         }
         return declaration;
+    }
+
+    std::string Declaration::ExportRaw() const
+    {
+        std::string builder = fmt::format("<?xml version={}", this->version);
+        if (this->encoding)
+        {
+            builder += " encoding=" + (*this->encoding);
+        }
+        if (this->standalone)
+        {
+            builder += " standalone=" + (*this->standalone);
+        }
+        return builder + "?>\n";
+    }
+
+    std::string Declaration::ExportFormatted(int indentLevel, int indentSize) const
+    {
+        return std::string(' ', indentLevel * indentSize) + this->ExportRaw();
+    }
+
+    void Declaration::SetEntityEncoding(bool flag)
+    {
     }
 
     namespace util

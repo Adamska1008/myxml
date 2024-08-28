@@ -58,7 +58,7 @@ namespace myxml
         return NodeType::Element;
     }
 
-    bool Element::isType(NodeType type)
+    bool Element::IsType(NodeType type)
     {
         return type == NodeType::Element;
     }
@@ -115,5 +115,13 @@ namespace myxml
         }
         builder += indent + "</" + std::string(this->GetName()) + ">\n";
         return builder;
+    }
+
+    void Element::SetEntityEncoding(bool flag)
+    {
+        for (auto it = this->FirstChild(); it != nullptr; it = it->next)
+        {
+            it->SetEntityEncoding(flag);
+        }
     }
 }

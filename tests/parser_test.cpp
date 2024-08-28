@@ -185,4 +185,19 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         // 检查子元素的文本内容
         REQUIRE(child->FirstChild()->AsText().value()->ExportRaw() == "Text");
     }
+
+    SECTION("Decoding entity")
+    {
+        std::string root = R"(<root>
+    &lt;&gt;
+</root>)";
+        auto elem = myxml::Element::Parse(root);
+
+        elem->SetEntityEncoding(false);
+        REQUIRE(elem->GetName() == "root");
+        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    <>\n");
+
+        elem->SetEntityEncoding(true);
+        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    &lt;&gt;\n");
+    }
 }
