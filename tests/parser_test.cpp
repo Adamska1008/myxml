@@ -192,9 +192,12 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     &lt;&gt;
 </root>)";
         auto elem = myxml::Element::Parse(root);
-        elem->FirstChild()->AsText().value()->SetEntityEncoding(false);
 
+        elem->SetEntityEncoding(false);
         REQUIRE(elem->GetName() == "root");
         REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    <>\n");
+
+        elem->SetEntityEncoding(true);
+        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    &lt;&gt;\n");
     }
 }

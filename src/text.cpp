@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <unordered_map>
 #include "text.hpp"
 
 namespace myxml
@@ -69,7 +70,34 @@ namespace myxml
 
     std::string Text::ExportRaw() const
     {
-        return this->inner;
+        if (!this->encodeOnExport)
+        {
+            return this->inner;
+        }
+        else
+        {
+            static std::unordered_map<char, std::string> entityMap = {
+                {'<', "&lt;"},
+                {'>', "&gt;"},
+                {'&', "&amp;"},
+                {'"', "&quot;"},
+                {'\'', "&apos;"},
+            };
+            std::size_t start = 0; // start of current segement
+            std::size_t len = this->inner.length();
+            std::string builder;
+            for (std::size_t i = 0; i < len; i++)
+            {
+                if (auto it = entityMap.find(this->inner[i]); it != entityMap.end())
+                {
+                    builder += this->inner.substr(start, i - start);
+                    builder += it->second;
+                    start = i + 1;
+                }
+            }
+            builder += this->inner.substr(start, len - start);
+            return builder;
+        }
     }
 
     std::string Text::ExportFormatted(int indentLevel, int indentSize) const
