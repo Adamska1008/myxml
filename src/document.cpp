@@ -50,6 +50,11 @@ namespace myxml
         return this->declaration.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
     }
 
+    void Document::SetEntityEncoding(bool flag)
+    {
+        this->root->SetEntityEncoding(flag);
+    }
+
     std::optional<Declaration> Declaration::BuildFromAttrs(std::map<std::string, std::string> attrs)
     {
         if (!attrs.count("version") || !util::isValidXmlVersion(attrs["version"]))
@@ -96,6 +101,10 @@ namespace myxml
     std::string Declaration::ExportFormatted(int indentLevel, int indentSize) const
     {
         return std::string(' ', indentLevel * indentSize) + this->ExportRaw();
+    }
+
+    void Declaration::SetEntityEncoding(bool flag)
+    {
     }
 
     namespace util

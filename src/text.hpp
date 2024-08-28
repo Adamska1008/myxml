@@ -15,7 +15,6 @@ namespace myxml
 
         // may used in Export
         bool IsAllSpace() const;
-        void SetEntityEncoding(bool);
 
         /* implement Node */
         virtual NodeType Type() override;
@@ -26,5 +25,6 @@ namespace myxml
         /* Implment Exportable*/
         virtual std::string ExportRaw() const override;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
+        virtual void SetEntityEncoding(bool) override;
     };
 }
