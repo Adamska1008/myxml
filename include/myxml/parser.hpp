@@ -1,6 +1,6 @@
 #pragma once
-#include "element.hpp"
-#include "document.hpp"
+#include "myxml/element.hpp"
+#include "myxml/document.hpp"
 
 namespace myxml
 {

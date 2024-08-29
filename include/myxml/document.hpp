@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
-#include "node.hpp"
+#include "myxml/node.hpp"
+#include "myxml/element.hpp"
 
 // Declaration and Documant are both NOT Node
 namespace myxml

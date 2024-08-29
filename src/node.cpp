@@ -1,5 +1,5 @@
-#include "node.hpp"
-#include "element.hpp"
+#include "myxml/node.hpp"
+#include "myxml/element.hpp"
 
 namespace myxml
 {

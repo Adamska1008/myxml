@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <unordered_map>
-#include "text.hpp"
+#include "myxml/text.hpp"
 
 namespace myxml
 {
