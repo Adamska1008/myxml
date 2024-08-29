@@ -1,7 +1,7 @@
 #include <set>
 #include <fmt/core.h>
-#include "document.hpp"
-#include "parser.hpp"
+#include "myxml/document.hpp"
+#include "myxml/parser.hpp"
 
 namespace myxml
 {

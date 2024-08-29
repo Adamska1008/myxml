@@ -1,5 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
-#include "document.cpp"
+#include "myxml/document.hpp"
 
 TEST_CASE("Simple document", "[document]")
 {

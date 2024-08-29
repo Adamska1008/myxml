@@ -1,7 +1,7 @@
 #include <cassert>
 #include <fmt/core.h>
-#include "parser.hpp"
-#include "error.hpp"
+#include "myxml/parser.hpp"
+#include "myxml/error.hpp"
 
 namespace myxml
 {

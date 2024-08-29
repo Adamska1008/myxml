@@ -1,4 +1,4 @@
-#include "error.hpp"
+#include "myxml/error.hpp"
 
 namespace myxml
 {

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <catch2/catch_test_macros.hpp>
-#include "parser.hpp"
+#include "myxml/parser.hpp"
 
 TEST_CASE("Parsing tag", "parser")
 {

@@ -4,8 +4,8 @@
 #include <string>
 #include <map>
 
-#include "text.hpp"
-#include "exportable.hpp"
+#include "myxml/text.hpp"
+#include "myxml/exportable.hpp"
 
 namespace myxml
 {
