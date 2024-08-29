@@ -53,26 +53,6 @@ namespace myxml
         this->attributes.insert(attris.begin(), attris.end());
     }
 
-    NodeType Element::Type()
-    {
-        return NodeType::Element;
-    }
-
-    bool Element::IsType(NodeType type)
-    {
-        return type == NodeType::Element;
-    }
-
-    std::optional<std::shared_ptr<Element>> Element::AsElement()
-    {
-        return std::dynamic_pointer_cast<Element>(this->shared_from_this());
-    }
-
-    std::optional<std::shared_ptr<Text>> Element::AsText()
-    {
-        return std::nullopt;
-    }
-
     std::string Element::ExportRaw() const
     {
 

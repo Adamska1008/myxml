@@ -37,11 +37,11 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 </root>)";
         auto elem = myxml::Element::Parse(withText);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    ");
-        auto child = elem->FirstChild()->next->AsElement().value();
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n    ");
+        auto child = elem->FirstChild()->next->As<myxml::Element>().value();
         REQUIRE(child->GetName() == "child");
-        REQUIRE(child->FirstChild()->AsText().value()->ExportRaw() == "Hello, world!");
-        REQUIRE(child->next->AsText().value()->ExportRaw() == "\n");
+        REQUIRE(child->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "Hello, world!");
+        REQUIRE(child->next->As<myxml::Text>().value()->ExportRaw() == "\n");
     }
 
     SECTION("Nested")
@@ -53,18 +53,18 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 </root>)";
         auto elem = myxml::Element::Parse(nested);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    ");
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n    ");
 
-        auto parent = elem->FirstChild()->next->AsElement().value();
+        auto parent = elem->FirstChild()->next->As<myxml::Element>().value();
         REQUIRE(parent->GetName() == "parent");
-        REQUIRE(parent->FirstChild()->AsText().value()->ExportRaw() == "\n        ");
+        REQUIRE(parent->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n        ");
 
-        auto child = parent->FirstChild()->next->AsElement().value();
+        auto child = parent->FirstChild()->next->As<myxml::Element>().value();
         REQUIRE(child->GetName() == "child");
         REQUIRE(child->FirstChild() == nullptr); // 因为 <child></child> 是空的，没有文本子节点
 
-        REQUIRE(parent->FirstChild()->next->next->AsText().value()->ExportRaw() == "\n    ");
-        REQUIRE(elem->FirstChild()->next->next->AsText().value()->ExportRaw() == "\n");
+        REQUIRE(parent->FirstChild()->next->next->As<myxml::Text>().value()->ExportRaw() == "\n    ");
+        REQUIRE(elem->FirstChild()->next->next->As<myxml::Text>().value()->ExportRaw() == "\n");
     }
 
     SECTION("Mutli-Level")
@@ -76,25 +76,25 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 </root>)";
         auto elem = myxml::Element::Parse(multiLevel);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    ");
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n    ");
 
         // 验证第一个 <item> 节点
-        auto item1 = elem->FirstChild()->next->AsElement().value();
+        auto item1 = elem->FirstChild()->next->As<myxml::Element>().value();
         REQUIRE(item1->GetName() == "item");
-        REQUIRE(item1->FirstChild()->AsText().value()->ExportRaw() == "First");
+        REQUIRE(item1->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "First");
 
         // 验证第二个 <item> 节点
-        auto item2 = item1->next->next->AsElement().value();
+        auto item2 = item1->next->next->As<myxml::Element>().value();
         REQUIRE(item2->GetName() == "item");
-        REQUIRE(item2->FirstChild()->AsText().value()->ExportRaw() == "Second");
+        REQUIRE(item2->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "Second");
 
         // 验证第三个 <item> 节点
-        auto item3 = item2->next->next->AsElement().value();
+        auto item3 = item2->next->next->As<myxml::Element>().value();
         REQUIRE(item3->GetName() == "item");
-        REQUIRE(item3->FirstChild()->AsText().value()->ExportRaw() == "Third");
+        REQUIRE(item3->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "Third");
 
         // 验证 root 节点的最后文本
-        REQUIRE(item3->next->AsText().value()->ExportRaw() == "\n");
+        REQUIRE(item3->next->As<myxml::Text>().value()->ExportRaw() == "\n");
     }
 
     SECTION("Closed Element")
@@ -104,15 +104,15 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 </root>)";
         auto elem = myxml::Element::Parse(closed);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    ");
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n    ");
 
         // 验证 <empty /> 节点
-        auto emptyElement = elem->FirstChild()->next->AsElement().value();
+        auto emptyElement = elem->FirstChild()->next->As<myxml::Element>().value();
         REQUIRE(emptyElement->GetName() == "empty");
         REQUIRE(emptyElement->FirstChild() == nullptr); // 自闭合标签没有子节点
 
         // 验证 root 节点的最后文本
-        REQUIRE(emptyElement->next->AsText().value()->ExportRaw() == "\n");
+        REQUIRE(emptyElement->next->As<myxml::Text>().value()->ExportRaw() == "\n");
     }
 
     SECTION("Mixed")
@@ -123,15 +123,15 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 </root>)";
         auto elem = myxml::Element::Parse(mixed);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    hello\n    ");
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n    hello\n    ");
 
         // 验证 <child> 节点
-        auto child = elem->FirstChild()->next->AsElement().value();
+        auto child = elem->FirstChild()->next->As<myxml::Element>().value();
         REQUIRE(child->GetName() == "child");
         REQUIRE(child->FirstChild() == nullptr); // <child></child> 是空的，没有文本子节点
 
         // 验证 root 节点的最后文本
-        REQUIRE(child->next->AsText().value()->ExportRaw() == "\n");
+        REQUIRE(child->next->As<myxml::Text>().value()->ExportRaw() == "\n");
     }
 
     SECTION("With attributes")
@@ -179,11 +179,11 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         REQUIRE(elem->GetAttribute("attr") == "value");
 
         // 检查根元素的第一个子元素
-        auto child = elem->FirstChild()->AsElement().value();
+        auto child = elem->FirstChild()->As<myxml::Element>().value();
         REQUIRE(child->GetName() == "child");
 
         // 检查子元素的文本内容
-        REQUIRE(child->FirstChild()->AsText().value()->ExportRaw() == "Text");
+        REQUIRE(child->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "Text");
     }
 
     SECTION("Decoding entity")
@@ -195,9 +195,17 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 
         elem->SetEntityEncoding(false);
         REQUIRE(elem->GetName() == "root");
-        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    <>\n");
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n    <>\n");
 
         elem->SetEntityEncoding(true);
-        REQUIRE(elem->FirstChild()->AsText().value()->ExportRaw() == "\n    &lt;&gt;\n");
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "\n    &lt;&gt;\n");
+    }
+
+    SECTION("CDATA")
+    {
+        std::string cdata = "<root><![CDATA[Hello!]]></root>";
+        auto elem = myxml::Element::Parse(cdata);
+
+        REQUIRE(elem->FirstChild()->As<myxml::CData>().value()->ExportRaw() == "<![CDATA[Hello!]]>\n");
     }
 }

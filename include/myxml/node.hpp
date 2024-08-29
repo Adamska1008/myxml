@@ -14,15 +14,8 @@ namespace myxml
     // defined below
     class CompositeNode;
 
-    enum class NodeType
-    {
-        Text,
-        Element,
-        Declaration,
-    };
-
     // Element, Text are Node.
-    class Node : public Exportable
+    class Node : public std::enable_shared_from_this<Node>, public Exportable
     {
     public:
         virtual ~Node() = default;
@@ -31,14 +24,14 @@ namespace myxml
         std::shared_ptr<Node> prev;
         std::shared_ptr<Node> next;
 
-        virtual NodeType Type() = 0;
-        virtual bool IsType(NodeType) = 0;
-        virtual std::optional<std::shared_ptr<Element>> AsElement() = 0;
-        virtual std::optional<std::shared_ptr<Text>> AsText() = 0;
+        template <typename T>
+        std::enable_if_t<std::is_base_of_v<Node, T>,
+                         std::optional<std::shared_ptr<T>>>
+        As();
     };
 
     // Element are Composite Node.
-    class CompositeNode : public Node, public std::enable_shared_from_this<CompositeNode>
+    class CompositeNode : public Node
     {
     private:
         std::shared_ptr<Node> firstChild;
@@ -60,4 +53,13 @@ namespace myxml
         std::shared_ptr<Node> InsertAtEnd(const std::shared_ptr<Node> &);
         void Unlink(const std::shared_ptr<Node> &);
     };
+
+    template <typename T>
+    std::enable_if_t<std::is_base_of_v<Node, T>,
+                     std::optional<std::shared_ptr<T>>>
+    Node::As()
+    {
+        auto derivedPtr = std::dynamic_pointer_cast<T>(this->shared_from_this());
+        return derivedPtr ? std::optional(derivedPtr) : std::nullopt;
+    }
 }

@@ -139,12 +139,34 @@ namespace myxml
         {
             len++;
         }
-        if (this->buffer[begin + len] != '<')
+        if (begin + len >= this->buffer.length())
         { // if jump out of while loop due to length limit
             throw SyntaxError(fmt::format("expected '<' after text"));
         }
         this->offset += len;
         return std::shared_ptr<Text>(new Text(this->buffer.substr(begin, len)));
+    }
+
+    std::optional<std::shared_ptr<CData>> Parser::parseCData()
+    {
+        if (this->peekNextNChars(9) != "<![CDATA[")
+        {
+            return std::nullopt;
+        }
+        this->nextNChars(9);
+        std::size_t begin = this->offset;
+        std::size_t len = 0;
+        while (begin + len + 2 < this->buffer.length() &&
+               std::string_view(this->buffer.data() + begin + len, 3) != "]]>")
+        {
+            len++;
+        }
+        if (begin + len + 2 >= this->buffer.length())
+        {
+            throw SyntaxError(fmt::format("expected \"]]>\" after CDATA"));
+        }
+        this->offset += len + 2;
+        return std::shared_ptr<CData>(new CData(this->buffer.substr(begin, len)));
     }
 
     std::optional<ElementTag> Parser::ParseTag()
@@ -194,6 +216,11 @@ namespace myxml
             {
             case '<':
             {
+                if (auto cdata = this->parseCData(); cdata)
+                {
+                    elem->InsertAtEnd(*cdata);
+                    continue;
+                }
                 auto tag = this->ParseTag(); // impossible to be std::nullopt
                 assert(tag);
                 switch (tag->type)
@@ -218,7 +245,7 @@ namespace myxml
                 case ElementTag::ClosingType::Closing:
                     if (tag->name != elem->GetName())
                     {
-                        throw SyntaxError(fmt::format(""));
+                        throw SyntaxError(fmt::format("elem name in closing tag is mismatched with the header"));
                     }
                     if (!header.attris.empty())
                     {

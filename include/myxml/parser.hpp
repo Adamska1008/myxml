@@ -1,14 +1,10 @@
 #pragma once
 #include "myxml/element.hpp"
 #include "myxml/document.hpp"
+#include "myxml/cdata.hpp"
 
 namespace myxml
 {
-    // No effect currently. Just use it to mark what is a tag.
-    struct Tag
-    {
-    };
-
     struct ElementTag
     {
         enum class ClosingType
@@ -59,7 +55,14 @@ namespace myxml
          * @throws `SyntaxError` if the following chars do not confront to `key="value"` format
          */
         std::optional<std::pair<std::string, std::string>> parseAttribute();
+        /**
+         * @throws `SyntaxError` if faild to find `<`
+         */
         std::shared_ptr<Text> parseText();
+        /**
+         * @returns `std::nullopt` if not start with `<!CDATA[`
+         */
+        std::optional<std::shared_ptr<CData>> parseCData();
         /**
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError`
