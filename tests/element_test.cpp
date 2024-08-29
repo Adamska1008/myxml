@@ -15,8 +15,8 @@ TEST_CASE("Element Functionality", "[element]")
     SECTION("Basic Insertion")
     {
         root->InsertAtFront(child);
-        REQUIRE(root->FirstChild()->AsElement().value()->GetName() == "child");
-        REQUIRE(root->LastChild()->AsElement().value()->GetName() == "child");
+        REQUIRE(root->FirstChild()->As<myxml::Element>().value()->GetName() == "child");
+        REQUIRE(root->LastChild()->As<myxml::Element>().value()->GetName() == "child");
     }
 
     SECTION("Get child by name after insert it")
@@ -33,7 +33,7 @@ TEST_CASE("Element Functionality", "[element]")
         root->InsertAtEnd(child);
         root->InsertAtEnd(sibiling);
         REQUIRE(root->Elem("child")->GetName() == "child");
-        REQUIRE(root->Elem("child")->next->AsElement().value()->GetName() == "sibiling");
-        REQUIRE(root->Elem("sibiling")->prev->AsElement().value()->GetName() == "child");
+        REQUIRE(root->Elem("child")->next->As<myxml::Element>().value()->GetName() == "sibiling");
+        REQUIRE(root->Elem("sibiling")->prev->As<myxml::Element>().value()->GetName() == "child");
     }
 }

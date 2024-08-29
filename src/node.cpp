@@ -1,8 +1,10 @@
+#include <type_traits>
 #include "myxml/node.hpp"
 #include "myxml/element.hpp"
 
 namespace myxml
 {
+
 
     std::shared_ptr<Node> CompositeNode::LastChild()
     {
@@ -40,7 +42,7 @@ namespace myxml
         }
         for (auto child = this->firstChild; child != nullptr; child = child->next)
         {
-            if (auto elem = child->AsElement(); elem && (*elem)->GetName() == name)
+            if (auto elem = child->As<Element>(); elem && (*elem)->GetName() == name)
             {
                 this->nameToElemBuffer.emplace(name, *elem);
                 return *elem;
@@ -55,7 +57,7 @@ namespace myxml
         {
             elem->parent->Unlink(elem);
         }
-        elem->parent = this->shared_from_this();
+        elem->parent = *this->shared_from_this()->As<CompositeNode>();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -76,7 +78,7 @@ namespace myxml
         {
             elem->parent->Unlink(elem);
         }
-        elem->parent = this->shared_from_this();
+        elem->parent = *this->shared_from_this()->As<CompositeNode>();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;

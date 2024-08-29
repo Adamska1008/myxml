@@ -19,17 +19,16 @@ namespace myxml
         };
 
     private:
-        // std::shared_ptr<Node> firstChild;
-        // std::shared_ptr<Node> lastChild;
         std::string name;
         std::map<std::string, std::string, std::less<>> attributes;
-        // std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
 
-        /* Set nitializer as private to avoid using Element without share_ptr*/
-        Element(std::string_view name);
+        /* Set initializer as private to avoid using Element without share_ptr*/
+        explicit Element(std::string_view name);
         Element() = default;
 
     public:
+        virtual ~Element() = default;
+
         /* Builder */
         // Wraps creating shared_ptr
         static std::shared_ptr<Element> New(std::string_view name);
@@ -44,12 +43,6 @@ namespace myxml
         void SetName(std::string_view);
         void SetAttribute(std::string key, std::string value);
         void ExtendAttributes(std::map<std::string, std::string>);
-
-        /* Implement Node */
-        virtual NodeType Type() override;
-        virtual bool IsType(NodeType) override;
-        virtual std::optional<std::shared_ptr<Element>> AsElement() override;
-        virtual std::optional<std::shared_ptr<Text>> AsText() override;
 
         /* Implement Exportable */
         virtual std::string ExportRaw() const override;
