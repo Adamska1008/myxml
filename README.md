@@ -12,6 +12,13 @@ The repo is still a work in progress and has not yet fully support XML features.
 
 Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what we aims to accomplish next.
 
+### TODOs
+
+- Implement XML Namespace Parsing
+- Add XPath Support
+- Integrate DTD/XML Schema Validation
+- Refactor for Zero-Copy Efficiency
+
 ## Build
 
 The `cmake install` command is not yes implemented. You can include the repo as a sub directory of your project and use `add_subdirectory()` to use the `myxml` target.
