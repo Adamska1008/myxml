@@ -13,9 +13,10 @@ The repo is still a work in progress and has not yet fully support XML features.
 ### What it can do now
 
 - Parsing nested elements with text and attributes
+- Entity encoding and newline normalization in text
 - Parsing document with declaration and a root element
 - Parsing CDATA
-- Providing parsing error message
+- Providing parsing error info
 
 ### TODOs
 
