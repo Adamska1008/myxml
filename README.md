@@ -59,7 +59,7 @@ ctest --test-dir build/tests/
 In the project directory, run:
 
 ```bash
-cmake --install build
+cmake --install build # usually requires root permission
 ```
 
 Then your C++ Compiler will be able to find **myxml** directly.
