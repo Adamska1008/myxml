@@ -208,4 +208,16 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 
         REQUIRE(elem->FirstChild()->As<myxml::CData>().value()->ExportRaw() == "<![CDATA[Hello!]]>\n");
     }
+
+    SECTION("Newline Normalization")
+    {
+        std::string nl = "<root>hello\r\n</root>";
+        auto elem = myxml::Element::Parse(nl);
+
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "hello\n");
+        nl = "<root>hello\r</root>";
+
+        elem = myxml::Element::Parse(nl);
+        REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "hello\n");
+    }
 }

@@ -8,7 +8,6 @@ namespace myxml
     {
     private:
         std::string inner;
-        bool encodeOnExport;
 
     public:
         explicit Text(std::string_view str);
@@ -21,6 +20,10 @@ namespace myxml
         /* Implment Exportable*/
         virtual std::string ExportRaw() const override;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
-        virtual void SetEntityEncoding(bool) override;
+    };
+
+    namespace util
+    {
+        const char *const platformSpecificNewline();
     };
 }

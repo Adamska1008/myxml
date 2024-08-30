@@ -96,12 +96,4 @@ namespace myxml
         builder += indent + "</" + std::string(this->GetName()) + ">\n";
         return builder;
     }
-
-    void Element::SetEntityEncoding(bool flag)
-    {
-        for (auto it = this->FirstChild(); it != nullptr; it = it->next)
-        {
-            it->SetEntityEncoding(flag);
-        }
-    }
 }

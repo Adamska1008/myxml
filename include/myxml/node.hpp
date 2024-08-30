@@ -28,6 +28,10 @@ namespace myxml
         std::enable_if_t<std::is_base_of_v<Node, T>,
                          std::optional<std::shared_ptr<T>>>
         As();
+
+        /** Implement Export */
+        virtual void SetEntityEncoding(bool) override;
+        virtual void SetPlatformSpecificNewline(bool) override;
     };
 
     // Element are Composite Node.
@@ -52,6 +56,10 @@ namespace myxml
         std::shared_ptr<Node> InsertAtFront(const std::shared_ptr<Node> &);
         std::shared_ptr<Node> InsertAtEnd(const std::shared_ptr<Node> &);
         void Unlink(const std::shared_ptr<Node> &);
+
+        /** Implement Export */
+        virtual void SetEntityEncoding(bool) override;
+        virtual void SetPlatformSpecificNewline(bool) override;
     };
 
     template <typename T>

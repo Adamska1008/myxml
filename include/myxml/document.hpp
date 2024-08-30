@@ -19,7 +19,6 @@ namespace myxml
         /* Exportable */
         virtual std::string ExportRaw() const;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
-        virtual void SetEntityEncoding(bool flag) override;
     };
 
     class Document : public Exportable

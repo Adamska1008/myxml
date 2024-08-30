@@ -4,7 +4,15 @@
 
 namespace myxml
 {
+    void Node::SetEntityEncoding(bool flag)
+    {
+        this->config.EntityEncoding = flag;
+    }
 
+    void Node::SetPlatformSpecificNewline(bool flag)
+    {
+        this->config.PlatformSpecificNewline = flag;
+    }
 
     std::shared_ptr<Node> CompositeNode::LastChild()
     {
@@ -120,4 +128,21 @@ namespace myxml
         elem->parent = nullptr;
     }
 
+    void CompositeNode::SetEntityEncoding(bool flag)
+    {
+        this->config.EntityEncoding = flag;
+        for (auto it = this->FirstChild(); it != nullptr; it = it->next)
+        {
+            it->SetEntityEncoding(flag);
+        }
+    }
+
+    void CompositeNode::SetPlatformSpecificNewline(bool flag)
+    {
+        this->config.PlatformSpecificNewline = flag;
+        for (auto it = this->FirstChild(); it != nullptr; it = it->next)
+        {
+            it->SetPlatformSpecificNewline(flag);
+        }
+    }
 }
