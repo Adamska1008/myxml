@@ -8,9 +8,14 @@
 
 ## Features
 
-The repo is still a work in progress and has not yet fully support XML features. Currently, it can parse xml element with attributes and PCDATA, including nested and multi-leveled elements.
+The repo is still a work in progress and has not yet fully support XML features. Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what we aims to accomplish next.
 
-Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what we aims to accomplish next.
+### What it can do now
+
+- Parsing nested elements with text and attributes
+- Parsing document with declaration and a root element
+- Parsing CDATA
+- Providing parsing error message
 
 ### TODOs
 
