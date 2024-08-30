@@ -103,10 +103,6 @@ namespace myxml
         return std::string(' ', indentLevel * indentSize) + this->ExportRaw();
     }
 
-    void Declaration::SetEntityEncoding(bool flag)
-    {
-    }
-
     namespace util
     {
         bool isValidXmlVersion(std::string_view version)
