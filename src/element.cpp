@@ -67,7 +67,7 @@ namespace myxml
             return builder;
         }
         builder += ">";
-        for (auto node = this->FirstChild(); node != nullptr; node = node->next)
+        for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
         {
             builder += node->ExportRaw();
         }
@@ -89,7 +89,7 @@ namespace myxml
             return builder;
         }
         builder += ">\n";
-        for (auto node = this->FirstChild(); node != nullptr; node = node->next)
+        for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
         {
             builder += node->ExportFormatted(indentLevel + 1, indentSize);
         }

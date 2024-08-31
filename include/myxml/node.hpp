@@ -17,17 +17,52 @@ namespace myxml
     // Element, Text are Node.
     class Node : public std::enable_shared_from_this<Node>, public Exportable
     {
+    private:
+        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+        std::shared_ptr<T> Next()
+        {
+            for (auto it = this->NextSibiling(); it != nullptr; it = it->NextSibiling())
+            {
+                if (auto cast = it->As<T>(); cast)
+                {
+                    return cast;
+                }
+            }
+            return nullptr;
+        }
+
+        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+        std::shared_ptr<T> Prev()
+        {
+            for (auto it = this->PrevSibiling(); it != nullptr; it = it->PrevSibiling())
+            {
+                if (auto cast = it->As<T>(); cast)
+                {
+                    return cast;
+                }
+            }
+            return nullptr;
+        }
+
     public:
         virtual ~Node() = default;
-
         std::shared_ptr<CompositeNode> parent;
         std::shared_ptr<Node> prev;
         std::shared_ptr<Node> next;
 
-        template <typename T>
-        std::enable_if_t<std::is_base_of_v<Node, T>,
-                         std::optional<std::shared_ptr<T>>>
-        As();
+        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+        std::shared_ptr<T> As()
+        {
+            return std::dynamic_pointer_cast<T>(this->shared_from_this());
+        }
+
+        /* Query */
+        std::shared_ptr<Node> NextSibiling();
+        std::shared_ptr<Node> PrevSibiling();
+        std::shared_ptr<Element> NextElem();
+        std::shared_ptr<Element> PrevElem();
+        std::shared_ptr<Text> NextText();
+        std::shared_ptr<Text> PrevText();
 
         /** Implement Export */
         virtual void SetEntityEncoding(bool) override;
@@ -42,6 +77,19 @@ namespace myxml
         std::shared_ptr<Node> lastChild;
         std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
 
+        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+        std::shared_ptr<T> First()
+        {
+            for (auto it = this->FirstChild(); it != nullptr; it = it->NextSibiling())
+            {
+                if (auto cast = it->As<T>(); cast)
+                {
+                    return cast;
+                }
+            }
+            return nullptr;
+        }
+
     public:
         virtual ~CompositeNode() = default;
 
@@ -51,6 +99,8 @@ namespace myxml
         std::shared_ptr<Node> LastChild();
         const std::shared_ptr<Node> &LastChild() const;
         std::shared_ptr<Element> Elem(std::string_view name);
+        std::shared_ptr<Element> FirstElem();
+        std::shared_ptr<Text> FirstText();
 
         /* Manipulate */
         std::shared_ptr<Node> InsertAtFront(const std::shared_ptr<Node> &);
@@ -61,13 +111,4 @@ namespace myxml
         virtual void SetEntityEncoding(bool) override;
         virtual void SetPlatformSpecificNewline(bool) override;
     };
-
-    template <typename T>
-    std::enable_if_t<std::is_base_of_v<Node, T>,
-                     std::optional<std::shared_ptr<T>>>
-    Node::As()
-    {
-        auto derivedPtr = std::dynamic_pointer_cast<T>(this->shared_from_this());
-        return derivedPtr ? std::optional(derivedPtr) : std::nullopt;
-    }
 }

@@ -36,6 +36,21 @@ namespace myxml
         return this->root;
     }
 
+    std::shared_ptr<Element> Document::Elem(std::string_view name)
+    {
+        return this->root->Elem(name);
+    }
+
+    std::shared_ptr<Element> Document::FirstElem()
+    {
+        return this->root->FirstElem();
+    }
+
+    std::shared_ptr<Text> Document::FirstText()
+    {
+        return this->root->FirstText();
+    }
+
     std::optional<Document> Document::Parse(std::string input)
     {
         return Parser(input).ParseDocument();
