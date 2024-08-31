@@ -324,13 +324,13 @@ namespace myxml
     }
 
     Parser::Parser(std::string_view buffer)
+        : buffer(std::make_shared<StringBuffer>(buffer))
     {
-        this->buffer = std::make_shared<StringBuffer>(buffer);
     }
 
     Parser::Parser(std::string &&buffer)
+        : buffer(std::make_shared<StringBuffer>(buffer))
     {
-        this->buffer = std::make_shared<StringBuffer>(buffer);
     }
 
     bool util::isValidXmlChar(char ch)

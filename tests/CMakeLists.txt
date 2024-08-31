@@ -1,5 +1,7 @@
 include(CTest)
 
+
+
 add_executable(element_test element_test.cpp)
 add_executable(parser_test parser_test.cpp)
 add_executable(exportable_test exportable_test.cpp)
@@ -23,3 +25,5 @@ add_test(NAME parser_test COMMAND parser_test)
 add_test(NAME exportable_test COMMAND exportable_test)
 add_test(NAME document_test COMMAND document_test)
 add_test(NAME buffer_test COMMAND buffer_test)
+
+set_tests_properties(buffer_test PROPERTIES WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests)

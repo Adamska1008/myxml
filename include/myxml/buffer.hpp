@@ -16,16 +16,17 @@ namespace myxml
     private:
         std::size_t offset = 0;
 
+        // { pointer to data, data length }
         virtual std::tuple<const char *, std::size_t> base() const = 0;
 
     public:
         virtual ~Buffer() = default;
-        virtual std::optional<char> Peek() const;
-        virtual std::optional<std::string_view> PeekN(int) const;
-        virtual std::optional<char> AfterN(int) const;
-        virtual std::optional<std::string_view> AfterNM(int, int) const;
-        virtual std::optional<char> Take();
-        virtual std::optional<std::string_view> TakeN(int);
+        std::optional<char> Peek() const;
+        std::optional<std::string_view> PeekN(int) const;
+        std::optional<char> AfterN(int) const;
+        std::optional<std::string_view> AfterNM(int, int) const;
+        std::optional<char> Take();
+        std::optional<std::string_view> TakeN(int);
     };
 
     class StringBuffer : public Buffer

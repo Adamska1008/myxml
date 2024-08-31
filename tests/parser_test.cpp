@@ -1,6 +1,7 @@
 #include <iostream>
 #include <catch2/catch_test_macros.hpp>
 #include "myxml/parser.hpp"
+#include "myxml/xmlfile.hpp"
 
 TEST_CASE("Parsing tag", "parser")
 {
@@ -219,5 +220,10 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 
         elem = myxml::Element::Parse(nl);
         REQUIRE(elem->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "hello\n");
+    }
+
+    SECTION("Simple File Buffer")
+    {
+        auto doc = myxml::Document::ParseFile("data/example.xml");
     }
 }

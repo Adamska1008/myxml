@@ -15,26 +15,27 @@ namespace myxml
     {
     }
 
-    XMLFile XMLFile::Open(std::string_view fpath)
+    std::shared_ptr<XMLFile> XMLFile::Open(std::string_view fpath)
     {
-        XMLFile xfile;
-        xfile.fd = open(fpath.data(), O_RDONLY);
-        if (xfile.fd == -1)
+        // cant use make_shared because XMLFile() is private
+        auto xfile = std::shared_ptr<XMLFile>(new XMLFile());
+        xfile->fd = open(fpath.data(), O_RDONLY);
+        if (xfile->fd == -1)
         {
             throw IOError();
         }
         struct stat fileInfo;
-        if (fstat(xfile.fd, &fileInfo) == -1)
+        if (fstat(xfile->fd, &fileInfo) == -1)
         {
             throw IOError();
         }
-        xfile.fileSize = fileInfo.st_size;
-        void *mappedRegion = mmap(nullptr, xfile.fileSize, PROT_READ, MAP_PRIVATE, xfile.fd, 0);
+        xfile->fileSize = fileInfo.st_size;
+        void *mappedRegion = mmap(nullptr, xfile->fileSize, PROT_READ, MAP_PRIVATE, xfile->fd, 0);
         if (mappedRegion == MAP_FAILED)
         {
             throw IOError();
         }
-        xfile.inner = static_cast<char *>(mappedRegion);
+        xfile->inner = static_cast<char *>(mappedRegion);
         return xfile;
     }
 

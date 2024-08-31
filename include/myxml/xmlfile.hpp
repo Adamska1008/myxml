@@ -22,7 +22,8 @@ namespace myxml
         virtual std::tuple<const char *, std::size_t> base() const;
 
     public:
-        static XMLFile Open(std::string_view fpath);
+        static std::shared_ptr<XMLFile> Open(std::string_view fpath);
         ~XMLFile();
+        XMLFile(const XMLFile &) = delete;
     };
 }

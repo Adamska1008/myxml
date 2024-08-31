@@ -2,6 +2,7 @@
 #include <fmt/core.h>
 #include "myxml/document.hpp"
 #include "myxml/parser.hpp"
+#include "myxml/xmlfile.hpp"
 
 namespace myxml
 {
@@ -40,6 +41,11 @@ namespace myxml
         return Parser(input).ParseDocument();
     }
 
+    std::optional<Document> Document::ParseFile(std::string fileName)
+    {
+        auto f = XMLFile::Open(fileName);
+        return Parser(f).ParseDocument();
+    }
     std::string Document::ExportRaw() const
     {
         return this->declaration.ExportRaw() + this->root->ExportRaw();

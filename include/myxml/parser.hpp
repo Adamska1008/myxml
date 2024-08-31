@@ -96,6 +96,10 @@ namespace myxml
         Parser() = delete;
         explicit Parser(std::string_view);
         explicit Parser(std::string &&);
+
+        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Buffer, T>>>
+        explicit Parser(std::shared_ptr<T> buffer)
+            : buffer(buffer) {}
     };
 
     namespace util
