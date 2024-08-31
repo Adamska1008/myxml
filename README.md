@@ -8,9 +8,15 @@
 
 ## Features
 
-The repo is still a work in progress and has not yet fully support XML features. Currently, it can parse xml element with attributes and PCDATA, including nested and multi-leveled elements.
+The repo is still a work in progress and has not yet fully support XML features. Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what we aims to accomplish next.
 
-Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what we aims to accomplish next.
+### What it can do now
+
+- Parsing nested elements with text and attributes
+- Entity encoding and newline normalization in text
+- Parsing document with declaration and a root element
+- Parsing CDATA
+- Providing parsing error info
 
 ### TODOs
 
@@ -19,13 +25,11 @@ Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.m
 - Integrate DTD/XML Schema Validation
 - Refactor for Zero-Copy Efficiency
 
-## Build
+## Setup
 
-The `cmake install` command is not yes implemented. You can include the repo as a sub directory of your project and use `add_subdirectory()` to use the `myxml` target.
+### Dependencies
 
-### Dependency
-
-To fetch Catch2 testing framework, run:
+**myxml** uses git submodule to manage dependencies. Run following commands first:
 
 ```bash
 git submodule init
@@ -46,17 +50,29 @@ cmake -S . -B build
 cmake --build build
 ```
 
+If you don't want to compile testing, add `-DBUILD_TESING=OFF` to the configure command.
+
 ### Running tests
 
-Ensure Catch2 is installed correctly. In the project directory, run:
+In the project directory, run:
 
 ```bash
 ctest --test-dir build/tests/
 ```
 
+### Installation
+
+In the project directory, run:
+
+```bash
+cmake --install build # usually requires root permission
+```
+
+Then your C++ Compiler will be able to find **myxml** directly.
+
 ### Integration
 
-To integrate myxml, add this repo to your project and modify your root `CMakeLists.txt`:
+If you want to integrate **myxml** into your CMake project, add this repo to your project and modify your root `CMakeLists.txt`:
 
 ```cmake
 add_subdirectory(myxml)  # or `deps/myxml`, as you like
