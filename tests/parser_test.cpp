@@ -1,5 +1,6 @@
 #include <iostream>
 #include <catch2/catch_test_macros.hpp>
+#include <filesystem>
 #include "myxml/parser.hpp"
 #include "myxml/xmlfile.hpp"
 
@@ -224,6 +225,7 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 
     SECTION("Simple File Buffer")
     {
-        auto doc = myxml::Document::ParseFile("data/example.xml");
+        std::cout << std::filesystem::current_path() << std::endl;
+        auto doc = myxml::Document::ParseFile("tests/data/example.xml");
     }
 }

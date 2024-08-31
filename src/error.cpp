@@ -42,4 +42,14 @@ namespace myxml
         : ParseError("End of input")
     {
     }
+
+    IOError::IOError(std::string message)
+        : message(message)
+    {
+    }
+
+    const char *IOError::what() const noexcept
+    {
+        return message.c_str();
+    }
 }

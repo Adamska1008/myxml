@@ -1,9 +1,9 @@
 // TODO: support windows
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <fmt/core.h>
 
 #include "myxml/xmlfile.hpp"
 #include "myxml/error.hpp"
@@ -22,18 +22,18 @@ namespace myxml
         xfile->fd = open(fpath.data(), O_RDONLY);
         if (xfile->fd == -1)
         {
-            throw IOError();
+            throw IOError(fmt::format("Failed to open file: {}", fpath));
         }
         struct stat fileInfo;
         if (fstat(xfile->fd, &fileInfo) == -1)
         {
-            throw IOError();
+            throw IOError(fmt::format("Failed to get info of file: {}", fpath));
         }
         xfile->fileSize = fileInfo.st_size;
         void *mappedRegion = mmap(nullptr, xfile->fileSize, PROT_READ, MAP_PRIVATE, xfile->fd, 0);
         if (mappedRegion == MAP_FAILED)
         {
-            throw IOError();
+            throw IOError(fmt::format("Failed to map memory for file: {}", fpath));
         }
         xfile->inner = static_cast<char *>(mappedRegion);
         return xfile;
