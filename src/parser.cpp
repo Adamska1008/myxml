@@ -7,96 +7,82 @@ namespace myxml
 {
     void Parser::skipWhiteSpaces()
     {
-        while (this->offset < this->buffer.length() && std::isspace(this->buffer[this->offset]))
+        while (this->peek() && std::isspace(*this->peek()))
         {
-            this->offset++;
+            this->take();
         }
     }
 
-    std::optional<char> Parser::peekChar()
+    std::optional<char> Parser::peek()
     {
-        if (this->offset < this->buffer.length())
-        {
-            return this->buffer[this->offset];
-        }
-        else
-        {
-            return std::nullopt;
-        }
+        return this->buffer->Peek();
     }
 
-    std::optional<std::string> Parser::peekNextNChars(int n)
+    std::optional<std::string_view> Parser::peekN(int n)
     {
-        if (this->offset + n - 1 < this->buffer.length())
-        {
-            return this->buffer.substr(this->offset, n);
-        }
-        else
-        {
-            return std::nullopt;
-        }
+        return this->buffer->PeekN(n);
     }
 
-    std::optional<char> Parser::nextChar()
+    std::optional<char> Parser::afterN(int n)
     {
-        if (auto peek = this->peekChar(); peek.has_value())
-        {
-            this->offset++;
-            return peek;
-        }
-        else
-            return std::nullopt;
+        return this->buffer->AfterN(n);
     }
 
-    std::optional<std::string> Parser::nextNChars(int n)
+    std::optional<std::string_view> Parser::afterNM(int n, int m)
     {
-        auto nchars = this->buffer.substr(this->offset, n);
-        this->offset += n;
-        return nchars;
+        return this->buffer->AfterNM(n, m);
+    }
+
+    std::optional<char> Parser::take()
+    {
+        return this->buffer->Take();
+    }
+
+    std::optional<std::string_view> Parser::takeN(int n)
+    {
+        return this->buffer->TakeN(n);
     }
 
     std::string Parser::parseIdent()
     {
-        if (this->peekChar() == std::nullopt)
+        if (this->peek() == std::nullopt)
             throw UnexpectedEndOfInput();
-        std::size_t begin = this->offset;
         // validate heading character
-        if (auto head = this->peekChar(); !head || (!std::isalpha(*head) && head != '_'))
+        if (auto head = this->peek(); !head || (!std::isalpha(*head) && head != '_'))
         {
             throw SyntaxError(fmt::format("element name which starts with {} is invalid.", *head));
         }
         std::size_t len = 0;
-        while (begin + len < this->buffer.length() &&
-               util::isValidXmlChar(this->buffer[begin + len]))
+        while (this->afterN(len) && util::isValidXmlChar(*this->afterN(len)))
         {
             len++;
         }
-        this->offset += len;
-        return this->buffer.substr(begin, len);
+        return std::string(*this->takeN(len));
     }
 
     std::string Parser::parseStringLiteral()
     {
-        if (!this->peekChar())
+        if (!this->peek())
         {
             throw UnexpectedEndOfInput();
         }
-        if (this->peekChar() != '"')
+        if (this->peek() != '"')
         {
-            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peekChar()));
+            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peek()));
         }
-        std::size_t cur = this->offset; // this->offset points to `"`
-        while (cur + 1 < this->buffer.length() && this->buffer[cur + 1] != '"')
+        this->take();
+        std::size_t len = 0;
+        while (this->afterN(len) != '"')
         {
-            cur++;
+            len++;
         }
-        if (cur + 1 >= this->buffer.length())
+        if (!this->afterN(len))
         { // if jump out due to length limit
             throw SyntaxError(fmt::format("missing closing double quote for string literal"));
         }
-        auto literal = this->buffer.substr(this->offset + 1, cur - this->offset);
-        this->offset = cur + 2; // cur + 1 -> `"`
-        return literal;
+        auto it = this->takeN(len);
+        this->take(); // skip "
+        return std::string(*it);
     }
 
     std::optional<std::pair<std::string, std::string>> Parser::parseAttribute()
@@ -116,7 +102,7 @@ namespace myxml
         { // There must be `>` or else after all attributes
             throw e;
         }
-        if (this->nextChar() != '=')
+        if (this->take() != '=')
         {
             throw SyntaxError(fmt::format("expected '=' after attribute name"));
         }
@@ -128,58 +114,54 @@ namespace myxml
 
     std::shared_ptr<Text> Parser::parseText()
     {
-        if (!this->peekChar())
+        if (!this->peek())
         {
             throw UnexpectedEndOfInput();
         }
-        std::size_t begin = this->offset;
         std::size_t len = 0;
-        while (begin + len < this->buffer.length() &&
-               this->buffer[begin + len] != '<')
+        while (this->afterN(len) != '<')
         {
             len++;
         }
-        if (begin + len >= this->buffer.length())
+        if (!this->afterN(len))
         { // if jump out of while loop due to length limit
             throw SyntaxError(fmt::format("expected '<' after text"));
         }
-        this->offset += len;
-        return std::shared_ptr<Text>(new Text(this->buffer.substr(begin, len)));
+        return std::shared_ptr<Text>(new Text(*this->takeN(len)));
     }
 
     std::optional<std::shared_ptr<CData>> Parser::parseCData()
     {
-        if (this->peekNextNChars(9) != "<![CDATA[")
+        if (this->peekN(9) != "<![CDATA[")
         {
             return std::nullopt;
         }
-        this->nextNChars(9);
-        std::size_t begin = this->offset;
+        this->takeN(9);
         std::size_t len = 0;
-        while (begin + len + 2 < this->buffer.length() &&
-               std::string_view(this->buffer.data() + begin + len, 3) != "]]>")
+        while (this->afterNM(len, 3) != "]]>")
         {
             len++;
         }
-        if (begin + len + 2 >= this->buffer.length())
+        if (!this->afterN(len + 2))
         {
             throw SyntaxError(fmt::format("expected \"]]>\" after CDATA"));
         }
-        this->offset += len + 2;
-        return std::shared_ptr<CData>(new CData(this->buffer.substr(begin, len)));
+        auto it = std::string(*this->takeN(len));
+        this->takeN(2);
+        return std::make_shared<CData>(it);
     }
 
     std::optional<ElementTag> Parser::ParseTag()
     {
-        if (this->nextChar() != '<')
+        if (this->take() != '<')
         {
             return std::nullopt;
         }
         ElementTag tag;
-        if (this->peekChar() == '/')
+        if (this->peek() == '/')
         {
             tag.type = ElementTag::ClosingType::Closing;
-            this->nextChar();
+            this->take();
         }
         this->skipWhiteSpaces();
         auto name = this->parseIdent();
@@ -190,16 +172,16 @@ namespace myxml
             tag.attris.insert(*attr);
         }
         this->skipWhiteSpaces();
-        if (this->peekChar() == '/')
+        if (this->peek() == '/')
         {
             if (tag.type != ElementTag::ClosingType::Open)
             {
                 throw SyntaxError(fmt::format("unexpected ending '/' found in closing tag"));
             }
             tag.type = ElementTag::ClosingType::Closed;
-            this->nextChar();
+            this->take();
         }
-        if (this->nextChar() != '>')
+        if (this->take() != '>')
         {
             throw SyntaxError(fmt::format("expected '>' at the end of the tag"));
         }
@@ -210,7 +192,7 @@ namespace myxml
     {
         auto elem = Element::New();
         elem->SetName(header.name);
-        while (auto ch = this->peekChar())
+        while (auto ch = this->peek())
         {
             switch (*ch)
             {
@@ -298,18 +280,18 @@ namespace myxml
 
     std::optional<Declaration> Parser::parseDeclaration()
     {
-        if (this->peekNextNChars(5) != "<?xml")
+        if (this->peekN(5) != "<?xml")
         {
             return std::nullopt;
         }
-        this->nextNChars(5);
+        this->takeN(5);
         std::map<std::string, std::string> attrs;
         while (auto attr = this->parseAttribute())
         {
             attrs.insert(*attr);
         }
         this->skipWhiteSpaces();
-        if (this->nextNChars(2) != "?>")
+        if (this->takeN(2) != "?>")
         {
             throw SyntaxError(fmt::format("expected \"?>\" at end of xml declaration"));
         }
@@ -342,7 +324,14 @@ namespace myxml
     }
 
     Parser::Parser(std::string_view buffer)
-        : buffer(buffer), offset(0) {}
+    {
+        this->buffer = std::make_shared<StringBuffer>(buffer);
+    }
+
+    Parser::Parser(std::string &&buffer)
+    {
+        this->buffer = std::make_shared<StringBuffer>(buffer);
+    }
 
     bool util::isValidXmlChar(char ch)
     {

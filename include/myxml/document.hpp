@@ -38,7 +38,9 @@ namespace myxml
         const std::shared_ptr<Element> &GetRoot() const;
         std::shared_ptr<Element> GetRoot();
 
+        /** Load */
         static std::optional<Document> Parse(std::string);
+        static std::optional<Document> ParseFile(std::string fileName);
 
         /* Exportable */
         virtual std::string ExportRaw() const;

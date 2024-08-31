@@ -2,6 +2,7 @@
 #include "myxml/element.hpp"
 #include "myxml/document.hpp"
 #include "myxml/cdata.hpp"
+#include "myxml/buffer.hpp"
 
 namespace myxml
 {
@@ -22,14 +23,15 @@ namespace myxml
     class Parser
     {
     private:
-        std::string buffer;
-        std::size_t offset;
+        std::shared_ptr<Buffer> buffer;
 
+        std::optional<char> peek();
+        std::optional<std::string_view> peekN(int);
+        std::optional<char> afterN(int);
+        std::optional<std::string_view> afterNM(int, int);
+        std::optional<char> take();
+        std::optional<std::string_view> takeN(int);
         void skipWhiteSpaces();
-        std::optional<char> peekChar();
-        std::optional<std::string> peekNextNChars(int);
-        std::optional<char> nextChar();
-        std::optional<std::string> nextNChars(int);
 
         /**
          * For all parsing method,
@@ -93,6 +95,7 @@ namespace myxml
         Document ParseDocument();
         Parser() = delete;
         explicit Parser(std::string_view);
+        explicit Parser(std::string &&);
     };
 
     namespace util

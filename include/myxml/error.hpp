@@ -57,4 +57,9 @@ namespace myxml
     public:
         UnexpectedEndOfInput();
     };
+
+    class IOError : public std::exception
+    {
+        
+    };
 }
