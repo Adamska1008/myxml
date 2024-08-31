@@ -2,76 +2,82 @@
 
 namespace myxml
 {
+    std::optional<char> Buffer::Peek() const
+    {
+        auto [ptr, len] = this->base();
+        if (this->offset >= len)
+        {
+            return std::nullopt;
+        }
+        return ptr[this->offset];
+    }
+
+    std::optional<std::string_view> Buffer::PeekN(int n) const
+    {
+        auto [ptr, len] = this->base();
+        if (this->offset >= len)
+        {
+            return std::nullopt;
+        }
+        return std::string_view(ptr + this->offset, n);
+    }
+
+    std::optional<char> Buffer::AfterN(int n) const
+    {
+        auto [ptr, len] = this->base();
+        if (this->offset + n > len)
+        {
+            return std::nullopt;
+        }
+        return ptr[this->offset + n];
+    }
+
+    std::optional<std::string_view> Buffer::AfterNM(int n, int m) const
+    {
+        auto [ptr, len] = this->base();
+        if (this->offset + n + m > len)
+        {
+            return std::nullopt;
+        }
+        return std::string_view(ptr + this->offset + n, m);
+    }
+
+    std::optional<char> Buffer::Take()
+    {
+        auto [ptr, len] = this->base();
+        if (this->offset >= len)
+        {
+            return std::nullopt;
+        }
+        return ptr[this->offset++];
+    }
+
+    std::optional<std::string_view> Buffer::TakeN(int n)
+    {
+        auto [ptr, len] = this->base();
+        if (offset + n >= len)
+        {
+            return std::nullopt;
+        }
+        std::string_view it(ptr + this->offset, n);
+        offset += n;
+        return it;
+    }
+
     StringBuffer::StringBuffer(std::string_view inner)
-        : inner(inner), offset(0)
+        : inner(inner)
     {
     }
 
     StringBuffer::StringBuffer(std::string &&inner)
-        : inner(inner), offset(0)
+        : inner(inner)
     {
     }
 
-    std::optional<char> StringBuffer::Peek() const
+    std::tuple<const char *, std::size_t> StringBuffer::base() const
     {
         auto view = this->getView();
-        if (offset >= view.length())
-        {
-            return std::nullopt;
-        }
-        return view[this->offset];
-    }
-
-    std::optional<std::string_view> StringBuffer::PeekN(int n) const
-    {
-        auto view = this->getView();
-        if (offset + n > view.length())
-        {
-            return std::nullopt;
-        }
-        return view.substr(this->offset, n);
-    }
-
-    std::optional<char> StringBuffer::AfterN(int n) const
-    {
-        auto view = this->getView();
-        if (offset + n > view.length())
-        {
-            return std::nullopt;
-        }
-        return view[this->offset + n];
-    }
-
-    std::optional<std::string_view> StringBuffer::AfterNM(int n, int m) const
-    {
-        auto view = this->getView();
-        if (offset + n + m > view.length())
-        {
-            return std::nullopt;
-        }
-        return view.substr(offset + n, m);
-    }
-
-    std::optional<char> StringBuffer::Take()
-    {
-        auto view = this->getView();
-        if (offset >= view.length())
-        {
-            return std::nullopt;
-        }
-        return view[this->offset++];
-    }
-
-    std::optional<std::string_view> StringBuffer::TakeN(int n)
-    {
-        auto view = this->getView();
-        if (offset + n >= view.length())
-        {
-            return std::nullopt;
-        }
-        std::string_view it = view.substr(offset, n);
-        offset += n;
-        return it;
+        return {view.data(), view.length()};
     }
 
     std::string_view StringBuffer::getView() const
