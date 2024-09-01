@@ -4,11 +4,17 @@
 >
 > [Learn more about XML on Wikipedia](https://en.wikipedia.org/wiki/XML)
 
-**myxml** is a simple, stable, and user-friendly XML DOM parser designed to be easy to integrate and extend.
+**myxml** is a minimal and user-friendly XML DOM parser designed to be easy to integrate and extend.
 
-## Features
+## Why myxml?
 
-The repo is still a work in progress and has not yet fully support XML features. Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what we aims to accomplish next.
+**myxml** is developed in modern C++(17), leveraging the capabilities of `string_view`, `shared_ptr`, `optional`, `variant` and some of newest SNIFAE utility(sadly not concept). It's fully modulized(not all in one file) and has a well-designed Is-a relationship.
+
+Currently **myxml** has only around 2000 lines of code, making it easy to get involved in its development. While it's far far from perfect, myxml is perfect for anyone looking to contribute to a modern C++ project. Share your ideas with us!
+
+## Progress and Roadmap
+
+The repo is still a work in progress and has not yet fully support all XML features. Contributions are welcome! Read [Contribution Guide](./docs/contribution_guide.md) for more information. Turn to [issues](https://github.com/Adamska1008/myxml/issues) to see what I think we should do.
 
 ### What it can do now
 
@@ -20,10 +26,15 @@ The repo is still a work in progress and has not yet fully support XML features.
 
 ### TODOs
 
+- Support full-featured Processing Instructions
 - Implement XML Namespace Parsing
 - Add XPath Support
 - Integrate DTD/XML Schema Validation
 - Refactor for Zero-Copy Efficiency
+
+### Zero-Copy?
+
+**myxml** uses `XMLFile` class to load files, leveraging `mmap` to opening files. Additionally **myxml** implements `StringBuffer` class, which holds a reference to any string used to build the DOM tree, or stores a moved string object. While **myxml** doesn't copy the entire data of an XMLDocument, it does copy Text and CDATA instead of referencing the source data. This is based on the assumption that user may drop raw string or close file after parsing, which may lead to dangling reference. Maybe **myxml** can offer an option for users who explicitly require zero-copy implementation in the future.
 
 ## Setup
 
@@ -95,17 +106,13 @@ int main()
 {
     std::string xml("<root attr=\"value\">Hello, world!<root/>");
     auto elem = myxml::Element::Parse(xml);
+    std::cout << root->FirstText() << std::endl; // "Hello, world!";
+    std::cout << root["attr"] << std::endl;      // "value"
 }
 ```
 
 For more examples, read test files [here](./tests/).
 
-## Why not tinyxml2
-
-**tinyxml2** aims to work in all conditions, so it abandons STL, RTTI or exceptions. Such design rule may cause several issues like a level of instability, for example [issue932](https://github.com/leethomason/tinyxml2/issues/932).
-
-What's more, **tinyxml2** is too old to be maintained or enhanced with new features. In contrast, **myxml** offers a more modern, readable codebase that is easier to extend and maintain.
-
 ## Inspiration
 
-This repo is inspired by [tinyxml2](https://github.com/leethomason/tinyxml2), [pugixml](https://github.com/zeux/pugixml) and the [serde](https://crates.io/crates/serde) serialization framework.
+This repo is inspired by [tinyxml2](https://github.com/leethomason/tinyxml2) and [pugixml](https://github.com/zeux/pugixml).

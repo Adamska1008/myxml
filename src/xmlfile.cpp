@@ -17,23 +17,23 @@ namespace myxml
 
     std::shared_ptr<XMLFile> XMLFile::Open(std::string_view fpath)
     {
-        // cant use make_shared because XMLFile() is private
+        // can't use make_shared because XMLFile() is private
         auto xfile = std::shared_ptr<XMLFile>(new XMLFile());
         xfile->fd = open(fpath.data(), O_RDONLY);
         if (xfile->fd == -1)
         {
-            throw IOError(fmt::format("Failed to open file: {}", fpath));
+            throw IOError(fmt::format("failed to open file: {}", fpath));
         }
         struct stat fileInfo;
         if (fstat(xfile->fd, &fileInfo) == -1)
         {
-            throw IOError(fmt::format("Failed to get info of file: {}", fpath));
+            throw IOError(fmt::format("failed to get info of file: {}", fpath));
         }
         xfile->fileSize = fileInfo.st_size;
         void *mappedRegion = mmap(nullptr, xfile->fileSize, PROT_READ, MAP_PRIVATE, xfile->fd, 0);
         if (mappedRegion == MAP_FAILED)
         {
-            throw IOError(fmt::format("Failed to map memory for file: {}", fpath));
+            throw IOError(fmt::format("failed to map memory for file: {}", fpath));
         }
         xfile->inner = static_cast<char *>(mappedRegion);
         return xfile;

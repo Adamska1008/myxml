@@ -8,7 +8,7 @@
 namespace myxml
 {
     /**
-     * ADT. Used by Parser. Parser will consume the source.
+     * ADT. Used by Parser.
      * Implement by StringBuffer and XMLFile
      */
     class Buffer
@@ -32,9 +32,7 @@ namespace myxml
     class StringBuffer : public Buffer
     {
     private:
-        using stringVariant = std::variant<std::string, std::string_view>;
-
-        stringVariant inner;
+        std::variant<std::string, std::string_view> inner;
         std::string_view getView() const;
 
         /** Implement Buffer */

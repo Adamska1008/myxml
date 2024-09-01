@@ -11,7 +11,7 @@ namespace myxml
     private:
         XMLFile();
 
-        /* Mmap related*/
+        /* mmap related*/
         int fd;
         std::size_t fileSize;
         char *inner;
@@ -23,7 +23,9 @@ namespace myxml
 
     public:
         static std::shared_ptr<XMLFile> Open(std::string_view fpath);
+        // RAII
         ~XMLFile();
+        // always copy shared_ptr instead of XMLFile
         XMLFile(const XMLFile &) = delete;
     };
 }
