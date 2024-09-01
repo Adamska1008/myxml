@@ -42,13 +42,14 @@ namespace myxml
         std::shared_ptr<Text> FirstText();
 
         /** Load */
-        static std::optional<Document> Parse(std::string);
-        static std::optional<Document> ParseFile(std::string fileName);
+        static Document Parse(std::string);
+        static Document ParseFile(std::string fileName);
 
         /* Exportable */
         virtual std::string ExportRaw() const;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
-        virtual void SetEntityEncoding(bool flag) override;
+        virtual void SetEntityEncoding(bool);
+        virtual void SetPlatformSpecificNewline(bool);
     };
 
     namespace util

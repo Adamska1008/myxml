@@ -9,9 +9,9 @@ TEST_CASE("Simple document", "[document]")
     <child>Value</child>
 </root>)";
         auto doc = myxml::Document::Parse(input);
-        REQUIRE(doc->GetRoot()->GetName() == "root");
-        REQUIRE(doc->Elem("child")->GetName() == "child");
-        REQUIRE(doc->Elem("child")->FirstText()->ExportRaw() == "Value");
+        REQUIRE(doc.GetRoot()->GetName() == "root");
+        REQUIRE(doc.Elem("child")->GetName() == "child");
+        REQUIRE(doc.Elem("child")->FirstText()->ExportRaw() == "Value");
     }
 
     SECTION("With decl")
@@ -22,7 +22,7 @@ TEST_CASE("Simple document", "[document]")
 </root>
 )";
         auto doc = myxml::Document::Parse(input);
-        REQUIRE(doc->GetDeclartion().version == "1.0");
-        REQUIRE(doc->GetDeclartion().encoding == "UTF-8");
+        REQUIRE(doc.GetDeclartion().version == "1.0");
+        REQUIRE(doc.GetDeclartion().encoding == "UTF-8");
     }
 }

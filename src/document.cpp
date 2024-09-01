@@ -51,12 +51,12 @@ namespace myxml
         return this->root->FirstText();
     }
 
-    std::optional<Document> Document::Parse(std::string input)
+    Document Document::Parse(std::string input)
     {
         return Parser(input).ParseDocument();
     }
 
-    std::optional<Document> Document::ParseFile(std::string fileName)
+    Document Document::ParseFile(std::string fileName)
     {
         auto f = XMLFile::Open(fileName);
         return Parser(f).ParseDocument();
@@ -74,6 +74,11 @@ namespace myxml
     void Document::SetEntityEncoding(bool flag)
     {
         this->root->SetEntityEncoding(flag);
+    }
+
+    void Document::SetPlatformSpecificNewline(bool flag)
+    {
+        this->root->SetPlatformSpecificNewline(flag);
     }
 
     std::optional<Declaration> Declaration::BuildFromAttrs(std::map<std::string, std::string> attrs)

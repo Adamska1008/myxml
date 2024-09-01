@@ -100,14 +100,26 @@ target_link_libraries(your_target PRIVATE myxml)
 Here’s a basic example:
 
 ```c++
-#include <element.hpp>
+#include <myxml/element.hpp>
 
 int main()
 {
     std::string xml("<root attr=\"value\">Hello, world!<root/>");
     auto elem = myxml::Element::Parse(xml);
-    std::cout << root->FirstText() << std::endl; // "Hello, world!";
+    std::cout << root->FirstText() << std::endl;    // "Hello, world!";
     std::cout << (*root)["attr"] << std::endl;      // "value"
+}
+```
+
+Parse file:
+
+```C++
+#include <myxml/document.hpp>
+
+int main()
+{
+    auto doc = myxml::Document::ParseFile("filename");
+    auto root = doc.GetRoot();
 }
 ```
 
