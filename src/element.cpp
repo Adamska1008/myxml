@@ -101,4 +101,9 @@ namespace myxml
         builder += indent + "</" + std::string(this->GetName()) + ">\n";
         return builder;
     }
+
+    std::shared_ptr<Element> literals::operator""_elem(const char *literal, std::size_t len)
+    {
+        return Element::Parse(std::string_view(literal, len));
+    }
 }

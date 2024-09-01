@@ -51,7 +51,7 @@ namespace myxml
         return this->root->FirstText();
     }
 
-    Document Document::Parse(std::string input)
+    Document Document::Parse(std::string_view input)
     {
         return Parser(input).ParseDocument();
     }
@@ -152,5 +152,10 @@ namespace myxml
         {
             return standalone == "yes" || standalone == "no";
         }
+    }
+
+    Document literals::operator""_doc(const char *literal, std::size_t len)
+    {
+        return Document::Parse(std::string_view(literal, len));
     }
 }

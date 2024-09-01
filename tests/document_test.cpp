@@ -26,3 +26,10 @@ TEST_CASE("Simple document", "[document]")
         REQUIRE(doc.GetDeclartion().encoding == "UTF-8");
     }
 }
+
+TEST_CASE("Custom String Literal", "[document]")
+{
+    using namespace myxml::literals;
+    auto doc = "<root></root>"_doc;
+    REQUIRE(doc.GetRoot()->GetName() == "root");
+}
