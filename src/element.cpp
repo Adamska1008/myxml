@@ -18,7 +18,7 @@ namespace myxml
 
     std::shared_ptr<Element> Element::Parse(std::string_view buf)
     {
-        return Parser(buf).ParseElement().value();
+        return Parser(buf).ParseElement();
     }
 
     std::optional<std::string_view> Element::GetAttribute(std::string_view name)
@@ -53,6 +53,11 @@ namespace myxml
         this->attributes.insert(attris.begin(), attris.end());
     }
 
+    std::string &Element::operator[](const std::string &key)
+    {
+        return this->attributes[key];
+    }
+
     std::string Element::ExportRaw() const
     {
 
@@ -67,7 +72,7 @@ namespace myxml
             return builder;
         }
         builder += ">";
-        for (auto node = this->FirstChild(); node != nullptr; node = node->next)
+        for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
         {
             builder += node->ExportRaw();
         }
@@ -89,7 +94,7 @@ namespace myxml
             return builder;
         }
         builder += ">\n";
-        for (auto node = this->FirstChild(); node != nullptr; node = node->next)
+        for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
         {
             builder += node->ExportFormatted(indentLevel + 1, indentSize);
         }

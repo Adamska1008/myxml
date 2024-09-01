@@ -37,8 +37,13 @@ namespace myxml
         Declaration &GetDeclartion();
         const std::shared_ptr<Element> &GetRoot() const;
         std::shared_ptr<Element> GetRoot();
+        std::shared_ptr<Element> Elem(std::string_view);
+        std::shared_ptr<Element> FirstElem();
+        std::shared_ptr<Text> FirstText();
 
+        /** Load */
         static std::optional<Document> Parse(std::string);
+        static std::optional<Document> ParseFile(std::string fileName);
 
         /* Exportable */
         virtual std::string ExportRaw() const;

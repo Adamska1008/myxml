@@ -2,9 +2,9 @@
 
 namespace myxml
 {
-  ExportConfig::ExportConfig()
-      : EntityEncoding(true),
-        PlatformSpecificNewline(false)
-  {
-  }
+    ExportConfig::ExportConfig()
+        : EntityEncoding(true),
+          PlatformSpecificNewline(false)
+    {
+    }
 }

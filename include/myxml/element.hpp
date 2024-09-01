@@ -43,6 +43,7 @@ namespace myxml
         void SetName(std::string_view);
         void SetAttribute(std::string key, std::string value);
         void ExtendAttributes(std::map<std::string, std::string>);
+        std::string &operator[](const std::string &);
 
         /* Implement Exportable */
         virtual std::string ExportRaw() const override;

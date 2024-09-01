@@ -2,6 +2,7 @@
 #include <fmt/core.h>
 #include "myxml/document.hpp"
 #include "myxml/parser.hpp"
+#include "myxml/xmlfile.hpp"
 
 namespace myxml
 {
@@ -35,11 +36,31 @@ namespace myxml
         return this->root;
     }
 
+    std::shared_ptr<Element> Document::Elem(std::string_view name)
+    {
+        return this->root->Elem(name);
+    }
+
+    std::shared_ptr<Element> Document::FirstElem()
+    {
+        return this->root->FirstElem();
+    }
+
+    std::shared_ptr<Text> Document::FirstText()
+    {
+        return this->root->FirstText();
+    }
+
     std::optional<Document> Document::Parse(std::string input)
     {
         return Parser(input).ParseDocument();
     }
 
+    std::optional<Document> Document::ParseFile(std::string fileName)
+    {
+        auto f = XMLFile::Open(fileName);
+        return Parser(f).ParseDocument();
+    }
     std::string Document::ExportRaw() const
     {
         return this->declaration.ExportRaw() + this->root->ExportRaw();

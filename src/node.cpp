@@ -14,6 +14,36 @@ namespace myxml
         this->config.PlatformSpecificNewline = flag;
     }
 
+    std::shared_ptr<Node> Node::NextSibiling()
+    {
+        return this->next;
+    }
+
+    std::shared_ptr<Node> Node::PrevSibiling()
+    {
+        return this->prev;
+    }
+
+    std::shared_ptr<Element> Node::NextElem()
+    {
+        return this->Next<Element>();
+    }
+
+    std::shared_ptr<Element> Node::PrevElem()
+    {
+        return this->Prev<Element>();
+    }
+
+    std::shared_ptr<Text> Node::NextText()
+    {
+        return this->Next<Text>();
+    }
+
+    std::shared_ptr<Text> Node::PrevText()
+    {
+        return this->Prev<Text>();
+    }
+
     std::shared_ptr<Node> CompositeNode::LastChild()
     {
         return this->lastChild;
@@ -34,6 +64,16 @@ namespace myxml
         return this->firstChild;
     }
 
+    std::shared_ptr<Element> CompositeNode::FirstElem()
+    {
+        return this->First<Element>();
+    }
+
+    std::shared_ptr<Text> CompositeNode::FirstText()
+    {
+        return this->First<Text>();
+    }
+
     std::shared_ptr<Element> CompositeNode::Elem(std::string_view name)
     {
         if (auto buf = this->nameToElemBuffer.find(name); buf != this->nameToElemBuffer.end())
@@ -50,10 +90,10 @@ namespace myxml
         }
         for (auto child = this->firstChild; child != nullptr; child = child->next)
         {
-            if (auto elem = child->As<Element>(); elem && (*elem)->GetName() == name)
+            if (auto elem = child->As<Element>(); elem && elem->GetName() == name)
             {
-                this->nameToElemBuffer.emplace(name, *elem);
-                return *elem;
+                this->nameToElemBuffer.emplace(name, elem);
+                return elem;
             }
         }
         return nullptr;
@@ -65,7 +105,7 @@ namespace myxml
         {
             elem->parent->Unlink(elem);
         }
-        elem->parent = *this->shared_from_this()->As<CompositeNode>();
+        elem->parent = this->shared_from_this()->As<CompositeNode>();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -86,7 +126,7 @@ namespace myxml
         {
             elem->parent->Unlink(elem);
         }
-        elem->parent = *this->shared_from_this()->As<CompositeNode>();
+        elem->parent = this->shared_from_this()->As<CompositeNode>();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;

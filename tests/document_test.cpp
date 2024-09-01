@@ -10,8 +10,8 @@ TEST_CASE("Simple document", "[document]")
 </root>)";
         auto doc = myxml::Document::Parse(input);
         REQUIRE(doc->GetRoot()->GetName() == "root");
-        REQUIRE(doc->GetRoot()->Elem("child")->GetName() == "child");
-        REQUIRE(doc->GetRoot()->Elem("child")->FirstChild()->As<myxml::Text>().value()->ExportRaw() == "Value");
+        REQUIRE(doc->Elem("child")->GetName() == "child");
+        REQUIRE(doc->Elem("child")->FirstText()->ExportRaw() == "Value");
     }
 
     SECTION("With decl")

@@ -57,4 +57,15 @@ namespace myxml
     public:
         UnexpectedEndOfInput();
     };
+
+    class IOError : public std::exception
+    {
+    private:
+        std::string message;
+
+    public:
+        IOError(std::string);
+
+        virtual const char *what() const noexcept override;
+    };
 }
