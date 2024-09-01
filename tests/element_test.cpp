@@ -36,4 +36,13 @@ TEST_CASE("Element Functionality", "[element]")
         REQUIRE(root->Elem("child")->NextElem()->GetName() == "sibiling");
         REQUIRE(root->Elem("sibiling")->PrevElem()->GetName() == "child");
     }
+
+    SECTION("Overload []")
+    {
+        root->SetAttribute("hello", "world");
+        REQUIRE((*root)["hello"] == "world");
+        REQUIRE(root->GetAttribute("hello") == "world");
+        (*root)["hello"] = "bar";
+        REQUIRE((*root)["hello"] == "bar");
+    }
 }

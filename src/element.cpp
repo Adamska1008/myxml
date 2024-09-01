@@ -53,6 +53,11 @@ namespace myxml
         this->attributes.insert(attris.begin(), attris.end());
     }
 
+    std::string &Element::operator[](const std::string &key)
+    {
+        return this->attributes[key];
+    }
+
     std::string Element::ExportRaw() const
     {
 
