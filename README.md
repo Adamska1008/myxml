@@ -106,7 +106,7 @@ int main()
 {
     std::string xml("<root attr=\"value\">Hello, world!<root/>");
     auto elem = myxml::Element::Parse(xml);
-    std::cout << root->FirstText() << std::endl;    // "Hello, world!";
+    std::cout << root->FirstText()->ExportRaw() << std::endl;    // "Hello, world!";
     std::cout << (*root)["attr"] << std::endl;      // "value"
 }
 ```
