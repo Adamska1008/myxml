@@ -49,4 +49,10 @@ namespace myxml
         virtual std::string ExportRaw() const override;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
     };
+
+    namespace literals
+    {
+        // Custom String Literal for Element
+        std::shared_ptr<Element> operator""_elem(const char *, std::size_t);
+    }
 }

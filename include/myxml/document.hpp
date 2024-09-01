@@ -42,7 +42,7 @@ namespace myxml
         std::shared_ptr<Text> FirstText();
 
         /** Load */
-        static Document Parse(std::string);
+        static Document Parse(std::string_view);
         static Document ParseFile(std::string fileName);
 
         /* Exportable */
@@ -57,5 +57,10 @@ namespace myxml
         bool isValidXmlVersion(std::string_view);
         bool isValidXmlEncoding(std::string_view);
         bool isValidXmlStandalone(std::string_view);
+    }
+
+    namespace literals
+    {
+        Document operator""_doc(const char *, std::size_t);
     }
 }

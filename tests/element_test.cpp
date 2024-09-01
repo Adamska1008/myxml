@@ -46,3 +46,10 @@ TEST_CASE("Element Functionality", "[element]")
         REQUIRE((*root)["hello"] == "bar");
     }
 }
+
+TEST_CASE("Custom String Literal", "[Element]")
+{
+    using namespace myxml::literals;
+    auto elem = "<root></root>"_elem;
+    REQUIRE(elem->GetName() == "root");
+}

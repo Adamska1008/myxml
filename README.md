@@ -97,7 +97,7 @@ target_link_libraries(your_target PRIVATE myxml)
 
 ## Usage
 
-Here’s a basic example:
+Here’s a **basic example**:
 
 ```c++
 #include <myxml/element.hpp>
@@ -111,7 +111,23 @@ int main()
 }
 ```
 
-Parse file:
+**Create Element using custom string literal**:
+
+```C++
+#include <myxml/element.hpp>
+// enable literals by using namespace
+using namespace xml::literals;
+
+int main()
+{
+    auto elem = "<root></root>"_elem;
+    std::cout << elem->GetName() << std::endl;
+}
+```
+
+Similar Approach for `myxml::Document`.
+
+**Parse file**:
 
 ```C++
 #include <myxml/document.hpp>
