@@ -130,11 +130,11 @@ namespace myxml
         return std::shared_ptr<Text>(new Text(*this->takeN(len)));
     }
 
-    std::optional<std::shared_ptr<CData>> Parser::parseCData()
+    std::shared_ptr<CData> Parser::parseCData()
     {
         if (this->peekN(9) != "<![CDATA[")
         {
-            return std::nullopt;
+            return nullptr;
         }
         this->takeN(9);
         std::size_t len = 0;
@@ -151,7 +151,7 @@ namespace myxml
         return std::make_shared<CData>(it);
     }
 
-    std::optional<ElementTag> Parser::ParseTag()
+    std::optional<ElementTag> Parser::ParseElementTag()
     {
         if (this->take() != '<')
         {
@@ -200,10 +200,10 @@ namespace myxml
             {
                 if (auto cdata = this->parseCData(); cdata)
                 {
-                    elem->InsertAtEnd(*cdata);
+                    elem->InsertAtEnd(cdata);
                     continue;
                 }
-                auto tag = this->ParseTag(); // impossible to be std::nullopt
+                auto tag = this->ParseElementTag(); // impossible to be std::nullopt
                 assert(tag);
                 switch (tag->type)
                 {
@@ -248,10 +248,10 @@ namespace myxml
         throw UnexpectedEndOfInput();
     }
 
-    std::optional<std::shared_ptr<Element>> Parser::ParseElement()
+    std::shared_ptr<Element> Parser::ParseElement()
     {
         this->skipWhiteSpaces();
-        if (auto tag = this->ParseTag(); tag)
+        if (auto tag = this->ParseElementTag(); tag)
         {
             if (tag->type == ElementTag::ClosingType::Closed)
             {
@@ -274,7 +274,7 @@ namespace myxml
         }
         else
         {
-            return std::nullopt;
+            return nullptr;
         }
     }
 
@@ -314,7 +314,7 @@ namespace myxml
         }
         if (auto root = this->ParseElement(); root)
         {
-            document.SetRoot(*root);
+            document.SetRoot(root);
         }
         else
         {

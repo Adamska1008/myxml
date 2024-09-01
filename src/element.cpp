@@ -18,7 +18,7 @@ namespace myxml
 
     std::shared_ptr<Element> Element::Parse(std::string_view buf)
     {
-        return Parser(buf).ParseElement().value();
+        return Parser(buf).ParseElement();
     }
 
     std::optional<std::string_view> Element::GetAttribute(std::string_view name)

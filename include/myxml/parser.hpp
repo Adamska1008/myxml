@@ -28,6 +28,7 @@ namespace myxml
         std::optional<char> peek();
         std::optional<std::string_view> peekN(int);
         std::optional<char> afterN(int);
+        // m characters after n characters
         std::optional<std::string_view> afterNM(int, int);
         std::optional<char> take();
         std::optional<std::string_view> takeN(int);
@@ -64,7 +65,7 @@ namespace myxml
         /**
          * @returns `std::nullopt` if not start with `<!CDATA[`
          */
-        std::optional<std::shared_ptr<CData>> parseCData();
+        std::shared_ptr<CData> parseCData();
         /**
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError`
@@ -80,13 +81,13 @@ namespace myxml
         std::optional<Declaration> parseDeclaration();
 
     public:
-        std::optional<std::shared_ptr<Element>> ParseElement();
+        std::shared_ptr<Element> ParseElement();
         /**
          * @returns std::nullopt if no heading `<`
          * @throws `SyntaxError` if the heading character is `<` and the trailing characters are in incorrect format
          * @throws `UnexpectedEndOfInput` if missing name
          */
-        std::optional<ElementTag> ParseTag();
+        std::optional<ElementTag> ParseElementTag();
         /**
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError`
