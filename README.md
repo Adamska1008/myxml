@@ -1,6 +1,7 @@
 # myxml
 
-![Static Badge](https://img.shields.io/badge/C%2B%2B-17-blue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-green)
+![Static Badge](https://img.shields.io/badge/C%2B%2B-17-blue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-green) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Adamska1008/myxml/cmake-single-platform.yml)
+
 
 
 
