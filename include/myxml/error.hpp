@@ -12,9 +12,11 @@ namespace myxml
         std::string message;
         // store message after being concated with prefix
         mutable std::string fullMessage;
+        std::size_t line;
+        std::size_t column;
 
     public:
-        ParseError(std::string message);
+        ParseError(std::string message, std::size_t line, std::size_t column);
 
         virtual const char *what() const noexcept override;
     };
@@ -31,7 +33,7 @@ namespace myxml
         virtual const char *prefix() const;
 
     public:
-        SyntaxError(std::string);
+        SyntaxError(std::string, std::size_t line, std::size_t column);
     };
 
     /**
@@ -43,7 +45,7 @@ namespace myxml
         virtual const char *prefix() const;
 
     public:
-        SemanticError(std::string);
+        SemanticError(std::string, std::size_t line, std::size_t column);
     };
 
     /**
@@ -55,7 +57,7 @@ namespace myxml
         virtual const char *prefix() const;
 
     public:
-        UnexpectedEndOfInput();
+        UnexpectedEndOfInput(std::size_t line, std::size_t column);
     };
 
     class IOError : public std::exception

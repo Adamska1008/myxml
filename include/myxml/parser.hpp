@@ -33,6 +33,7 @@ namespace myxml
         std::optional<char> take();
         std::optional<std::string_view> takeN(int);
         void skipWhiteSpaces();
+        std::tuple<std::size_t, std::size_t> currentLoc();
 
         /**
          * For all parsing method,
