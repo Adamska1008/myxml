@@ -13,6 +13,11 @@ namespace myxml
         }
     }
 
+    std::tuple<std::size_t, std::size_t> Parser::currentLoc()
+    {
+        return this->buffer->CurrentLocation();
+    }
+
     std::optional<char> Parser::peek()
     {
         return this->buffer->Peek();
@@ -46,11 +51,15 @@ namespace myxml
     std::string Parser::parseIdent()
     {
         if (this->peek() == std::nullopt)
-            throw UnexpectedEndOfInput();
+        {
+            auto [line, col] = this->currentLoc();
+            throw UnexpectedEndOfInput(line, col);
+        }
         // validate heading character
         if (auto head = this->peek(); !head || (!std::isalpha(*head) && head != '_'))
         {
-            throw SyntaxError(fmt::format("element name which starts with {} is invalid.", *head));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("element name which starts with {} is invalid.", *head), line, col);
         }
         std::size_t len = 0;
         while (this->afterN(len) && util::isValidXmlChar(*this->afterN(len)))
@@ -64,11 +73,13 @@ namespace myxml
     {
         if (!this->peek())
         {
-            throw UnexpectedEndOfInput();
+            auto [line, col] = this->currentLoc();
+            throw UnexpectedEndOfInput(line, col);
         }
         if (this->peek() != '"')
         {
-            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peek()));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peek()), line, col);
         }
         this->take();
         std::size_t len = 0;
@@ -78,7 +89,8 @@ namespace myxml
         }
         if (!this->afterN(len))
         { // if jump out due to length limit
-            throw SyntaxError(fmt::format("missing closing double quote for string literal"));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("missing closing double quote for string literal"), line, col);
         }
         auto it = this->takeN(len);
         this->take(); // skip "
@@ -104,7 +116,8 @@ namespace myxml
         }
         if (this->take() != '=')
         {
-            throw SyntaxError(fmt::format("expected '=' after attribute name"));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("expected '=' after attribute name"), line, col);
         }
         attr.first = key;
         auto value = this->parseStringLiteral();
@@ -116,7 +129,8 @@ namespace myxml
     {
         if (!this->peek())
         {
-            throw UnexpectedEndOfInput();
+            auto [line, col] = this->currentLoc();
+            throw UnexpectedEndOfInput(line, col);
         }
         std::size_t len = 0;
         while (this->afterN(len) != '<')
@@ -125,7 +139,8 @@ namespace myxml
         }
         if (!this->afterN(len))
         { // if jump out of while loop due to length limit
-            throw SyntaxError(fmt::format("expected '<' after text"));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("expected '<' after text"), line, col);
         }
         return std::shared_ptr<Text>(new Text(*this->takeN(len)));
     }
@@ -144,7 +159,8 @@ namespace myxml
         }
         if (!this->afterN(len + 2))
         {
-            throw SyntaxError(fmt::format("expected \"]]>\" after CDATA"));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("expected \"]]>\" after CDATA"), line, col);
         }
         auto it = std::string(*this->takeN(len));
         this->takeN(2);
@@ -176,14 +192,16 @@ namespace myxml
         {
             if (tag.type != ElementTag::ClosingType::Open)
             {
-                throw SyntaxError(fmt::format("unexpected ending '/' found in closing tag"));
+                auto [line, col] = this->currentLoc();
+                throw SyntaxError(fmt::format("unexpected ending '/' found in closing tag"), line, col);
             }
             tag.type = ElementTag::ClosingType::Closed;
             this->take();
         }
         if (this->take() != '>')
         {
-            throw SyntaxError(fmt::format("expected '>' at the end of the tag"));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("expected '>' at the end of the tag"), line, col);
         }
         return tag;
     }
@@ -227,7 +245,8 @@ namespace myxml
                 case ElementTag::ClosingType::Closing:
                     if (tag->name != elem->GetName())
                     {
-                        throw SyntaxError(fmt::format("elem name in closing tag is mismatched with the header"));
+                        auto [line, col] = this->currentLoc();
+                        throw SyntaxError(fmt::format("elem name in closing tag is mismatched with the header"), line, col);
                     }
                     if (!header.attris.empty())
                     {
@@ -245,7 +264,8 @@ namespace myxml
                 break;
             }
         }
-        throw UnexpectedEndOfInput();
+        auto [line, col] = this->currentLoc();
+        throw UnexpectedEndOfInput(line, col);
     }
 
     std::shared_ptr<Element> Parser::ParseElement()
@@ -269,7 +289,8 @@ namespace myxml
             }
             else // Closing </tag>
             {
-                throw SyntaxError(fmt::format("unexpected closing tag"));
+                auto [line, col] = this->currentLoc();
+                throw SyntaxError(fmt::format("unexpected closing tag"), line, col);
             }
         }
         else
@@ -293,7 +314,8 @@ namespace myxml
         this->skipWhiteSpaces();
         if (this->takeN(2) != "?>")
         {
-            throw SyntaxError(fmt::format("expected \"?>\" at end of xml declaration"));
+            auto [line, col] = this->currentLoc();
+            throw SyntaxError(fmt::format("expected \"?>\" at end of xml declaration"), line, col);
         }
         if (auto decl = Declaration::BuildFromAttrs(attrs); decl)
         {
@@ -301,7 +323,8 @@ namespace myxml
         }
         else
         {
-            throw SemanticError(fmt::format("declaration has incorrect attributes"));
+            auto [line, col] = this->currentLoc();
+            throw SemanticError(fmt::format("declaration has incorrect attributes"), line, col);
         }
     }
 
@@ -318,7 +341,8 @@ namespace myxml
         }
         else
         {
-            throw SemanticError(fmt::format("missing root element in xml document"));
+            auto [line, col] = this->currentLoc();
+            throw SemanticError(fmt::format("missing root element in xml document"), line, col);
         }
         return document;
     }

@@ -15,9 +15,15 @@ namespace myxml
     {
     private:
         std::size_t offset = 0;
+        std::size_t line = 0;
+        std::size_t column = 0;
 
-        // { pointer to data, data length }
+        // @returns {pointer to data, data length}
         virtual std::tuple<const char *, std::size_t> base() const = 0;
+        // update line and column
+        void updateLocation(char);
+        // update line and column
+        void updateLocation(std::string_view);
 
     public:
         virtual ~Buffer() = default;
@@ -27,6 +33,8 @@ namespace myxml
         std::optional<std::string_view> AfterNM(int, int) const;
         std::optional<char> Take();
         std::optional<std::string_view> TakeN(int);
+        // @returns {line, column}
+        std::tuple<std::size_t, std::size_t> CurrentLocation();
     };
 
     class StringBuffer : public Buffer
@@ -41,5 +49,6 @@ namespace myxml
     public:
         StringBuffer(std::string_view);
         StringBuffer(std::string &&);
+        StringBuffer(const char *);
     };
 }
