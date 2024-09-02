@@ -2,6 +2,27 @@
 
 namespace myxml
 {
+    void Buffer::updateLocation(char ch)
+    {
+        if (ch == '\n')
+        {
+            this->column = 0;
+            this->line++;
+        }
+        else
+        {
+            this->column++;
+        }
+    }
+
+    void Buffer::updateLocation(std::string_view strv)
+    {
+        for (auto ch : strv)
+        {
+            this->updateLocation(ch);
+        }
+    }
+
     std::optional<char> Buffer::Peek() const
     {
         auto [ptr, len] = this->base();
@@ -49,7 +70,9 @@ namespace myxml
         {
             return std::nullopt;
         }
-        return ptr[this->offset++];
+        auto ch = ptr[this->offset++];
+        this->updateLocation(ch);
+        return ch;
     }
 
     std::optional<std::string_view> Buffer::TakeN(int n)
@@ -59,9 +82,15 @@ namespace myxml
         {
             return std::nullopt;
         }
-        std::string_view it(ptr + this->offset, n);
+        std::string_view strv(ptr + this->offset, n);
+        this->updateLocation(strv);
         offset += n;
-        return it;
+        return strv;
+    }
+
+    std::tuple<std::size_t, std::size_t> Buffer::CurrentLocation()
+    {
+        return {this->line, this->column};
     }
 
     StringBuffer::StringBuffer(std::string_view inner)
@@ -71,6 +100,11 @@ namespace myxml
 
     StringBuffer::StringBuffer(std::string &&inner)
         : inner(inner)
+    {
+    }
+
+    StringBuffer::StringBuffer(const char *ptr)
+        : StringBuffer(std::string_view(ptr))
     {
     }
 
