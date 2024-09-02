@@ -1,9 +1,6 @@
 # myxml
 
-![Static Badge](https://img.shields.io/badge/C%2B%2B-17-blue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-green) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Adamska1008/myxml/cmake-single-platform.yml)
-
-
-
+![Static Badge](https://img.shields.io/badge/C%2B%2B-17-blue) ![GitHub License](https://img.shields.io/github/license/Adamska1008/myxml) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Adamska1008/myxml/cmake-single-platform.yml)
 
 >Extensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing arbitrary data. It defines a set of rules for encoding documents in a format that is both human-readable and machine-readable. The World Wide Web Consortium's XML 1.0 Specification of 1998 and several other related specifications—all of them free open standards—define XML.
 >
