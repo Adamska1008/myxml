@@ -6,12 +6,12 @@ namespace myxml
 {
     void Node::entity_encoding(bool flag)
     {
-        this->config.EntityEncoding = flag;
+        this->config.entity_encoding = flag;
     }
 
     void Node::platform_specific_newline(bool flag)
     {
-        this->config.PlatformSpecificNewline = flag;
+        this->config.platform_specific_newline = flag;
     }
 
     std::shared_ptr<Node> Node::NextSibiling()
@@ -24,24 +24,24 @@ namespace myxml
         return this->prev;
     }
 
-    std::shared_ptr<Element> Node::NextElem()
+    std::shared_ptr<element_impl> Node::NextElem()
     {
-        return this->Next<Element>();
+        return this->Next<element_impl>();
     }
 
-    std::shared_ptr<Element> Node::PrevElem()
+    std::shared_ptr<element_impl> Node::PrevElem()
     {
-        return this->Prev<Element>();
+        return this->Prev<element_impl>();
     }
 
-    std::shared_ptr<Text> Node::NextText()
+    std::shared_ptr<text_impl> Node::NextText()
     {
-        return this->Next<Text>();
+        return this->Next<text_impl>();
     }
 
-    std::shared_ptr<Text> Node::PrevText()
+    std::shared_ptr<text_impl> Node::PrevText()
     {
-        return this->Prev<Text>();
+        return this->Prev<text_impl>();
     }
 
     std::shared_ptr<Node> CompositeNode::LastChild()
@@ -64,21 +64,21 @@ namespace myxml
         return this->firstChild;
     }
 
-    std::shared_ptr<Element> CompositeNode::FirstElem()
+    std::shared_ptr<element_impl> CompositeNode::FirstElem()
     {
-        return this->First<Element>();
+        return this->First<element_impl>();
     }
 
-    std::shared_ptr<Text> CompositeNode::FirstText()
+    std::shared_ptr<text_impl> CompositeNode::FirstText()
     {
-        return this->First<Text>();
+        return this->First<text_impl>();
     }
 
-    std::shared_ptr<Element> CompositeNode::Elem(std::string_view name)
+    std::shared_ptr<element_impl> CompositeNode::Elem(std::string_view name)
     {
         if (auto buf = this->nameToElemBuffer.find(name); buf != this->nameToElemBuffer.end())
         {
-            std::weak_ptr<Element> ptr = buf->second;
+            std::weak_ptr<element_impl> ptr = buf->second;
             if (auto child = ptr.lock(); child != nullptr)
             {
                 return child;
@@ -90,7 +90,7 @@ namespace myxml
         }
         for (auto child = this->firstChild; child != nullptr; child = child->next)
         {
-            if (auto elem = child->As<Element>(); elem && elem->GetName() == name)
+            if (auto elem = child->As<element_impl>(); elem && elem->name == name)
             {
                 this->nameToElemBuffer.emplace(name, elem);
                 return elem;
@@ -170,7 +170,7 @@ namespace myxml
 
     void CompositeNode::entity_encoding(bool flag)
     {
-        this->config.EntityEncoding = flag;
+        this->config.entity_encoding = flag;
         for (auto it = this->FirstChild(); it != nullptr; it = it->next)
         {
             it->entity_encoding(flag);
@@ -179,7 +179,7 @@ namespace myxml
 
     void CompositeNode::platform_specific_newline(bool flag)
     {
-        this->config.PlatformSpecificNewline = flag;
+        this->config.platform_specific_newline = flag;
         for (auto it = this->FirstChild(); it != nullptr; it = it->next)
         {
             it->platform_specific_newline(flag);

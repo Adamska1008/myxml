@@ -9,9 +9,9 @@ TEST_CASE("Simple document", "[document]")
     <child>Value</child>
 </root>)";
         auto doc = myxml::document::parse(input);
-        REQUIRE(doc.get_root()->GetName() == "root");
-        REQUIRE(doc.first_elem("child")->GetName() == "child");
-        REQUIRE(doc.first_elem("child")->FirstText()->ExportRaw() == "Value");
+        REQUIRE(doc.get_root().name() == "root");
+        REQUIRE(doc.first_elem("child").name() == "child");
+        REQUIRE(doc.first_elem("child").first_text().str() == "Value");
     }
 
     SECTION("With decl")
@@ -31,5 +31,5 @@ TEST_CASE("Custom String Literal", "[document]")
 {
     using namespace myxml::literals;
     auto doc = "<root></root>"_doc;
-    REQUIRE(doc.get_root()->GetName() == "root");
+    REQUIRE(doc.get_root().name() == "root");
 }

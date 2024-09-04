@@ -3,19 +3,19 @@
 #include <optional>
 #include <map>
 
-#include "myxml/exportable.hpp"
+#include "myxml/printable.hpp"
 
 namespace myxml
 {
     // defined in element.hpp
-    class Element;
+    class element_impl;
     // defined in text.hpp
-    class Text;
+    class text_impl;
     // defined below
     class CompositeNode;
 
     // Element, Text are Node.
-    class Node : public std::enable_shared_from_this<Node>, public exportable
+    class Node : public std::enable_shared_from_this<Node>, public printable
     {
     private:
         template <typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
@@ -59,10 +59,10 @@ namespace myxml
         /* Query */
         std::shared_ptr<Node> NextSibiling();
         std::shared_ptr<Node> PrevSibiling();
-        std::shared_ptr<Element> NextElem();
-        std::shared_ptr<Element> PrevElem();
-        std::shared_ptr<Text> NextText();
-        std::shared_ptr<Text> PrevText();
+        std::shared_ptr<element_impl> NextElem();
+        std::shared_ptr<element_impl> PrevElem();
+        std::shared_ptr<text_impl> NextText();
+        std::shared_ptr<text_impl> PrevText();
 
         /** Implement Export */
         virtual void entity_encoding(bool) override;
@@ -75,7 +75,19 @@ namespace myxml
     private:
         std::shared_ptr<Node> firstChild;
         std::shared_ptr<Node> lastChild;
-        std::map<std::string, std::weak_ptr<Element>, std::less<>> nameToElemBuffer;
+        std::map<std::string, std::weak_ptr<element_impl>, std::less<>> nameToElemBuffer;
+
+    public:
+        virtual ~CompositeNode() = default;
+
+        /* Query */
+        std::shared_ptr<Node> FirstChild();
+        const std::shared_ptr<Node> &FirstChild() const;
+        std::shared_ptr<Node> LastChild();
+        const std::shared_ptr<Node> &LastChild() const;
+        std::shared_ptr<element_impl> Elem(std::string_view name);
+        std::shared_ptr<element_impl> FirstElem();
+        std::shared_ptr<text_impl> FirstText();
 
         template <typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
         std::shared_ptr<T> First()
@@ -89,18 +101,6 @@ namespace myxml
             }
             return nullptr;
         }
-
-    public:
-        virtual ~CompositeNode() = default;
-
-        /* Query */
-        std::shared_ptr<Node> FirstChild();
-        const std::shared_ptr<Node> &FirstChild() const;
-        std::shared_ptr<Node> LastChild();
-        const std::shared_ptr<Node> &LastChild() const;
-        std::shared_ptr<Element> Elem(std::string_view name);
-        std::shared_ptr<Element> FirstElem();
-        std::shared_ptr<Text> FirstText();
 
         /* Manipulate */
         std::shared_ptr<Node> InsertAtFront(const std::shared_ptr<Node> &);

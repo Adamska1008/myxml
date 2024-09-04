@@ -4,26 +4,46 @@
 
 namespace myxml
 {
-    class Text : public Node
+
+    class text : public printable
     {
+        friend class element;
+
     private:
-        std::string inner;
+        std::shared_ptr<text_impl> _impl;
+
+        text(std::shared_ptr<text_impl>);
 
     public:
-        explicit Text(std::string_view str);
+        text(std::string_view);
+        text(std::string &&);
 
-        virtual ~Text() = default; 
+        /* Implement printable */
+        virtual void print(std::ostream &) const override;
+        virtual void entity_encoding(bool) override;
+        virtual void platform_specific_newline(bool) override;
+    };
+
+    struct text_impl : public Node
+    {
+        std::string inner;
+
+        text_impl() = default;
+        explicit text_impl(std::string_view str);
+
+        virtual ~text_impl() = default;
 
         // may used in Export
         bool IsAllSpace() const;
 
         /* Implment Exportable*/
-        virtual std::string ExportRaw() const override;
-        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
+        // virtual std::string ExportRaw() const override;
+        // virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
+        virtual void print(std::ostream &) const override;
     };
 
     namespace util
     {
-        const char *const platformSpecificNewline();
+        const std::string_view platform_specific_newline();
     };
 }

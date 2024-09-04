@@ -5,7 +5,7 @@
 ### Simple
 
 ```C++
-using myxml;
+using namespace myxml;
 // `std::string xml`
 document doc = document::parse(xml);
 // or
@@ -19,6 +19,15 @@ optional<element> elem = doc.first_elem("elem");
 ```
 
 ### Element
+
+#### Basic
+
+```C++
+using namespace myxml;
+element elem("root");
+fmt::println(root->name());
+root->set_name("far");
+```
 
 #### Attributes
 
@@ -35,11 +44,6 @@ fmt::println(elem["hello"]);
 elem["hello"] = "world!";
 // if key not exist, query it will create an empty attribute
 elem["hello"]; // == elem["hello"] = "";
-// use attribute to get an optional reference
-if (auto value = elem.attribute("hello"); value)
-{
-    fmt::println("element has attribute \"hello\" with value {}", *value);
-}
 ```
 
 #### Children
@@ -58,7 +62,9 @@ std::vector<element> children = root.elems("child");
 ### Text
 
 ```C++
-// Simple Query
+// create from string
+text txt = "Hello";
+// or from query
 text txt = root.first_text();
 // print raw
 fmt::println(txt);

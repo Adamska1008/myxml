@@ -62,7 +62,7 @@ namespace myxml
         /**
          * @throws `SyntaxError` if faild to find `<`
          */
-        std::shared_ptr<Text> parseText();
+        std::shared_ptr<text_impl> parseText();
         /**
          * @returns `std::nullopt` if not start with `<!CDATA[`
          */
@@ -72,7 +72,7 @@ namespace myxml
          * @throws `SyntaxError`
          * @throws `SemanticError`
          */
-        std::shared_ptr<Element> parseElementWithHeader(ElementTag header);
+        std::shared_ptr<element_impl> parseElementWithHeader(ElementTag header);
         /**
          * @returns std::nullopt if not starts with `<?xml`
          * @throws `UnexpectedEndOfInput`
@@ -82,7 +82,7 @@ namespace myxml
         std::optional<declaration> parseDeclaration();
 
     public:
-        std::shared_ptr<Element> ParseElement();
+        std::shared_ptr<element_impl> ParseElement();
         /**
          * @returns std::nullopt if no heading `<`
          * @throws `SyntaxError` if the heading character is `<` and the trailing characters are in incorrect format

@@ -6,7 +6,7 @@
 // Declaration and Documant are both NOT Node
 namespace myxml
 {
-    struct declaration : public exportable
+    struct declaration : public printable
     {
         std::string version;
         std::optional<std::string> encoding;
@@ -19,37 +19,39 @@ namespace myxml
         /* Exportable */
         virtual std::string ExportRaw() const;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
+        virtual void entity_encoding(bool) {};
+        virtual void platform_specific_newline(bool) {};
+        virtual void print(std::ostream &os) const {}
     };
 
-    class document : public exportable
+    class document : public printable
     {
     private:
         declaration decl;
-        std::shared_ptr<Element> root;
+        element root;
 
     public:
         /* Manipulate */
         void set_declaration(const declaration &);
-        void set_root(std::shared_ptr<Element> root);
+        void set_root(std::shared_ptr<element_impl> root);
 
         /* Query */
         const declaration &get_declaration() const;
         declaration &get_declaration();
-        const std::shared_ptr<Element> &get_root() const;
-        std::shared_ptr<Element> get_root();
-        std::shared_ptr<Element> first_elem(std::string_view);
-        std::shared_ptr<Element> first_elem();
-        std::shared_ptr<Text> first_text();
+        const element &get_root() const;
+        element &get_root();
+        element first_elem(std::string_view);
+        element first_elem();
+        text first_text();
 
         /** Load */
         static document parse(std::string_view);
         static document load(std::string fileName);
 
-        /* Exportable */
-        virtual std::string ExportRaw() const;
-        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
-        virtual void entity_encoding(bool);
-        virtual void platform_specific_newline(bool);
+        /* Implement printable */
+        virtual void print(std::ostream &os) const override;
+        virtual void entity_encoding(bool) override;
+        virtual void platform_specific_newline(bool) override;
     };
 
     namespace util

@@ -5,54 +5,77 @@
 #include <map>
 
 #include "myxml/text.hpp"
-#include "myxml/exportable.hpp"
+#include "myxml/printable.hpp"
 
 namespace myxml
 {
-    class Element : public CompositeNode // public std::enable_shared_from_this<Element>, public Node
+
+    enum class ClosingType
     {
-    public:
-        enum class ClosingType
-        {
-            Closed,
-            Closing,
-        };
-
-    private:
-        std::string name;
-        std::map<std::string, std::string, std::less<>> attributes;
-
-        /* Set initializer as private to avoid using Element without share_ptr*/
-        explicit Element(std::string_view name);
-        Element() = default;
-
-    public:
-        virtual ~Element() = default;
-
-        /* Builder */
-        // Wraps creating shared_ptr
-        static std::shared_ptr<Element> New(std::string_view name);
-        static std::shared_ptr<Element> New();
-        static std::shared_ptr<Element> Parse(std::string_view buf);
-
-        /* Query */
-        std::optional<std::string_view> GetAttribute(std::string_view name);
-        std::string_view GetName() const;
-
-        /* Manipulate */
-        void SetName(std::string_view);
-        void SetAttribute(std::string key, std::string value);
-        void ExtendAttributes(std::map<std::string, std::string>);
-        std::string &operator[](const std::string &);
-
-        /* Implement Exportable */
-        virtual std::string ExportRaw() const override;
-        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
+        Closed,
+        Closing,
     };
+
+    class element;
 
     namespace literals
     {
         // Custom String Literal for Element
-        std::shared_ptr<Element> operator""_elem(const char *, std::size_t);
+        element operator""_elem(const char *, std::size_t);
     }
+
+    class element : public printable
+    {
+
+        friend element literals::operator""_elem(const char *, std::size_t);
+        friend class document;
+
+    private:
+        std::shared_ptr<element_impl> _impl;
+        element(std::shared_ptr<element_impl>);
+
+    public:
+        element() : _impl(nullptr) {}
+        explicit element(std::string_view);
+
+        static element parse(std::string_view);
+        static element load(std::string_view);
+        std::string &operator[](const std::string &);
+        std::string_view name();
+
+        element first_elem();
+        element first_elem(std::string_view);
+        text first_text();
+
+        /* Implement printable */
+        virtual void print(std::ostream &) const override;
+        virtual void entity_encoding(bool) override;
+        virtual void platform_specific_newline(bool) override;
+    };
+
+    struct element_impl : public CompositeNode // public std::enable_shared_from_this<Element>, public Node
+    {
+    public:
+        std::string name;
+        std::map<std::string, std::string, std::less<>> attributes;
+
+        /* Set initializer as private to avoid using Element without share_ptr*/
+
+        virtual ~element_impl() = default;
+        explicit element_impl(std::string_view name);
+        element_impl() = default;
+        /* Builder */
+        // Wraps creating shared_ptr
+        static std::shared_ptr<element_impl> _new(std::string_view name);
+        static std::shared_ptr<element_impl> _new();
+        static std::shared_ptr<element_impl> parse(std::string_view buf);
+        static std::shared_ptr<element_impl> load(std::string_view path);
+
+        /* Manipulate */
+        void extend_attributes(std::map<std::string, std::string>);
+        std::string &operator[](const std::string &);
+
+        /* Implement Exportable */
+        virtual void print(std::ostream &) const override;
+    };
 }

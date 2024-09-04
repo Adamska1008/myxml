@@ -125,7 +125,7 @@ namespace myxml
         return attr;
     }
 
-    std::shared_ptr<Text> Parser::parseText()
+    std::shared_ptr<text_impl> Parser::parseText()
     {
         if (!this->peek())
         {
@@ -142,7 +142,7 @@ namespace myxml
             auto [line, col] = this->currentLoc();
             throw SyntaxError(fmt::format("expected '<' after text"), line, col);
         }
-        return std::shared_ptr<Text>(new Text(*this->takeN(len)));
+        return std::shared_ptr<text_impl>(new text_impl(*this->takeN(len)));
     }
 
     std::shared_ptr<CData> Parser::parseCData()
@@ -206,10 +206,10 @@ namespace myxml
         return tag;
     }
 
-    std::shared_ptr<Element> Parser::parseElementWithHeader(ElementTag header)
+    std::shared_ptr<element_impl> Parser::parseElementWithHeader(ElementTag header)
     {
-        auto elem = Element::New();
-        elem->SetName(header.name);
+        auto elem = element_impl::_new();
+        elem->name = header.name;
         while (auto ch = this->peek())
         {
             switch (*ch)
@@ -233,24 +233,24 @@ namespace myxml
                 }
                 case ElementTag::ClosingType::Closed:
                 {
-                    auto child = Element::New();
-                    child->SetName(tag->name);
+                    auto child = element_impl::_new();
+                    child->name = tag->name;
                     if (!tag->attris.empty())
                     {
-                        child->ExtendAttributes(tag->attris);
+                        child->extend_attributes(tag->attris);
                     }
                     elem->InsertAtEnd(child);
                     break;
                 }
                 case ElementTag::ClosingType::Closing:
-                    if (tag->name != elem->GetName())
+                    if (tag->name != elem->name)
                     {
                         auto [line, col] = this->currentLoc();
                         throw SyntaxError(fmt::format("elem name in closing tag is mismatched with the header"), line, col);
                     }
                     if (!header.attris.empty())
                     {
-                        elem->ExtendAttributes(header.attris);
+                        elem->extend_attributes(header.attris);
                     }
                     return elem;
                 default:
@@ -268,18 +268,18 @@ namespace myxml
         throw UnexpectedEndOfInput(line, col);
     }
 
-    std::shared_ptr<Element> Parser::ParseElement()
+    std::shared_ptr<element_impl> Parser::ParseElement()
     {
         this->skipWhiteSpaces();
         if (auto tag = this->ParseElementTag(); tag)
         {
             if (tag->type == ElementTag::ClosingType::Closed)
             {
-                auto elem = Element::New();
-                elem->SetName(tag->name);
+                auto elem = element_impl::_new();
+                elem->name = tag->name;
                 if (!tag->attris.empty())
                 {
-                    elem->ExtendAttributes(tag->attris);
+                    elem->extend_attributes(tag->attris);
                 }
                 return elem;
             }

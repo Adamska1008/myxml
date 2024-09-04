@@ -1,4 +1,5 @@
 #include <set>
+#include <iostream>
 #include <fmt/core.h>
 #include "myxml/document.hpp"
 #include "myxml/parser.hpp"
@@ -11,7 +12,7 @@ namespace myxml
         this->decl = decl;
     }
 
-    void document::set_root(std::shared_ptr<Element> root)
+    void document::set_root(std::shared_ptr<element_impl> root)
     {
         this->root = root;
     }
@@ -26,29 +27,29 @@ namespace myxml
         return this->decl;
     }
 
-    const std::shared_ptr<Element> &document::get_root() const
+    const element &document::get_root() const
     {
         return this->root;
     }
 
-    std::shared_ptr<Element> document::get_root()
+    element &document::get_root()
     {
         return this->root;
     }
 
-    std::shared_ptr<Element> document::first_elem(std::string_view name)
+    element document::first_elem(std::string_view name)
     {
-        return this->root->Elem(name);
+        return this->root.first_elem(name);
     }
 
-    std::shared_ptr<Element> document::first_elem()
+    element document::first_elem()
     {
-        return this->root->FirstElem();
+        return this->root.first_elem();
     }
 
-    std::shared_ptr<Text> document::first_text()
+    text document::first_text()
     {
-        return this->root->FirstText();
+        return this->root.first_text();
     }
 
     document document::parse(std::string_view input)
@@ -61,24 +62,28 @@ namespace myxml
         auto f = XMLFile::Open(fileName);
         return Parser(f).ParseDocument();
     }
-    std::string document::ExportRaw() const
-    {
-        return this->decl.ExportRaw() + this->root->ExportRaw();
-    }
+    // std::string document::ExportRaw() const
+    // {
+    //     return this->decl.ExportRaw() + this->root->ExportRaw();
+    // }
 
-    std::string document::ExportFormatted(int indentLevel, int indentSize) const
+    void document::print(std::ostream &os) const
     {
-        return this->decl.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
+        os << this->decl << this->root;
     }
+    // std::string document::ExportFormatted(int indentLevel, int indentSize) const
+    // {
+    //     return this->decl.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
+    // }
 
     void document::entity_encoding(bool flag)
     {
-        this->root->entity_encoding(flag);
+        this->root.entity_encoding(flag);
     }
 
     void document::platform_specific_newline(bool flag)
     {
-        this->root->platform_specific_newline(flag);
+        this->root.platform_specific_newline(flag);
     }
 
     std::optional<declaration> declaration::from_attrs(std::map<std::string, std::string> attrs)
