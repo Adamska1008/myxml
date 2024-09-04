@@ -1,7 +1,5 @@
 include(CTest)
 
-
-
 add_executable(element_test element_test.cpp)
 add_executable(parser_test parser_test.cpp)
 add_executable(exportable_test exportable_test.cpp)
