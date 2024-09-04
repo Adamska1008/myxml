@@ -11,8 +11,8 @@ document doc = document::parse(xml);
 // or
 document doc = document::load(path);
 // get root elem
-element root = doc.root();
-// or just query elem
+optional<element> elem = doc.root().first_elem();
+// or directly query elem in root
 optional<element> elem = doc.first_elem();
 // or query by name
 optional<element> elem = doc.first_elem("elem");
@@ -23,16 +23,23 @@ optional<element> elem = doc.first_elem("elem");
 #### Attributes
 
 ```C++
-// create an element with name root
+// create an element with name 'root'
 element elem("root");
-// or 
+// or get an element from parsing
 element elem = element::parse(xml);
-// query attributes, it returns an optional string reference
+// or do it by custom string literal
+element elem = "<root/>"_elem;
+// query attributes, it returns an string reference
 fmt::println(elem["hello"]);
 // modify attribute, will create new attribute if not found one
 elem["hello"] = "world!";
 // if key not exist, query it will create an empty attribute
 elem["hello"]; // == elem["hello"] = "";
+// use attribute to get an optional reference
+if (auto value = elem.attribute("hello"); value)
+{
+    fmt::println("element has attribute \"hello\" with value {}", *value);
+}
 ```
 
 #### Children

@@ -299,7 +299,7 @@ namespace myxml
         }
     }
 
-    std::optional<Declaration> Parser::parseDeclaration()
+    std::optional<declaration> Parser::parseDeclaration()
     {
         if (this->peekN(5) != "<?xml")
         {
@@ -317,7 +317,7 @@ namespace myxml
             auto [line, col] = this->currentLoc();
             throw SyntaxError(fmt::format("expected \"?>\" at end of xml declaration"), line, col);
         }
-        if (auto decl = Declaration::BuildFromAttrs(attrs); decl)
+        if (auto decl = declaration::from_attrs(attrs); decl)
         {
             return decl;
         }
@@ -328,16 +328,16 @@ namespace myxml
         }
     }
 
-    Document Parser::ParseDocument()
+    document Parser::ParseDocument()
     {
-        Document document;
+        document document;
         if (auto decl = this->parseDeclaration(); decl)
         {
-            document.SetDeclaration(*decl);
+            document.set_declaration(*decl);
         }
         if (auto root = this->ParseElement(); root)
         {
-            document.SetRoot(root);
+            document.set_root(root);
         }
         else
         {

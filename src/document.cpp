@@ -6,93 +6,93 @@
 
 namespace myxml
 {
-    void Document::SetDeclaration(const Declaration &declaration)
+    void document::set_declaration(const declaration &decl)
     {
-        this->declaration = declaration;
+        this->decl = decl;
     }
 
-    void Document::SetRoot(std::shared_ptr<Element> root)
+    void document::set_root(std::shared_ptr<Element> root)
     {
         this->root = root;
     }
 
-    const Declaration &Document::GetDeclartion() const
+    const declaration &document::get_declaration() const
     {
-        return this->declaration;
+        return this->decl;
     }
 
-    Declaration &Document::GetDeclartion()
+    declaration &document::get_declaration()
     {
-        return this->declaration;
+        return this->decl;
     }
 
-    const std::shared_ptr<Element> &Document::GetRoot() const
-    {
-        return this->root;
-    }
-
-    std::shared_ptr<Element> Document::GetRoot()
+    const std::shared_ptr<Element> &document::get_root() const
     {
         return this->root;
     }
 
-    std::shared_ptr<Element> Document::Elem(std::string_view name)
+    std::shared_ptr<Element> document::get_root()
+    {
+        return this->root;
+    }
+
+    std::shared_ptr<Element> document::first_elem(std::string_view name)
     {
         return this->root->Elem(name);
     }
 
-    std::shared_ptr<Element> Document::FirstElem()
+    std::shared_ptr<Element> document::first_elem()
     {
         return this->root->FirstElem();
     }
 
-    std::shared_ptr<Text> Document::FirstText()
+    std::shared_ptr<Text> document::first_text()
     {
         return this->root->FirstText();
     }
 
-    Document Document::Parse(std::string_view input)
+    document document::parse(std::string_view input)
     {
         return Parser(input).ParseDocument();
     }
 
-    Document Document::ParseFile(std::string fileName)
+    document document::load(std::string fileName)
     {
         auto f = XMLFile::Open(fileName);
         return Parser(f).ParseDocument();
     }
-    std::string Document::ExportRaw() const
+    std::string document::ExportRaw() const
     {
-        return this->declaration.ExportRaw() + this->root->ExportRaw();
+        return this->decl.ExportRaw() + this->root->ExportRaw();
     }
 
-    std::string Document::ExportFormatted(int indentLevel, int indentSize) const
+    std::string document::ExportFormatted(int indentLevel, int indentSize) const
     {
-        return this->declaration.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
+        return this->decl.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
     }
 
-    void Document::SetEntityEncoding(bool flag)
+    void document::entity_encoding(bool flag)
     {
-        this->root->SetEntityEncoding(flag);
+        this->root->entity_encoding(flag);
     }
 
-    void Document::SetPlatformSpecificNewline(bool flag)
+    void document::platform_specific_newline(bool flag)
     {
-        this->root->SetPlatformSpecificNewline(flag);
+        this->root->platform_specific_newline(flag);
     }
 
-    std::optional<Declaration> Declaration::BuildFromAttrs(std::map<std::string, std::string> attrs)
+    std::optional<declaration> declaration::from_attrs(std::map<std::string, std::string> attrs)
     {
-        if (!attrs.count("version") || !util::isValidXmlVersion(attrs["version"]))
+        if (!attrs.count("version") || !util::is_valid_xml_version(attrs["version"]))
         {
             return std::nullopt;
         }
-        Declaration declaration;
+        declaration declaration;
         declaration.version = attrs["version"];
         if (attrs.count("encoding"))
         {
             auto encoding = attrs["encoding"];
-            if (!util::isValidXmlEncoding(encoding))
+            if (!util::is_valid_xml_encoding(encoding))
             {
                 return std::nullopt;
             }
@@ -101,7 +101,7 @@ namespace myxml
         if (attrs.count("standalone"))
         {
             auto standalone = attrs["standalone"];
-            if (!util::isValidXmlStandalone(standalone))
+            if (!util::is_valid_xml_standalone(standalone))
             {
                 return std::nullopt;
             }
@@ -110,7 +110,7 @@ namespace myxml
         return declaration;
     }
 
-    std::string Declaration::ExportRaw() const
+    std::string declaration::ExportRaw() const
     {
         std::string builder = fmt::format("<?xml version={}", this->version);
         if (this->encoding)
@@ -124,19 +124,19 @@ namespace myxml
         return builder + "?>\n";
     }
 
-    std::string Declaration::ExportFormatted(int indentLevel, int indentSize) const
+    std::string declaration::ExportFormatted(int indentLevel, int indentSize) const
     {
         return std::string(' ', indentLevel * indentSize) + this->ExportRaw();
     }
 
     namespace util
     {
-        bool isValidXmlVersion(std::string_view version)
+        bool is_valid_xml_version(std::string_view version)
         {
             return version == "1.0" || version == "1.1";
         }
 
-        bool isValidXmlEncoding(std::string_view encoding)
+        bool is_valid_xml_encoding(std::string_view encoding)
         {
             // FIXME: not cover all valid encoding
             static std::set<std::string, std::less<>> valid{
@@ -148,14 +148,14 @@ namespace myxml
             return valid.count(encoding);
         }
 
-        bool isValidXmlStandalone(std::string_view standalone)
+        bool is_valid_xml_standalone(std::string_view standalone)
         {
             return standalone == "yes" || standalone == "no";
         }
     }
 
-    Document literals::operator""_doc(const char *literal, std::size_t len)
+    document literals::operator""_doc(const char *literal, std::size_t len)
     {
-        return Document::Parse(std::string_view(literal, len));
+        return document::parse(std::string_view(literal, len));
     }
 }

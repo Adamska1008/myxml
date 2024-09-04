@@ -14,6 +14,6 @@ namespace myxml
         virtual ~CData() = default;
         virtual std::string ExportRaw() const override;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
-        virtual void SetEntityEncoding(bool) override;
+        virtual void entity_encoding(bool) override;
     };
 }

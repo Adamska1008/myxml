@@ -187,11 +187,11 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 </root>)";
         auto elem = myxml::Element::Parse(root);
 
-        elem->SetEntityEncoding(false);
+        elem->entity_encoding(false);
         REQUIRE(elem->GetName() == "root");
         REQUIRE(elem->FirstText()->ExportRaw() == "\n    <>\n");
 
-        elem->SetEntityEncoding(true);
+        elem->entity_encoding(true);
         REQUIRE(elem->FirstText()->ExportRaw() == "\n    &lt;&gt;\n");
     }
 
@@ -218,6 +218,6 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     SECTION("Simple File Buffer")
     {
         std::cout << std::filesystem::current_path() << std::endl;
-        auto doc = myxml::Document::ParseFile("tests/data/example.xml");
+        auto doc = myxml::document::load("tests/data/example.xml");
     }
 }

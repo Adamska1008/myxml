@@ -4,12 +4,12 @@
 
 namespace myxml
 {
-    void Node::SetEntityEncoding(bool flag)
+    void Node::entity_encoding(bool flag)
     {
         this->config.EntityEncoding = flag;
     }
 
-    void Node::SetPlatformSpecificNewline(bool flag)
+    void Node::platform_specific_newline(bool flag)
     {
         this->config.PlatformSpecificNewline = flag;
     }
@@ -168,21 +168,21 @@ namespace myxml
         elem->parent = nullptr;
     }
 
-    void CompositeNode::SetEntityEncoding(bool flag)
+    void CompositeNode::entity_encoding(bool flag)
     {
         this->config.EntityEncoding = flag;
         for (auto it = this->FirstChild(); it != nullptr; it = it->next)
         {
-            it->SetEntityEncoding(flag);
+            it->entity_encoding(flag);
         }
     }
 
-    void CompositeNode::SetPlatformSpecificNewline(bool flag)
+    void CompositeNode::platform_specific_newline(bool flag)
     {
         this->config.PlatformSpecificNewline = flag;
         for (auto it = this->FirstChild(); it != nullptr; it = it->next)
         {
-            it->SetPlatformSpecificNewline(flag);
+            it->platform_specific_newline(flag);
         }
     }
 }

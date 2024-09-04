@@ -15,7 +15,7 @@ namespace myxml
     class CompositeNode;
 
     // Element, Text are Node.
-    class Node : public std::enable_shared_from_this<Node>, public Exportable
+    class Node : public std::enable_shared_from_this<Node>, public exportable
     {
     private:
         template <typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
@@ -65,8 +65,8 @@ namespace myxml
         std::shared_ptr<Text> PrevText();
 
         /** Implement Export */
-        virtual void SetEntityEncoding(bool) override;
-        virtual void SetPlatformSpecificNewline(bool) override;
+        virtual void entity_encoding(bool) override;
+        virtual void platform_specific_newline(bool) override;
     };
 
     // Element are Composite Node.
@@ -108,7 +108,7 @@ namespace myxml
         void Unlink(const std::shared_ptr<Node> &);
 
         /** Implement Export */
-        virtual void SetEntityEncoding(bool) override;
-        virtual void SetPlatformSpecificNewline(bool) override;
+        virtual void entity_encoding(bool) override;
+        virtual void platform_specific_newline(bool) override;
     };
 }

@@ -18,7 +18,7 @@ namespace myxml
         return std::string(indentLevel * indentSize, ' ') + this->ExportRaw();
     }
 
-    void CData::SetEntityEncoding(bool)
+    void CData::entity_encoding(bool)
     { // do nothing
     }
 }

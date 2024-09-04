@@ -12,7 +12,7 @@ namespace myxml
     public:
         explicit Text(std::string_view str);
 
-        virtual ~Text() = default;
+        virtual ~Text() = default; 
 
         // may used in Export
         bool IsAllSpace() const;

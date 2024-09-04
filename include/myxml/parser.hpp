@@ -79,7 +79,7 @@ namespace myxml
          * @throws `SyntaxError`
          * @throws `SemanticError`
          */
-        std::optional<Declaration> parseDeclaration();
+        std::optional<declaration> parseDeclaration();
 
     public:
         std::shared_ptr<Element> ParseElement();
@@ -94,7 +94,7 @@ namespace myxml
          * @throws `SyntaxError`
          * @throws `SemanticError`
          */
-        Document ParseDocument();
+        document ParseDocument();
         Parser() = delete;
         explicit Parser(std::string_view);
         explicit Parser(std::string &&);

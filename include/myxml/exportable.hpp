@@ -12,16 +12,16 @@ namespace myxml
         ExportConfig();
     };
 
-    class Exportable
+    class exportable
     {
     protected:
         ExportConfig config;
 
     public:
-        virtual ~Exportable() = default;
+        virtual ~exportable() = default;
         virtual std::string ExportRaw() const = 0;
         virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const = 0;
-        virtual void SetEntityEncoding(bool) {};
-        virtual void SetPlatformSpecificNewline(bool) {};
+        virtual void entity_encoding(bool) {};
+        virtual void platform_specific_newline(bool) {};
     };
 }
