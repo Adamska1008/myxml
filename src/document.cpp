@@ -1,4 +1,5 @@
 #include <set>
+#include <iostream>
 #include <fmt/core.h>
 #include "myxml/document.hpp"
 #include "myxml/parser.hpp"
@@ -6,93 +7,87 @@
 
 namespace myxml
 {
-    void Document::SetDeclaration(const Declaration &declaration)
+    void document::set_declaration(const declaration &decl)
     {
-        this->declaration = declaration;
+        this->_decl = decl;
     }
 
-    void Document::SetRoot(std::shared_ptr<Element> root)
+    void document::set_root(std::shared_ptr<element_impl> root)
     {
-        this->root = root;
+        this->_root = root;
     }
 
-    const Declaration &Document::GetDeclartion() const
+    declaration &document::get_declaration()
     {
-        return this->declaration;
+        return this->_decl;
     }
 
-    Declaration &Document::GetDeclartion()
+    element &document::root()
     {
-        return this->declaration;
+        return this->_root;
     }
 
-    const std::shared_ptr<Element> &Document::GetRoot() const
+    element document::first_elem(std::string_view name)
     {
-        return this->root;
+        return this->_root.first_elem(name);
     }
 
-    std::shared_ptr<Element> Document::GetRoot()
+    element document::first_elem()
     {
-        return this->root;
+        return this->_root.first_elem();
     }
 
-    std::shared_ptr<Element> Document::Elem(std::string_view name)
+    text document::first_text()
     {
-        return this->root->Elem(name);
+        return this->_root.first_text();
     }
 
-    std::shared_ptr<Element> Document::FirstElem()
+    document document::parse(std::string_view input)
     {
-        return this->root->FirstElem();
+        return parser(input).parse_document();
     }
 
-    std::shared_ptr<Text> Document::FirstText()
+    document document::load(std::string fileName)
     {
-        return this->root->FirstText();
+        auto f = xml_file::open_file(fileName);
+        return parser(f).parse_document();
+    }
+    // std::string document::ExportRaw() const
+    // {
+    //     return this->decl.ExportRaw() + this->root->ExportRaw();
+    // }
+
+    void document::print(std::ostream &os) const
+    {
+        os << this->_decl << this->_root;
+    }
+    // std::string document::ExportFormatted(int indentLevel, int indentSize) const
+    // {
+    //     return this->decl.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
+    // }
+
+    void document::entity_encoding(bool flag)
+    {
+        this->_root.entity_encoding(flag);
     }
 
-    Document Document::Parse(std::string_view input)
+    void document::platform_specific_newline(bool flag)
     {
-        return Parser(input).ParseDocument();
+        this->_root.platform_specific_newline(flag);
     }
 
-    Document Document::ParseFile(std::string fileName)
+    std::optional<declaration> declaration::from_attrs(std::map<std::string, std::string> attrs)
     {
-        auto f = XMLFile::Open(fileName);
-        return Parser(f).ParseDocument();
-    }
-    std::string Document::ExportRaw() const
-    {
-        return this->declaration.ExportRaw() + this->root->ExportRaw();
-    }
-
-    std::string Document::ExportFormatted(int indentLevel, int indentSize) const
-    {
-        return this->declaration.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
-    }
-
-    void Document::SetEntityEncoding(bool flag)
-    {
-        this->root->SetEntityEncoding(flag);
-    }
-
-    void Document::SetPlatformSpecificNewline(bool flag)
-    {
-        this->root->SetPlatformSpecificNewline(flag);
-    }
-
-    std::optional<Declaration> Declaration::BuildFromAttrs(std::map<std::string, std::string> attrs)
-    {
-        if (!attrs.count("version") || !util::isValidXmlVersion(attrs["version"]))
+        if (!attrs.count("version") || !util::is_valid_xml_version(attrs["version"]))
         {
             return std::nullopt;
         }
-        Declaration declaration;
+        declaration declaration;
         declaration.version = attrs["version"];
         if (attrs.count("encoding"))
         {
             auto encoding = attrs["encoding"];
-            if (!util::isValidXmlEncoding(encoding))
+            if (!util::is_valid_xml_encoding(encoding))
             {
                 return std::nullopt;
             }
@@ -101,7 +96,7 @@ namespace myxml
         if (attrs.count("standalone"))
         {
             auto standalone = attrs["standalone"];
-            if (!util::isValidXmlStandalone(standalone))
+            if (!util::is_valid_xml_standalone(standalone))
             {
                 return std::nullopt;
             }
@@ -110,7 +105,7 @@ namespace myxml
         return declaration;
     }
 
-    std::string Declaration::ExportRaw() const
+    std::string declaration::ExportRaw() const
     {
         std::string builder = fmt::format("<?xml version={}", this->version);
         if (this->encoding)
@@ -124,19 +119,19 @@ namespace myxml
         return builder + "?>\n";
     }
 
-    std::string Declaration::ExportFormatted(int indentLevel, int indentSize) const
+    std::string declaration::ExportFormatted(int indentLevel, int indentSize) const
     {
         return std::string(' ', indentLevel * indentSize) + this->ExportRaw();
     }
 
     namespace util
     {
-        bool isValidXmlVersion(std::string_view version)
+        bool is_valid_xml_version(std::string_view version)
         {
             return version == "1.0" || version == "1.1";
         }
 
-        bool isValidXmlEncoding(std::string_view encoding)
+        bool is_valid_xml_encoding(std::string_view encoding)
         {
             // FIXME: not cover all valid encoding
             static std::set<std::string, std::less<>> valid{
@@ -148,14 +143,14 @@ namespace myxml
             return valid.count(encoding);
         }
 
-        bool isValidXmlStandalone(std::string_view standalone)
+        bool is_valid_xml_standalone(std::string_view standalone)
         {
             return standalone == "yes" || standalone == "no";
         }
     }
 
-    Document literals::operator""_doc(const char *literal, std::size_t len)
+    document literals::operator""_doc(const char *literal, std::size_t len)
     {
-        return Document::Parse(std::string_view(literal, len));
+        return document::parse(std::string_view(literal, len));
     }
 }

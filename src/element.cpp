@@ -1,109 +1,156 @@
+#include <iostream>
 #include "myxml/element.hpp"
 #include "myxml/parser.hpp"
+#include "myxml/xmlfile.hpp"
 
 namespace myxml
 {
-    Element::Element(std::string_view name)
-        : name(name) {}
-
-    std::shared_ptr<Element> Element::New(std::string_view name)
+    element::element(std::shared_ptr<element_impl> impl)
+        : _impl(impl)
     {
-        return std::shared_ptr<Element>(new Element(name));
     }
 
-    std::shared_ptr<Element> Element::New()
+    element::element(std::string_view name)
+        : element(element_impl::_new(name))
     {
-        return std::shared_ptr<Element>(new Element());
     }
 
-    std::shared_ptr<Element> Element::Parse(std::string_view buf)
+    std::string_view element::name()
     {
-        return Parser(buf).ParseElement();
+        return this->_impl->_name;
     }
 
-    std::optional<std::string_view> Element::GetAttribute(std::string_view name)
+    element element::parse(std::string_view xml)
     {
-        if (auto attr = this->attributes.find(name); attr != this->attributes.end())
+        return element_impl::parse(xml);
+    }
+
+    element element::load(std::string_view path)
+    {
+        return element_impl::load(path);
+    }
+
+    std::string &element::operator[](const std::string &attr)
+    {
+        return (*_impl)[attr];
+    }
+
+    element element::first_elem()
+    {
+        return _impl->first<element_impl>();
+    }
+
+    element element::first_elem(std::string_view name)
+    {
+        return _impl->first_elem(name);
+    }
+
+    text element::first_text()
+    {
+        return _impl->first<text_impl>();
+    }
+
+    cdata element::first_cdata()
+    {
+        return _impl->first<cdata_impl>();
+    }
+
+    void element::print(std::ostream &os) const
+    {
+        _impl->print(os);
+    }
+
+    void element::entity_encoding(bool flag)
+    {
+        return _impl->entity_encoding(flag);
+    }
+
+    void element::platform_specific_newline(bool flag)
+    {
+        return _impl->platform_specific_newline(flag);
+    }
+
+    element_impl::element_impl(std::string_view name)
+        : _name(name) {}
+
+    std::shared_ptr<element_impl> element_impl::_new(std::string_view name)
+    {
+        return std::shared_ptr<element_impl>(new element_impl(name));
+    }
+
+    std::shared_ptr<element_impl> element_impl::_new()
+    {
+        return std::shared_ptr<element_impl>(new element_impl());
+    }
+
+    std::shared_ptr<element_impl> element_impl::parse(std::string_view buf)
+    {
+        return parser(buf).parse_element();
+    }
+
+    std::shared_ptr<element_impl> element_impl::load(std::string_view path)
+    {
+        auto f = xml_file::open_file(path);
+        return parser(f).parse_element();
+    }
+
+    void element_impl::extend_attributes(std::map<std::string, std::string> attris)
+    {
+        this->_attributes.insert(attris.begin(), attris.end());
+    }
+
+    std::string &element_impl::operator[](const std::string &key)
+    {
+        return this->_attributes[key];
+    }
+
+    // std::string element_impl::ExportRaw() const
+    // {
+
+    //     std::string builder = "<" + std::string(this->name);
+    //     for (const auto &[key, value] : this->attributes)
+    //     {
+    //         builder += "" + key + "=\"" + value + "\"";
+    //     }
+    //     if (this->FirstChild() == nullptr)
+    //     {
+    //         builder += " />";
+    //         return builder;
+    //     }
+    //     builder += ">";
+    //     for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
+    //     {
+    //         builder += node->ExportRaw();
+    //     }
+    //     builder += "</" + std::string(this->name) + ">";
+    //     return builder;
+    // }
+
+    void element_impl::print(std::ostream &os) const
+    {
+        os << "<" << this->_name;
+        for (const auto &[key, value] : this->_attributes)
         {
-            return attr->second;
+            os << "" << key << "=\"" << value << "\"";
         }
-        else
+        if (this->first_child() == nullptr)
         {
-            return std::nullopt;
+            os << " />";
+            return;
         }
-    }
-
-    std::string_view Element::GetName() const
-    {
-        return this->name;
-    }
-
-    void Element::SetName(std::string_view name)
-    {
-        this->name = name;
-    }
-
-    void Element::SetAttribute(std::string key, std::string value)
-    {
-        this->attributes.emplace(key, value);
-    }
-
-    void Element::ExtendAttributes(std::map<std::string, std::string> attris)
-    {
-        this->attributes.insert(attris.begin(), attris.end());
-    }
-
-    std::string &Element::operator[](const std::string &key)
-    {
-        return this->attributes[key];
-    }
-
-    std::string Element::ExportRaw() const
-    {
-
-        std::string builder = "<" + std::string(this->GetName());
-        for (const auto &[key, value] : this->attributes)
+        os << ">";
+        for (auto node = this->first_child(); node != nullptr; node = node->next_sibiling())
         {
-            builder += "" + key + "=\"" + value + "\"";
+            node->print(os);
         }
-        if (this->FirstChild() == nullptr)
-        {
-            builder += " />";
-            return builder;
-        }
-        builder += ">";
-        for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
-        {
-            builder += node->ExportRaw();
-        }
-        builder += "</" + std::string(this->GetName()) + ">";
-        return builder;
+        os << "</" << this->_name << ">";
     }
 
-    std::string Element::ExportFormatted(int indentLevel, int indentSize) const
+    namespace literals
     {
-        std::string indent(indentLevel * indentSize, ' ');
-        std::string builder = indent + "<" + std::string(this->GetName());
-        for (const auto &[key, value] : this->attributes)
+        element operator""_elem(const char *literal, std::size_t len)
         {
-            builder += "" + key + "=\"" + value + "\"";
+            return element_impl::parse(std::string_view(literal, len));
         }
-        if (this->FirstChild() == nullptr)
-        {
-            builder += " />\n";
-            return builder;
-        }
-        builder += ">\n";
-        for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
-        {
-            builder += node->ExportFormatted(indentLevel + 1, indentSize);
-        }
-        builder += indent + "</" + std::string(this->GetName()) + ">\n";
-        return builder;
-    }
-
-    std::shared_ptr<Element> literals::operator""_elem(const char *literal, std::size_t len)
-    {
-        return Element::Parse(std::string_view(literal, len));
     }
 }

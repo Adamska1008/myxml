@@ -6,25 +6,25 @@ TEST_CASE("String Buffer", "[buffer]")
 {
     SECTION("Simple String Buffer")
     {
-        myxml::StringBuffer sb = "Hello, world!";
-        REQUIRE(sb.Peek() == 'H');
-        REQUIRE(sb.PeekN(3) == "Hel");
-        REQUIRE(sb.TakeN(3) == "Hel");
-        REQUIRE(sb.AfterN(1) == 'o');
-        REQUIRE(sb.AfterNM(1, 2) == "o,");
+        myxml::string_buffer sb = "Hello, world!";
+        REQUIRE(sb.peek() == 'H');
+        REQUIRE(sb.peek_n(3) == "Hel");
+        REQUIRE(sb.take_n(3) == "Hel");
+        REQUIRE(sb.after_n(1) == 'o');
+        REQUIRE(sb.after_n_m(1, 2) == "o,");
     }
 
     SECTION("Location", "[buffer]")
     {
-        myxml::StringBuffer sb = "Hello, world!\nLine2";
+        myxml::string_buffer sb = "Hello, world!\nLine2";
 
-        REQUIRE(sb.TakeN(3) == "Hel");
-        REQUIRE(sb.CurrentLocation() == std::make_tuple(0, 3));
-        REQUIRE(sb.TakeN(4) == "lo, ");
-        REQUIRE(sb.CurrentLocation() == std::make_tuple(0, 7));
-        REQUIRE(sb.TakeN(7) == "world!\n");
-        REQUIRE(sb.CurrentLocation() == std::make_tuple(1, 0));
-        REQUIRE(sb.TakeN(3) == "Lin");
-        REQUIRE(sb.CurrentLocation() == std::make_tuple(1, 3));
+        REQUIRE(sb.take_n(3) == "Hel");
+        REQUIRE(sb.cur_loc() == std::make_tuple(0, 3));
+        REQUIRE(sb.take_n(4) == "lo, ");
+        REQUIRE(sb.cur_loc() == std::make_tuple(0, 7));
+        REQUIRE(sb.take_n(7) == "world!\n");
+        REQUIRE(sb.cur_loc() == std::make_tuple(1, 0));
+        REQUIRE(sb.take_n(3) == "Lin");
+        REQUIRE(sb.cur_loc() == std::make_tuple(1, 3));
     }
 }

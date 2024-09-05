@@ -3,15 +3,16 @@
 
 TEST_CASE("Simple document", "[document]")
 {
+    using namespace myxml;
     SECTION("No decl")
     {
         std::string input = R"(<root>
     <child>Value</child>
 </root>)";
-        auto doc = myxml::Document::Parse(input);
-        REQUIRE(doc.GetRoot()->GetName() == "root");
-        REQUIRE(doc.Elem("child")->GetName() == "child");
-        REQUIRE(doc.Elem("child")->FirstText()->ExportRaw() == "Value");
+        auto doc = document::parse(input);
+        REQUIRE(doc.root().name() == "root");
+        REQUIRE(doc.first_elem("child").name() == "child");
+        REQUIRE(doc.first_elem("child").first_text().str() == "Value");
     }
 
     SECTION("With decl")
@@ -21,9 +22,9 @@ TEST_CASE("Simple document", "[document]")
     <child>Value</child>
 </root>
 )";
-        auto doc = myxml::Document::Parse(input);
-        REQUIRE(doc.GetDeclartion().version == "1.0");
-        REQUIRE(doc.GetDeclartion().encoding == "UTF-8");
+        auto doc = document::parse(input);
+        REQUIRE(doc.get_declaration().version == "1.0");
+        REQUIRE(doc.get_declaration().encoding == "UTF-8");
     }
 }
 
@@ -31,5 +32,5 @@ TEST_CASE("Custom String Literal", "[document]")
 {
     using namespace myxml::literals;
     auto doc = "<root></root>"_doc;
-    REQUIRE(doc.GetRoot()->GetName() == "root");
+    REQUIRE(doc.root().name() == "root");
 }

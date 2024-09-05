@@ -4,10 +4,41 @@
 
 namespace myxml
 {
-
-    Text::Text(std::string_view input)
+    text::text(std::shared_ptr<text_impl> impl)
+        : _impl(impl)
     {
-        if (config.EntityEncoding)
+    }
+
+    text::text(std::string &&str)
+    {
+        _impl = std::make_shared<text_impl>();
+        _impl->inner = str;
+    }
+
+    text::text(std::string_view str)
+    {
+        _impl = std::make_shared<text_impl>();
+        _impl->inner = str;
+    }
+
+    void text::print(std::ostream &os) const
+    {
+        this->_impl->print(os);
+    }
+
+    void text::entity_encoding(bool flag)
+    {
+        this->_impl->entity_encoding(flag);
+    }
+
+    void text::platform_specific_newline(bool flag)
+    {
+        this->_impl->platform_specific_newline(flag);
+    }
+
+    text_impl::text_impl(std::string_view input)
+    {
+        if (_config.entity_encoding)
         {
             // entity encoding
             static std::map<std::string, char, std::less<>> entityMap = {
@@ -57,16 +88,11 @@ namespace myxml
         }
     }
 
-    bool Text::IsAllSpace() const
+    void text_impl::print(std::ostream &os) const
     {
-        return std::all_of(this->inner.begin(), this->inner.end(), isspace);
-    }
-
-    std::string Text::ExportRaw() const
-    {
-        if (!this->config.EntityEncoding && !this->config.PlatformSpecificNewline)
+        if (!this->_config.entity_encoding && !this->_config.platform_specific_newline)
         {
-            return this->inner;
+            os << this->inner;
         }
         else
         {
@@ -79,42 +105,34 @@ namespace myxml
             };
             std::size_t start = 0; // start of current segement
             std::size_t len = this->inner.length();
-            std::string builder;
             for (std::size_t i = 0; i < len; i++)
             {
-                if (this->config.EntityEncoding)
+                if (this->_config.entity_encoding)
                 {
                     if (auto it = entityMap.find(this->inner[i]); it != entityMap.end())
                     {
-                        builder += this->inner.substr(start, i - start);
-                        builder += it->second;
+                        os << this->inner.substr(start, i - start);
+                        os << it->second;
                         start = i + 1;
                     }
                 }
-                if (this->config.PlatformSpecificNewline)
+                if (this->_config.platform_specific_newline)
                 {
                     if (this->inner[i] == '\n')
                     {
-                        builder += this->inner.substr(start, i - start);
-                        builder += util::platformSpecificNewline();
+                        os << this->inner.substr(start, i - start);
+                        os << util::platform_specific_newline();
                         start = i + 1;
                     }
                 }
             }
-            builder += this->inner.substr(start, len - start);
-            return builder;
+            os << this->inner.substr(start, len - start);
         }
-    }
-
-    std::string Text::ExportFormatted(int indentLevel, int indentSize) const
-    {
-        // TODO: better implementation
-        return std::string(indentLevel * indentSize, ' ') + this->inner + '\n';
     }
 
     namespace util
     {
-        const char *const platformSpecificNewline()
+        const std::string_view platform_specific_newline()
         {
 #ifdef _WIN32
             return "\r\n";

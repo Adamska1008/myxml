@@ -6,9 +6,9 @@
 
 namespace myxml
 {
-    struct ElementTag
+    struct element_tag
     {
-        enum class ClosingType
+        enum class closing_type
         {
             Open,   // <tag>
             Closed, // <tag/>
@@ -16,25 +16,26 @@ namespace myxml
         };
 
         std::string name;
-        ElementTag::ClosingType type = ClosingType::Open;
-        std::map<std::string, std::string> attris;
+        element_tag::closing_type type = closing_type::Open;
+        std::map<std::string, std::string> attrs;
     };
 
-    class Parser
+    class parser
     {
     private:
-        std::shared_ptr<Buffer> buffer;
+        std::shared_ptr<buffer> _buffer;
 
         std::optional<char> peek();
-        std::optional<std::string_view> peekN(int);
-        std::optional<char> afterN(int);
+        std::optional<std::string_view> peek_n(int);
+        std::optional<char> after_n(int);
         // m characters after n characters
-        std::optional<std::string_view> afterNM(int, int);
+        std::optional<std::string_view> after_n_m(int, int);
         std::optional<char> take();
-        std::optional<std::string_view> takeN(int);
-        void skipWhiteSpaces();
-        std::tuple<std::size_t, std::size_t> currentLoc();
+        std::optional<std::string_view> take_n(int);
+        void skip_whitespaces();
+        std::tuple<std::size_t, std::size_t> cur_loc();
 
+    public:
         /**
          * For all parsing method,
          * return std::nullopt means `not this one` and will not consume buffer.
@@ -46,66 +47,65 @@ namespace myxml
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError` if an invalid character occurs.
          */
-        std::string parseIdent();
+        std::string parse_ident();
         /**
          * Parse a string literal
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError` if missing any of `"`
          */
-        std::string parseStringLiteral();
+        std::string parse_str_literal();
         /**
          * @returns std::nullopt if find no attribute
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError` if the following chars do not confront to `key="value"` format
          */
-        std::optional<std::pair<std::string, std::string>> parseAttribute();
+        std::optional<std::pair<std::string, std::string>> parse_attribute();
         /**
          * @throws `SyntaxError` if faild to find `<`
          */
-        std::shared_ptr<Text> parseText();
+        std::shared_ptr<text_impl> parse_text();
         /**
          * @returns `std::nullopt` if not start with `<!CDATA[`
          */
-        std::shared_ptr<CData> parseCData();
+        std::shared_ptr<cdata_impl> parse_cdata();
         /**
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError`
          * @throws `SemanticError`
          */
-        std::shared_ptr<Element> parseElementWithHeader(ElementTag header);
+        std::shared_ptr<element_impl> parse_element_with_header(element_tag header);
         /**
          * @returns std::nullopt if not starts with `<?xml`
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError`
          * @throws `SemanticError`
          */
-        std::optional<Declaration> parseDeclaration();
+        std::optional<declaration> parse_declaration();
 
-    public:
-        std::shared_ptr<Element> ParseElement();
+        std::shared_ptr<element_impl> parse_element();
         /**
          * @returns std::nullopt if no heading `<`
          * @throws `SyntaxError` if the heading character is `<` and the trailing characters are in incorrect format
          * @throws `UnexpectedEndOfInput` if missing name
          */
-        std::optional<ElementTag> ParseElementTag();
+        std::optional<element_tag> parse_element_tag();
         /**
          * @throws `UnexpectedEndOfInput`
          * @throws `SyntaxError`
          * @throws `SemanticError`
          */
-        Document ParseDocument();
-        Parser() = delete;
-        explicit Parser(std::string_view);
-        explicit Parser(std::string &&);
+        document parse_document();
+        parser() = delete;
+        explicit parser(std::string_view);
+        explicit parser(std::string &&);
 
-        template <typename T, typename = std::enable_if_t<std::is_base_of_v<Buffer, T>>>
-        explicit Parser(std::shared_ptr<T> buffer)
-            : buffer(buffer) {}
+        template <typename T, typename = std::enable_if_t<std::is_base_of_v<buffer, T>>>
+        explicit parser(std::shared_ptr<T> buffer)
+            : _buffer(buffer) {}
     };
 
     namespace util
     {
-        bool isValidXmlChar(char ch);
+        bool is_valid_xml_char(char ch);
     }
 }

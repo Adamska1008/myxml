@@ -1,47 +1,49 @@
 #include <catch2/catch_test_macros.hpp>
 #include "myxml/element.hpp"
 
-TEST_CASE("Element Functionality", "[element]")
+TEST_CASE("Element Impl", "[element]")
 {
-    auto root = myxml::Element::New("root");
-    auto child = myxml::Element::New("child");
-    auto sibiling = myxml::Element::New("sibiling");
+    using namespace myxml;
+
+    auto root = element_impl::_new("root");
+    auto child = element_impl::_new("child");
+    auto sibiling = element_impl::_new("sibiling");
 
     SECTION("GetName")
     {
-        REQUIRE(root->GetName() == "root");
+        REQUIRE(root->_name == "root");
     }
 
     SECTION("Basic Insertion")
     {
-        root->InsertAtFront(child);
-        REQUIRE(root->FirstElem()->GetName() == "child");
-        REQUIRE(root->LastChild()->As<myxml::Element>()->GetName() == "child");
+        root->push_front(child);
+        REQUIRE(root->first<element_impl>()->_name == "child");
+        REQUIRE(root->last_child()->as<myxml::element_impl>()->_name == "child");
     }
 
     SECTION("Get child by name after insert it")
     {
-        root->InsertAtFront(child);
+        root->push_front(child);
         // Unbuffered
-        REQUIRE(root->Elem("child")->GetName() == "child");
+        REQUIRE(root->first_elem("child")->_name == "child");
         // Buffered
-        REQUIRE(root->Elem("child")->GetName() == "child");
+        REQUIRE(root->first_elem("child")->_name == "child");
     }
 
     SECTION("Multi child")
     {
-        root->InsertAtEnd(child);
-        root->InsertAtEnd(sibiling);
-        REQUIRE(root->Elem("child")->GetName() == "child");
-        REQUIRE(root->Elem("child")->NextElem()->GetName() == "sibiling");
-        REQUIRE(root->Elem("sibiling")->PrevElem()->GetName() == "child");
+        root->push_back(child);
+        root->push_back(sibiling);
+        REQUIRE(root->first_elem("child")->_name == "child");
+        REQUIRE(root->first_elem("child")->next<element_impl>()->_name == "sibiling");
+        REQUIRE(root->first_elem("sibiling")->prev<element_impl>()->_name == "child");
     }
 
     SECTION("Overload []")
     {
-        root->SetAttribute("hello", "world");
+        root->_attributes["hello"] = "world";
         REQUIRE((*root)["hello"] == "world");
-        REQUIRE(root->GetAttribute("hello") == "world");
+        REQUIRE(root->_attributes["hello"] == "world");
         (*root)["hello"] = "bar";
         REQUIRE((*root)["hello"] == "bar");
     }
@@ -51,5 +53,5 @@ TEST_CASE("Custom String Literal", "[Element]")
 {
     using namespace myxml::literals;
     auto elem = "<root></root>"_elem;
-    REQUIRE(elem->GetName() == "root");
+    REQUIRE(elem.name() == "root");
 }

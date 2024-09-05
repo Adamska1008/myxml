@@ -6,26 +6,25 @@
 
 namespace myxml
 {
-    class XMLFile : public Buffer
+    class xml_file : public buffer
     {
     private:
-        XMLFile();
+        xml_file();
 
         /* mmap related*/
-        int fd;
-        std::size_t fileSize;
-        char *inner;
+        int _fd;
+        std::size_t _size;
+        char *_mapped;
+        std::size_t _offset;
 
-        std::size_t offset;
-
-        /* Implement Buffer*/
+        /* Implement buffer*/
         virtual std::tuple<const char *, std::size_t> base() const;
 
     public:
-        static std::shared_ptr<XMLFile> Open(std::string_view fpath);
+        static std::shared_ptr<xml_file> open_file(std::string_view fpath);
         // RAII
-        ~XMLFile();
+        ~xml_file();
         // always copy shared_ptr instead of XMLFile
-        XMLFile(const XMLFile &) = delete;
+        xml_file(const xml_file &) = delete;
     };
 }

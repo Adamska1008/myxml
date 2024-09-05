@@ -5,7 +5,7 @@
 
 namespace myxml
 {
-    void Parser::skipWhiteSpaces()
+    void parser::skip_whitespaces()
     {
         while (this->peek() && std::isspace(*this->peek()))
         {
@@ -13,244 +13,244 @@ namespace myxml
         }
     }
 
-    std::tuple<std::size_t, std::size_t> Parser::currentLoc()
+    std::tuple<std::size_t, std::size_t> parser::cur_loc()
     {
-        return this->buffer->CurrentLocation();
+        return this->_buffer->cur_loc();
     }
 
-    std::optional<char> Parser::peek()
+    std::optional<char> parser::peek()
     {
-        return this->buffer->Peek();
+        return this->_buffer->peek();
     }
 
-    std::optional<std::string_view> Parser::peekN(int n)
+    std::optional<std::string_view> parser::peek_n(int n)
     {
-        return this->buffer->PeekN(n);
+        return this->_buffer->peek_n(n);
     }
 
-    std::optional<char> Parser::afterN(int n)
+    std::optional<char> parser::after_n(int n)
     {
-        return this->buffer->AfterN(n);
+        return this->_buffer->after_n(n);
     }
 
-    std::optional<std::string_view> Parser::afterNM(int n, int m)
+    std::optional<std::string_view> parser::after_n_m(int n, int m)
     {
-        return this->buffer->AfterNM(n, m);
+        return this->_buffer->after_n_m(n, m);
     }
 
-    std::optional<char> Parser::take()
+    std::optional<char> parser::take()
     {
-        return this->buffer->Take();
+        return this->_buffer->take();
     }
 
-    std::optional<std::string_view> Parser::takeN(int n)
+    std::optional<std::string_view> parser::take_n(int n)
     {
-        return this->buffer->TakeN(n);
+        return this->_buffer->take_n(n);
     }
 
-    std::string Parser::parseIdent()
+    std::string parser::parse_ident()
     {
         if (this->peek() == std::nullopt)
         {
-            auto [line, col] = this->currentLoc();
-            throw UnexpectedEndOfInput(line, col);
+            auto [line, col] = this->cur_loc();
+            throw unexpected_eof(line, col);
         }
         // validate heading character
         if (auto head = this->peek(); !head || (!std::isalpha(*head) && head != '_'))
         {
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("element name which starts with {} is invalid.", *head), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("element name which starts with {} is invalid.", *head), line, col);
         }
         std::size_t len = 0;
-        while (this->afterN(len) && util::isValidXmlChar(*this->afterN(len)))
+        while (this->after_n(len) && util::is_valid_xml_char(*this->after_n(len)))
         {
             len++;
         }
-        return std::string(*this->takeN(len));
+        return std::string(*this->take_n(len));
     }
 
-    std::string Parser::parseStringLiteral()
+    std::string parser::parse_str_literal()
     {
         if (!this->peek())
         {
-            auto [line, col] = this->currentLoc();
-            throw UnexpectedEndOfInput(line, col);
+            auto [line, col] = this->cur_loc();
+            throw unexpected_eof(line, col);
         }
         if (this->peek() != '"')
         {
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peek()), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("expected '\"' at the beginning of string literal, find {}", *this->peek()), line, col);
         }
         this->take();
         std::size_t len = 0;
-        while (this->afterN(len) != '"')
+        while (this->after_n(len) != '"')
         {
             len++;
         }
-        if (!this->afterN(len))
+        if (!this->after_n(len))
         { // if jump out due to length limit
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("missing closing double quote for string literal"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("missing closing double quote for string literal"), line, col);
         }
-        auto it = this->takeN(len);
+        auto it = this->take_n(len);
         this->take(); // skip "
         return std::string(*it);
     }
 
-    std::optional<std::pair<std::string, std::string>> Parser::parseAttribute()
+    std::optional<std::pair<std::string, std::string>> parser::parse_attribute()
     {
-        this->skipWhiteSpaces();
+        this->skip_whitespaces();
         std::pair<std::string, std::string> attr;
         std::string key;
         try
         {
-            key = this->parseIdent();
+            key = this->parse_ident();
         }
-        catch (SyntaxError e)
+        catch (syntax_error e)
         { // Only SyntaxError in parseIdent is incorrect heading character
             return std::nullopt;
         }
-        catch (UnexpectedEndOfInput e)
+        catch (unexpected_eof e)
         { // There must be `>` or else after all attributes
             throw e;
         }
         if (this->take() != '=')
         {
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("expected '=' after attribute name"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("expected '=' after attribute name"), line, col);
         }
         attr.first = key;
-        auto value = this->parseStringLiteral();
+        auto value = this->parse_str_literal();
         attr.second = value;
         return attr;
     }
 
-    std::shared_ptr<Text> Parser::parseText()
+    std::shared_ptr<text_impl> parser::parse_text()
     {
         if (!this->peek())
         {
-            auto [line, col] = this->currentLoc();
-            throw UnexpectedEndOfInput(line, col);
+            auto [line, col] = this->cur_loc();
+            throw unexpected_eof(line, col);
         }
         std::size_t len = 0;
-        while (this->afterN(len) != '<')
+        while (this->after_n(len) != '<')
         {
             len++;
         }
-        if (!this->afterN(len))
+        if (!this->after_n(len))
         { // if jump out of while loop due to length limit
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("expected '<' after text"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("expected '<' after text"), line, col);
         }
-        return std::shared_ptr<Text>(new Text(*this->takeN(len)));
+        return std::shared_ptr<text_impl>(new text_impl(*this->take_n(len)));
     }
 
-    std::shared_ptr<CData> Parser::parseCData()
+    std::shared_ptr<cdata_impl> parser::parse_cdata()
     {
-        if (this->peekN(9) != "<![CDATA[")
+        if (this->peek_n(9) != "<![CDATA[")
         {
             return nullptr;
         }
-        this->takeN(9);
+        this->take_n(9);
         std::size_t len = 0;
-        while (this->afterNM(len, 3) != "]]>")
+        while (this->after_n_m(len, 3) != "]]>")
         {
             len++;
         }
-        if (!this->afterN(len + 2))
+        if (!this->after_n(len + 2))
         {
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("expected \"]]>\" after CDATA"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("expected \"]]>\" after CDATA"), line, col);
         }
-        auto it = std::string(*this->takeN(len));
-        this->takeN(2);
-        return std::make_shared<CData>(it);
+        auto it = std::string(*this->take_n(len));
+        this->take_n(2);
+        return std::make_shared<cdata_impl>(it);
     }
 
-    std::optional<ElementTag> Parser::ParseElementTag()
+    std::optional<element_tag> parser::parse_element_tag()
     {
         if (this->take() != '<')
         {
             return std::nullopt;
         }
-        ElementTag tag;
+        element_tag tag;
         if (this->peek() == '/')
         {
-            tag.type = ElementTag::ClosingType::Closing;
+            tag.type = element_tag::closing_type::Closing;
             this->take();
         }
-        this->skipWhiteSpaces();
-        auto name = this->parseIdent();
+        this->skip_whitespaces();
+        auto name = this->parse_ident();
         tag.name = name;
-        this->skipWhiteSpaces();
-        while (auto attr = this->parseAttribute())
+        this->skip_whitespaces();
+        while (auto attr = this->parse_attribute())
         {
-            tag.attris.insert(*attr);
+            tag.attrs.insert(*attr);
         }
-        this->skipWhiteSpaces();
+        this->skip_whitespaces();
         if (this->peek() == '/')
         {
-            if (tag.type != ElementTag::ClosingType::Open)
+            if (tag.type != element_tag::closing_type::Open)
             {
-                auto [line, col] = this->currentLoc();
-                throw SyntaxError(fmt::format("unexpected ending '/' found in closing tag"), line, col);
+                auto [line, col] = this->cur_loc();
+                throw syntax_error(fmt::format("unexpected ending '/' found in closing tag"), line, col);
             }
-            tag.type = ElementTag::ClosingType::Closed;
+            tag.type = element_tag::closing_type::Closed;
             this->take();
         }
         if (this->take() != '>')
         {
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("expected '>' at the end of the tag"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("expected '>' at the end of the tag"), line, col);
         }
         return tag;
     }
 
-    std::shared_ptr<Element> Parser::parseElementWithHeader(ElementTag header)
+    std::shared_ptr<element_impl> parser::parse_element_with_header(element_tag header)
     {
-        auto elem = Element::New();
-        elem->SetName(header.name);
+        auto elem = element_impl::_new();
+        elem->_name = header.name;
         while (auto ch = this->peek())
         {
             switch (*ch)
             {
             case '<':
             {
-                if (auto cdata = this->parseCData(); cdata)
+                if (auto cdata = this->parse_cdata(); cdata)
                 {
-                    elem->InsertAtEnd(cdata);
+                    elem->push_back(cdata);
                     continue;
                 }
-                auto tag = this->ParseElementTag(); // impossible to be std::nullopt
+                auto tag = this->parse_element_tag(); // impossible to be std::nullopt
                 assert(tag);
                 switch (tag->type)
                 {
-                case ElementTag::ClosingType::Open:
+                case element_tag::closing_type::Open:
                 {
-                    auto child = this->parseElementWithHeader(*tag);
-                    elem->InsertAtEnd(child);
+                    auto child = this->parse_element_with_header(*tag);
+                    elem->push_back(child);
                     break;
                 }
-                case ElementTag::ClosingType::Closed:
+                case element_tag::closing_type::Closed:
                 {
-                    auto child = Element::New();
-                    child->SetName(tag->name);
-                    if (!tag->attris.empty())
+                    auto child = element_impl::_new();
+                    child->_name = tag->name;
+                    if (!tag->attrs.empty())
                     {
-                        child->ExtendAttributes(tag->attris);
+                        child->extend_attributes(tag->attrs);
                     }
-                    elem->InsertAtEnd(child);
+                    elem->push_back(child);
                     break;
                 }
-                case ElementTag::ClosingType::Closing:
-                    if (tag->name != elem->GetName())
+                case element_tag::closing_type::Closing:
+                    if (tag->name != elem->_name)
                     {
-                        auto [line, col] = this->currentLoc();
-                        throw SyntaxError(fmt::format("elem name in closing tag is mismatched with the header"), line, col);
+                        auto [line, col] = this->cur_loc();
+                        throw syntax_error(fmt::format("elem name in closing tag is mismatched with the header"), line, col);
                     }
-                    if (!header.attris.empty())
+                    if (!header.attrs.empty())
                     {
-                        elem->ExtendAttributes(header.attris);
+                        elem->extend_attributes(header.attrs);
                     }
                     return elem;
                 default:
@@ -259,38 +259,38 @@ namespace myxml
                 break;
             }
             default:
-                auto text = this->parseText();
-                elem->InsertAtEnd(text);
+                auto text = this->parse_text();
+                elem->push_back(text);
                 break;
             }
         }
-        auto [line, col] = this->currentLoc();
-        throw UnexpectedEndOfInput(line, col);
+        auto [line, col] = this->cur_loc();
+        throw unexpected_eof(line, col);
     }
 
-    std::shared_ptr<Element> Parser::ParseElement()
+    std::shared_ptr<element_impl> parser::parse_element()
     {
-        this->skipWhiteSpaces();
-        if (auto tag = this->ParseElementTag(); tag)
+        this->skip_whitespaces();
+        if (auto tag = this->parse_element_tag(); tag)
         {
-            if (tag->type == ElementTag::ClosingType::Closed)
+            if (tag->type == element_tag::closing_type::Closed)
             {
-                auto elem = Element::New();
-                elem->SetName(tag->name);
-                if (!tag->attris.empty())
+                auto elem = element_impl::_new();
+                elem->_name = tag->name;
+                if (!tag->attrs.empty())
                 {
-                    elem->ExtendAttributes(tag->attris);
+                    elem->extend_attributes(tag->attrs);
                 }
                 return elem;
             }
-            else if (tag->type == ElementTag::ClosingType::Open)
+            else if (tag->type == element_tag::closing_type::Open)
             {
-                return this->parseElementWithHeader(*tag);
+                return this->parse_element_with_header(*tag);
             }
             else // Closing </tag>
             {
-                auto [line, col] = this->currentLoc();
-                throw SyntaxError(fmt::format("unexpected closing tag"), line, col);
+                auto [line, col] = this->cur_loc();
+                throw syntax_error(fmt::format("unexpected closing tag"), line, col);
             }
         }
         else
@@ -299,65 +299,65 @@ namespace myxml
         }
     }
 
-    std::optional<Declaration> Parser::parseDeclaration()
+    std::optional<declaration> parser::parse_declaration()
     {
-        if (this->peekN(5) != "<?xml")
+        if (this->peek_n(5) != "<?xml")
         {
             return std::nullopt;
         }
-        this->takeN(5);
+        this->take_n(5);
         std::map<std::string, std::string> attrs;
-        while (auto attr = this->parseAttribute())
+        while (auto attr = this->parse_attribute())
         {
             attrs.insert(*attr);
         }
-        this->skipWhiteSpaces();
-        if (this->takeN(2) != "?>")
+        this->skip_whitespaces();
+        if (this->take_n(2) != "?>")
         {
-            auto [line, col] = this->currentLoc();
-            throw SyntaxError(fmt::format("expected \"?>\" at end of xml declaration"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw syntax_error(fmt::format("expected \"?>\" at end of xml declaration"), line, col);
         }
-        if (auto decl = Declaration::BuildFromAttrs(attrs); decl)
+        if (auto decl = declaration::from_attrs(attrs); decl)
         {
             return decl;
         }
         else
         {
-            auto [line, col] = this->currentLoc();
-            throw SemanticError(fmt::format("declaration has incorrect attributes"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw semantic_error(fmt::format("declaration has incorrect attributes"), line, col);
         }
     }
 
-    Document Parser::ParseDocument()
+    document parser::parse_document()
     {
-        Document document;
-        if (auto decl = this->parseDeclaration(); decl)
+        document document;
+        if (auto decl = this->parse_declaration(); decl)
         {
-            document.SetDeclaration(*decl);
+            document.set_declaration(*decl);
         }
-        if (auto root = this->ParseElement(); root)
+        if (auto root = this->parse_element(); root)
         {
-            document.SetRoot(root);
+            document.set_root(root);
         }
         else
         {
-            auto [line, col] = this->currentLoc();
-            throw SemanticError(fmt::format("missing root element in xml document"), line, col);
+            auto [line, col] = this->cur_loc();
+            throw semantic_error(fmt::format("missing root element in xml document"), line, col);
         }
         return document;
     }
 
-    Parser::Parser(std::string_view buffer)
-        : buffer(std::make_shared<StringBuffer>(buffer))
+    parser::parser(std::string_view buffer)
+        : _buffer(std::make_shared<string_buffer>(buffer))
     {
     }
 
-    Parser::Parser(std::string &&buffer)
-        : buffer(std::make_shared<StringBuffer>(buffer))
+    parser::parser(std::string &&buffer)
+        : _buffer(std::make_shared<string_buffer>(buffer))
     {
     }
 
-    bool util::isValidXmlChar(char ch)
+    bool util::is_valid_xml_char(char ch)
     {
         return std::isalnum(ch) || ch == '_' || ch == '-' || ch == '.' || ch == ':';
     }
