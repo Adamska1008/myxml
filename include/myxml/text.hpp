@@ -24,7 +24,7 @@ namespace myxml
         virtual void platform_specific_newline(bool) override;
     };
 
-    struct text_impl : public Node
+    struct text_impl : public node
     {
         std::string inner;
 

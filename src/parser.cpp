@@ -218,7 +218,7 @@ namespace myxml
             {
                 if (auto cdata = this->parse_cdata(); cdata)
                 {
-                    elem->InsertAtEnd(cdata);
+                    elem->push_back(cdata);
                     continue;
                 }
                 auto tag = this->parse_element_tag(); // impossible to be std::nullopt
@@ -228,7 +228,7 @@ namespace myxml
                 case element_tag::closing_type::Open:
                 {
                     auto child = this->parse_element_with_header(*tag);
-                    elem->InsertAtEnd(child);
+                    elem->push_back(child);
                     break;
                 }
                 case element_tag::closing_type::Closed:
@@ -239,7 +239,7 @@ namespace myxml
                     {
                         child->extend_attributes(tag->attrs);
                     }
-                    elem->InsertAtEnd(child);
+                    elem->push_back(child);
                     break;
                 }
                 case element_tag::closing_type::Closing:
@@ -260,7 +260,7 @@ namespace myxml
             }
             default:
                 auto text = this->parse_text();
-                elem->InsertAtEnd(text);
+                elem->push_back(text);
                 break;
             }
         }

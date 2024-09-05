@@ -53,7 +53,7 @@ namespace myxml
         virtual void platform_specific_newline(bool) override;
     };
 
-    struct element_impl : public CompositeNode // public std::enable_shared_from_this<Element>, public Node
+    struct element_impl : public composite_node // public std::enable_shared_from_this<Element>, public Node
     {
     public:
         std::string name;

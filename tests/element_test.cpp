@@ -3,9 +3,11 @@
 
 TEST_CASE("Element Impl", "[element]")
 {
-    auto root = myxml::element_impl::_new("root");
-    auto child = myxml::element_impl::_new("child");
-    auto sibiling = myxml::element_impl::_new("sibiling");
+    using namespace myxml;
+
+    auto root = element_impl::_new("root");
+    auto child = element_impl::_new("child");
+    auto sibiling = element_impl::_new("sibiling");
 
     SECTION("GetName")
     {
@@ -14,27 +16,27 @@ TEST_CASE("Element Impl", "[element]")
 
     SECTION("Basic Insertion")
     {
-        root->InsertAtFront(child);
-        REQUIRE(root->FirstElem()->name == "child");
-        REQUIRE(root->LastChild()->As<myxml::element_impl>()->name == "child");
+        root->push_front(child);
+        REQUIRE(root->first<element_impl>()->name == "child");
+        REQUIRE(root->last_child()->as<myxml::element_impl>()->name == "child");
     }
 
     SECTION("Get child by name after insert it")
     {
-        root->InsertAtFront(child);
+        root->push_front(child);
         // Unbuffered
-        REQUIRE(root->Elem("child")->name == "child");
+        REQUIRE(root->first_elem("child")->name == "child");
         // Buffered
-        REQUIRE(root->Elem("child")->name == "child");
+        REQUIRE(root->first_elem("child")->name == "child");
     }
 
     SECTION("Multi child")
     {
-        root->InsertAtEnd(child);
-        root->InsertAtEnd(sibiling);
-        REQUIRE(root->Elem("child")->name == "child");
-        REQUIRE(root->Elem("child")->NextElem()->name == "sibiling");
-        REQUIRE(root->Elem("sibiling")->PrevElem()->name == "child");
+        root->push_back(child);
+        root->push_back(sibiling);
+        REQUIRE(root->first_elem("child")->name == "child");
+        REQUIRE(root->first_elem("child")->next<element_impl>()->name == "sibiling");
+        REQUIRE(root->first_elem("sibiling")->prev<element_impl>()->name == "child");
     }
 
     SECTION("Overload []")

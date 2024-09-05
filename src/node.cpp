@@ -4,77 +4,47 @@
 
 namespace myxml
 {
-    void Node::entity_encoding(bool flag)
+    void node::entity_encoding(bool flag)
     {
         this->config.entity_encoding = flag;
     }
 
-    void Node::platform_specific_newline(bool flag)
+    void node::platform_specific_newline(bool flag)
     {
         this->config.platform_specific_newline = flag;
     }
 
-    std::shared_ptr<Node> Node::NextSibiling()
+    std::shared_ptr<node> node::next_sibiling()
     {
-        return this->next;
+        return this->_next;
     }
 
-    std::shared_ptr<Node> Node::PrevSibiling()
+    std::shared_ptr<node> node::prev_sibiling()
     {
-        return this->prev;
+        return this->_prev;
     }
 
-    std::shared_ptr<element_impl> Node::NextElem()
-    {
-        return this->Next<element_impl>();
-    }
-
-    std::shared_ptr<element_impl> Node::PrevElem()
-    {
-        return this->Prev<element_impl>();
-    }
-
-    std::shared_ptr<text_impl> Node::NextText()
-    {
-        return this->Next<text_impl>();
-    }
-
-    std::shared_ptr<text_impl> Node::PrevText()
-    {
-        return this->Prev<text_impl>();
-    }
-
-    std::shared_ptr<Node> CompositeNode::LastChild()
+    std::shared_ptr<node> composite_node::last_child()
     {
         return this->lastChild;
     }
 
-    const std::shared_ptr<Node> &CompositeNode::LastChild() const
+    const std::shared_ptr<node> &composite_node::last_child() const
     {
         return this->lastChild;
     }
 
-    std::shared_ptr<Node> CompositeNode::FirstChild()
+    std::shared_ptr<node> composite_node::first_child()
     {
         return this->firstChild;
     }
 
-    const std::shared_ptr<Node> &CompositeNode::FirstChild() const
+    const std::shared_ptr<node> &composite_node::first_child() const
     {
         return this->firstChild;
     }
 
-    std::shared_ptr<element_impl> CompositeNode::FirstElem()
-    {
-        return this->First<element_impl>();
-    }
-
-    std::shared_ptr<text_impl> CompositeNode::FirstText()
-    {
-        return this->First<text_impl>();
-    }
-
-    std::shared_ptr<element_impl> CompositeNode::Elem(std::string_view name)
+    std::shared_ptr<element_impl> composite_node::first_elem(std::string_view name)
     {
         if (auto buf = this->nameToElemBuffer.find(name); buf != this->nameToElemBuffer.end())
         {
@@ -88,9 +58,9 @@ namespace myxml
                 this->nameToElemBuffer.erase(buf);
             }
         }
-        for (auto child = this->firstChild; child != nullptr; child = child->next)
+        for (auto child = this->firstChild; child != nullptr; child = child->_next)
         {
-            if (auto elem = child->As<element_impl>(); elem && elem->name == name)
+            if (auto elem = child->as<element_impl>(); elem && elem->name == name)
             {
                 this->nameToElemBuffer.emplace(name, elem);
                 return elem;
@@ -99,13 +69,13 @@ namespace myxml
         return nullptr;
     }
 
-    std::shared_ptr<Node> CompositeNode::InsertAtFront(const std::shared_ptr<Node> &elem)
+    std::shared_ptr<node> composite_node::push_front(const std::shared_ptr<node> &elem)
     {
-        if (elem->parent != nullptr)
+        if (elem->_parent != nullptr)
         {
-            elem->parent->Unlink(elem);
+            elem->_parent->unlink(elem);
         }
-        elem->parent = this->shared_from_this()->As<CompositeNode>();
+        elem->_parent = this->shared_from_this()->as<composite_node>();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -113,20 +83,20 @@ namespace myxml
         }
         else
         {
-            this->firstChild->prev = elem;
-            elem->next = this->firstChild;
+            this->firstChild->_prev = elem;
+            elem->_next = this->firstChild;
             this->firstChild = elem;
         }
         return elem;
     }
 
-    std::shared_ptr<Node> CompositeNode::InsertAtEnd(const std::shared_ptr<Node> &elem)
+    std::shared_ptr<node> composite_node::push_back(const std::shared_ptr<node> &elem)
     {
-        if (elem->parent != nullptr)
+        if (elem->_parent != nullptr)
         {
-            elem->parent->Unlink(elem);
+            elem->_parent->unlink(elem);
         }
-        elem->parent = this->shared_from_this()->As<CompositeNode>();
+        elem->_parent = this->shared_from_this()->as<composite_node>();
         if (this->firstChild == nullptr)
         {
             this->firstChild = elem;
@@ -134,53 +104,53 @@ namespace myxml
         }
         else
         {
-            this->lastChild->next = elem;
-            elem->prev = this->lastChild;
+            this->lastChild->_next = elem;
+            elem->_prev = this->lastChild;
             this->lastChild = elem;
         }
         return elem;
     }
 
-    void CompositeNode::Unlink(const std::shared_ptr<Node> &elem)
+    void composite_node::unlink(const std::shared_ptr<node> &elem)
     {
-        if (elem->parent.get() != this)
+        if (elem->_parent.get() != this)
         {
             return;
         }
         if (elem == this->firstChild)
         {
-            this->firstChild = this->firstChild->next;
+            this->firstChild = this->firstChild->_next;
         }
         if (elem == this->lastChild)
         {
-            this->lastChild = this->lastChild->prev;
+            this->lastChild = this->lastChild->_prev;
         }
-        if (elem->prev != nullptr)
+        if (elem->_prev != nullptr)
         {
-            elem->prev->next = elem->next;
+            elem->_prev->_next = elem->_next;
         }
-        if (elem->next != nullptr)
+        if (elem->_next != nullptr)
         {
-            elem->next->prev = elem->prev;
+            elem->_next->_prev = elem->_prev;
         }
-        elem->next = nullptr;
-        elem->prev = nullptr;
-        elem->parent = nullptr;
+        elem->_next = nullptr;
+        elem->_prev = nullptr;
+        elem->_parent = nullptr;
     }
 
-    void CompositeNode::entity_encoding(bool flag)
+    void composite_node::entity_encoding(bool flag)
     {
         this->config.entity_encoding = flag;
-        for (auto it = this->FirstChild(); it != nullptr; it = it->next)
+        for (auto it = this->first_child(); it != nullptr; it = it->_next)
         {
             it->entity_encoding(flag);
         }
     }
 
-    void CompositeNode::platform_specific_newline(bool flag)
+    void composite_node::platform_specific_newline(bool flag)
     {
         this->config.platform_specific_newline = flag;
-        for (auto it = this->FirstChild(); it != nullptr; it = it->next)
+        for (auto it = this->first_child(); it != nullptr; it = it->_next)
         {
             it->platform_specific_newline(flag);
         }

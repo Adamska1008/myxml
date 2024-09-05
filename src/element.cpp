@@ -37,17 +37,17 @@ namespace myxml
 
     element element::first_elem()
     {
-        return _impl->First<element_impl>();
+        return _impl->first<element_impl>();
     }
 
     element element::first_elem(std::string_view name)
     {
-        return _impl->Elem(name);
+        return _impl->first_elem(name);
     }
 
     text element::first_text()
     {
-        return _impl->First<text_impl>();
+        return _impl->first<text_impl>();
     }
 
     void element::print(std::ostream &os) const
@@ -128,40 +128,18 @@ namespace myxml
         {
             os << "" << key << "=\"" << value << "\"";
         }
-        if (this->FirstChild() == nullptr)
+        if (this->first_child() == nullptr)
         {
             os << " />";
             return;
         }
         os << ">";
-        for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
+        for (auto node = this->first_child(); node != nullptr; node = node->next_sibiling())
         {
             node->print(os);
         }
         os << "</" << this->name << ">";
     }
-
-    // std::string element_impl::ExportFormatted(int indentLevel, int indentSize) const
-    // {
-    //     std::string indent(indentLevel * indentSize, ' ');
-    //     std::string builder = indent + "<" + std::string(this->name);
-    //     for (const auto &[key, value] : this->attributes)
-    //     {
-    //         builder += "" + key + "=\"" + value + "\"";
-    //     }
-    //     if (this->FirstChild() == nullptr)
-    //     {
-    //         builder += " />\n";
-    //         return builder;
-    //     }
-    //     builder += ">\n";
-    //     for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
-    //     {
-    //         builder += node->ExportFormatted(indentLevel + 1, indentSize);
-    //     }
-    //     builder += indent + "</" + std::string(this->name) + ">\n";
-    //     return builder;
-    // }
 
     namespace literals
     {

@@ -22,7 +22,7 @@ namespace myxml
         virtual void print(std::ostream &) const override;
     };
 
-    class cdata_impl : public Node
+    class cdata_impl : public node
     {
     public:
         std::string inner;
