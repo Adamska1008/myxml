@@ -12,6 +12,8 @@
 
 **myxml** is developed in modern C++(17), leveraging the capabilities of `string_view`, `shared_ptr`, `optional`, `variant` and some of newest SNIFAE utility(sadly not concept). It's fully modulized(not all in one file) and has a well-designed Is-a relationship.
 
+Many of the most-starred XML parsers on GitHub are somewhat outdated and not as handy as popular JSON parsers like [nlohmann](https://github.com/nlohmann/json). It’s time to create a modern alternative.
+
 Currently **myxml** has only around 2000 lines of code, making it easy to get involved in its development. While it's far far from perfect, myxml is perfect for anyone looking to contribute to a modern C++ project. Share your ideas with us!
 
 ## Progress and Roadmap
