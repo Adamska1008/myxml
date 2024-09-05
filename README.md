@@ -106,10 +106,9 @@ Here’s a **basic example**:
 
 int main()
 {
-    std::string xml("<root attr=\"value\">Hello, world!<root/>");
-    auto elem = myxml::Element::Parse(xml);
-    std::cout << root->FirstText()->ExportRaw() << std::endl;    // "Hello, world!";
-    std::cout << (*root)["attr"] << std::endl;      // "value"
+    auto elem = myxml::element::parse("<root attr=\"value\">Hello, world!<root/>");
+    std::cout << elem.first_text() << std::endl;    // "Hello, world!";
+    std::cout << elem["attr"] << std::endl;      // "value"
 }
 ```
 
@@ -123,11 +122,11 @@ using namespace xml::literals;
 int main()
 {
     auto elem = "<root></root>"_elem;
-    std::cout << elem->GetName() << std::endl;
+    std::cout << elem.name() << std::endl; // root
 }
 ```
 
-Similar Approach for `myxml::Document`.
+Similar Approach for `myxml::document`.
 
 **Parse file**:
 
@@ -136,8 +135,8 @@ Similar Approach for `myxml::Document`.
 
 int main()
 {
-    auto doc = myxml::Document::ParseFile("filename");
-    auto root = doc.GetRoot();
+    auto doc = myxml::document::load("filename");
+    auto root = doc.root();
 }
 ```
 
@@ -145,4 +144,4 @@ For more examples, read test files [here](./tests/).
 
 ## Inspiration
 
-This repo is inspired by [tinyxml2](https://github.com/leethomason/tinyxml2) and [pugixml](https://github.com/zeux/pugixml).
+This repo is inspired by [tinyxml2](https://github.com/leethomason/tinyxml2), [pugixml](https://github.com/zeux/pugixml) and [nlohmann/json](https://github.com/nlohmann/json).
