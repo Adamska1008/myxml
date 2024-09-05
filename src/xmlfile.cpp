@@ -22,18 +22,18 @@ namespace myxml
         xfile->fd = open(fpath.data(), O_RDONLY);
         if (xfile->fd == -1)
         {
-            throw IOError(fmt::format("failed to open file: {}", fpath));
+            throw io_error(fmt::format("failed to open file: {}", fpath));
         }
         struct stat fileInfo;
         if (fstat(xfile->fd, &fileInfo) == -1)
         {
-            throw IOError(fmt::format("failed to get info of file: {}", fpath));
+            throw io_error(fmt::format("failed to get info of file: {}", fpath));
         }
         xfile->fileSize = fileInfo.st_size;
         void *mappedRegion = mmap(nullptr, xfile->fileSize, PROT_READ, MAP_PRIVATE, xfile->fd, 0);
         if (mappedRegion == MAP_FAILED)
         {
-            throw IOError(fmt::format("failed to map memory for file: {}", fpath));
+            throw io_error(fmt::format("failed to map memory for file: {}", fpath));
         }
         xfile->inner = static_cast<char *>(mappedRegion);
         return xfile;

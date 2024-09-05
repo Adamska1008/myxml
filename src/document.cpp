@@ -54,13 +54,13 @@ namespace myxml
 
     document document::parse(std::string_view input)
     {
-        return Parser(input).ParseDocument();
+        return parser(input).parse_document();
     }
 
     document document::load(std::string fileName)
     {
         auto f = XMLFile::Open(fileName);
-        return Parser(f).ParseDocument();
+        return parser(f).parse_document();
     }
     // std::string document::ExportRaw() const
     // {

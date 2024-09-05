@@ -4,26 +4,37 @@
 
 namespace myxml
 {
-    CData::CData(std::string str)
+    cdata::cdata(std::shared_ptr<cdata_impl> impl)
+        : _impl(impl)
+    {
+    }
+
+    cdata::cdata(std::string_view str)
+        : _impl(std::make_shared<cdata_impl>(str))
+    {
+    }
+
+    cdata::cdata(std::string &&str)
+        : _impl(std::make_shared<cdata_impl>(str))
+    {
+    }
+
+    void cdata::print(std::ostream &os) const
+    {
+        _impl->print(os);
+    }
+
+    cdata_impl::cdata_impl(std::string_view str)
         : inner(str)
     {
     }
 
-    // std::string CData::ExportRaw() const
-    // {
-    //     return fmt::format("<![CDATA[{}]]>\n", this->inner);
-    // }
-
-    // std::string CData::ExportFormatted(int indentLevel, int indentSize) const
-    // {
-    //     return std::string(indentLevel * indentSize, ' ') + this->ExportRaw();
-    // }
-
-    void CData::entity_encoding(bool)
-    { // do nothing
+    cdata_impl::cdata_impl(std::string &&str)
+        : inner(str)
+    {
     }
 
-    void CData::print(std::ostream &os) const
+    void cdata_impl::print(std::ostream &os) const
     {
         os << "<![CDATA[" << this->inner << "]]>\n";
     }

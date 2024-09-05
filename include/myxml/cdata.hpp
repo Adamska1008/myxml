@@ -1,20 +1,38 @@
 #pragma once
 #include "myxml/node.hpp"
+#include "myxml/printable.hpp"
 
 namespace myxml
 {
-    class CData : public Node
+    class cdata_impl;
+
+    class cdata : public printable
     {
     private:
-        std::string inner;
+        std::shared_ptr<cdata_impl> _impl;
+
+        cdata(std::shared_ptr<cdata_impl>);
 
     public:
-        explicit CData(std::string);
+        cdata(std::string &&);
+        cdata(std::string_view);
 
-        virtual ~CData() = default;
-        // virtual std::string ExportRaw() const override;
-        // virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const override;
-        virtual void entity_encoding(bool) override;
+        virtual void entity_encoding(bool) override {}
+        virtual void platform_specific_newline(bool) override {}
+        virtual void print(std::ostream &) const override;
+    };
+
+    class cdata_impl : public Node
+    {
+    public:
+        std::string inner;
+
+        cdata_impl() {};
+        explicit cdata_impl(std::string_view);
+        explicit cdata_impl(std::string &&);
+        virtual ~cdata_impl() = default;
+
+        virtual void entity_encoding(bool) override {}
         virtual void platform_specific_newline(bool) override {}
         virtual void print(std::ostream &) const override;
     };

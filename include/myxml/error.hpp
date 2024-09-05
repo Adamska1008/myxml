@@ -3,7 +3,7 @@
 
 namespace myxml
 {
-    class ParseError : public std::exception
+    class parse_error : public std::exception
     {
     private:
         virtual const char *prefix() const = 0;
@@ -16,7 +16,7 @@ namespace myxml
         std::size_t column;
 
     public:
-        ParseError(std::string message, std::size_t line, std::size_t column);
+        parse_error(std::string message, std::size_t line, std::size_t column);
 
         virtual const char *what() const noexcept override;
     };
@@ -27,46 +27,46 @@ namespace myxml
      *  2. Unexpected token. Encounter a token that is not expected in the context. For example: extra semicolon.
      *  ...
      */
-    class SyntaxError : public ParseError
+    class syntax_error : public parse_error
     {
     private:
         virtual const char *prefix() const;
 
     public:
-        SyntaxError(std::string, std::size_t line, std::size_t column);
+        syntax_error(std::string, std::size_t line, std::size_t column);
     };
 
     /**
      *
      */
-    class SemanticError : public ParseError
+    class semantic_error : public parse_error
     {
     private:
         virtual const char *prefix() const;
 
     public:
-        SemanticError(std::string, std::size_t line, std::size_t column);
+        semantic_error(std::string, std::size_t line, std::size_t column);
     };
 
     /**
      * e.g. EOF
      */
-    class UnexpectedEndOfInput : public ParseError
+    class unexpected_eof : public parse_error
     {
     private:
         virtual const char *prefix() const;
 
     public:
-        UnexpectedEndOfInput(std::size_t line, std::size_t column);
+        unexpected_eof(std::size_t line, std::size_t column);
     };
 
-    class IOError : public std::exception
+    class io_error : public std::exception
     {
     private:
         std::string message;
 
     public:
-        IOError(std::string);
+        io_error(std::string);
 
         virtual const char *what() const noexcept override;
     };

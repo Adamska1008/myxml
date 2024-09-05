@@ -7,19 +7,19 @@
 TEST_CASE("Parsing tag", "parser")
 {
     std::string open = "<tag>";
-    auto tag = myxml::Parser(open).ParseElementTag();
+    auto tag = myxml::parser(open).parse_element_tag();
     REQUIRE(tag->name == "tag");
-    REQUIRE(tag->type == myxml::ElementTag::ClosingType::Open);
+    REQUIRE(tag->type == myxml::element_tag::closing_type::Open);
 
     std::string closed = "<tag/>";
-    tag = myxml::Parser(closed).ParseElementTag();
+    tag = myxml::parser(closed).parse_element_tag();
     REQUIRE(tag->name == "tag");
-    REQUIRE(tag->type == myxml::ElementTag::ClosingType::Closed);
+    REQUIRE(tag->type == myxml::element_tag::closing_type::Closed);
 
     std::string closing = "</tag>";
-    tag = myxml::Parser(closing).ParseElementTag();
+    tag = myxml::parser(closing).parse_element_tag();
     REQUIRE(tag->name == "tag");
-    REQUIRE(tag->type == myxml::ElementTag::ClosingType::Closing);
+    REQUIRE(tag->type == myxml::element_tag::closing_type::Closing);
 }
 
 TEST_CASE("Parsing simple xml elements", "[parser]")
@@ -200,7 +200,7 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         std::string cdata = "<root><![CDATA[Hello!]]></root>";
         auto elem = myxml::element_impl::parse(cdata);
 
-        REQUIRE(elem->FirstChild()->As<myxml::CData>()->str() == "<![CDATA[Hello!]]>\n");
+        REQUIRE(elem->FirstChild()->As<myxml::cdata_impl>()->str() == "<![CDATA[Hello!]]>\n");
     }
 
     SECTION("Newline Normalization")

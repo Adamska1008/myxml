@@ -6,7 +6,7 @@
 
 namespace myxml
 {
-    class XMLFile : public Buffer
+    class XMLFile : public buffer
     {
     private:
         XMLFile();
@@ -18,7 +18,7 @@ namespace myxml
 
         std::size_t offset;
 
-        /* Implement Buffer*/
+        /* Implement buffer*/
         virtual std::tuple<const char *, std::size_t> base() const;
 
     public:

@@ -3,54 +3,54 @@
 
 namespace myxml
 {
-    ParseError::ParseError(std::string message, std::size_t line, std::size_t column)
+    parse_error::parse_error(std::string message, std::size_t line, std::size_t column)
         : message(message), line(line), column(column)
     {
     }
 
-    const char *ParseError::what() const noexcept
+    const char *parse_error::what() const noexcept
     {
         this->fullMessage = fmt::format("{}{}\nin line: {} column: {}",
                                         this->prefix(), this->message, this->line, this->column);
         return this->fullMessage.c_str();
     }
 
-    const char *SyntaxError::prefix() const
+    const char *syntax_error::prefix() const
     {
         return "Syntax Error: ";
     }
 
-    SyntaxError::SyntaxError(std::string, std::size_t line, std::size_t column)
-        : ParseError(message, line, column)
+    syntax_error::syntax_error(std::string, std::size_t line, std::size_t column)
+        : parse_error(message, line, column)
     {
     }
 
-    const char *SemanticError::prefix() const
+    const char *semantic_error::prefix() const
     {
         return "Sematic Error: ";
     }
 
-    SemanticError::SemanticError(std::string, std::size_t line, std::size_t column)
-        : ParseError(message, line, column)
+    semantic_error::semantic_error(std::string, std::size_t line, std::size_t column)
+        : parse_error(message, line, column)
     {
     }
 
-    const char *UnexpectedEndOfInput::prefix() const
+    const char *unexpected_eof::prefix() const
     {
         return "Unexpected End of Input: ";
     }
 
-    UnexpectedEndOfInput::UnexpectedEndOfInput(std::size_t line, std::size_t column)
-        : ParseError("End of input", line, column)
+    unexpected_eof::unexpected_eof(std::size_t line, std::size_t column)
+        : parse_error("End of input", line, column)
     {
     }
 
-    IOError::IOError(std::string message)
+    io_error::io_error(std::string message)
         : message(message)
     {
     }
 
-    const char *IOError::what() const noexcept
+    const char *io_error::what() const noexcept
     {
         return message.c_str();
     }

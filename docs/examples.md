@@ -32,6 +32,7 @@ root->set_name("far");
 #### Attributes
 
 ```C++
+using namespace myxml;
 // create an element with name 'root'
 element elem("root");
 // or get an element from parsing
@@ -49,6 +50,7 @@ elem["hello"]; // == elem["hello"] = "";
 #### Children
 
 ```C++
+using namespace myxml;
 // element root;
 element child = root.first_elem();
 // or first element with name "child"
@@ -62,6 +64,7 @@ std::vector<element> children = root.elems("child");
 ### Text
 
 ```C++
+using namespace myxml;
 // create from string
 text txt = "Hello";
 // or from query

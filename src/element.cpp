@@ -80,13 +80,13 @@ namespace myxml
 
     std::shared_ptr<element_impl> element_impl::parse(std::string_view buf)
     {
-        return Parser(buf).ParseElement();
+        return parser(buf).parse_element();
     }
 
     std::shared_ptr<element_impl> element_impl::load(std::string_view path)
     {
         auto f = XMLFile::Open(path);
-        return Parser(f).ParseElement();
+        return parser(f).parse_element();
     }
 
     void element_impl::extend_attributes(std::map<std::string, std::string> attris)
