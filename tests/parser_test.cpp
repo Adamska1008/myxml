@@ -218,6 +218,7 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 
     SECTION("Simple File Buffer")
     {
-        auto doc = document::load("tests/data/example.xml");
+        auto doc = document::load("tests/data/example1.xml");
+        auto root = doc.root();
     }
 }
