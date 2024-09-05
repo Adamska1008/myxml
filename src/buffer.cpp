@@ -6,12 +6,12 @@ namespace myxml
     {
         if (ch == '\n')
         {
-            this->_column = 0;
-            this->_line++;
+            _column = 0;
+            _line++;
         }
         else
         {
-            this->_column++;
+            _column++;
         }
     }
 
@@ -26,51 +26,51 @@ namespace myxml
     std::optional<char> buffer::peek() const
     {
         auto [ptr, len] = this->base();
-        if (this->_offset >= len)
+        if (_offset >= len)
         {
             return std::nullopt;
         }
-        return ptr[this->_offset];
+        return ptr[_offset];
     }
 
     std::optional<std::string_view> buffer::peek_n(int n) const
     {
         auto [ptr, len] = this->base();
-        if (this->_offset >= len)
+        if (_offset >= len)
         {
             return std::nullopt;
         }
-        return std::string_view(ptr + this->_offset, n);
+        return std::string_view(ptr + _offset, n);
     }
 
     std::optional<char> buffer::after_n(int n) const
     {
         auto [ptr, len] = this->base();
-        if (this->_offset + n > len)
+        if (_offset + n > len)
         {
             return std::nullopt;
         }
-        return ptr[this->_offset + n];
+        return ptr[_offset + n];
     }
 
     std::optional<std::string_view> buffer::after_n_m(int n, int m) const
     {
         auto [ptr, len] = this->base();
-        if (this->_offset + n + m > len)
+        if (_offset + n + m > len)
         {
             return std::nullopt;
         }
-        return std::string_view(ptr + this->_offset + n, m);
+        return std::string_view(ptr + _offset + n, m);
     }
 
     std::optional<char> buffer::take()
     {
         auto [ptr, len] = this->base();
-        if (this->_offset >= len)
+        if (_offset >= len)
         {
             return std::nullopt;
         }
-        auto ch = ptr[this->_offset++];
+        auto ch = ptr[_offset++];
         this->update_loc(ch);
         return ch;
     }
@@ -82,7 +82,7 @@ namespace myxml
         {
             return std::nullopt;
         }
-        std::string_view strv(ptr + this->_offset, n);
+        std::string_view strv(ptr + _offset, n);
         this->update_loc(strv);
         _offset += n;
         return strv;
@@ -90,7 +90,7 @@ namespace myxml
 
     std::tuple<std::size_t, std::size_t> buffer::cur_loc()
     {
-        return {this->_line, this->_column};
+        return {_line, _column};
     }
 
     string_buffer::string_buffer(std::string_view inner)
@@ -116,13 +116,13 @@ namespace myxml
 
     std::string_view string_buffer::view() const
     {
-        if (std::holds_alternative<std::string>(this->_inner))
+        if (std::holds_alternative<std::string>(_inner))
         {
-            return std::string_view(std::get<std::string>(this->_inner));
+            return std::string_view(std::get<std::string>(_inner));
         }
         else
         {
-            return std::get<std::string_view>(this->_inner);
+            return std::get<std::string_view>(_inner);
         }
     }
 }

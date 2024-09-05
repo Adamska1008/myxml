@@ -15,7 +15,7 @@ namespace myxml
     {
     }
 
-    std::shared_ptr<xml_file> xml_file::open(std::string_view fpath)
+    std::shared_ptr<xml_file> xml_file::open_file(std::string_view fpath)
     {
         // can't use make_shared because XMLFile() is private
         auto xfile = std::shared_ptr<xml_file>(new xml_file());

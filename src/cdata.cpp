@@ -36,6 +36,6 @@ namespace myxml
 
     void cdata_impl::print(std::ostream &os) const
     {
-        os << "<![CDATA[" << this->_inner << "]]>\n";
+        os << "<![CDATA[" << _inner << "]]>\n";
     }
 }

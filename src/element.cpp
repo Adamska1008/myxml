@@ -90,7 +90,7 @@ namespace myxml
 
     std::shared_ptr<element_impl> element_impl::load(std::string_view path)
     {
-        auto f = xml_file::open(path);
+        auto f = xml_file::open_file(path);
         return parser(f).parse_element();
     }
 

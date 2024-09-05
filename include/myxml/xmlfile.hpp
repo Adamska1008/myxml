@@ -21,7 +21,7 @@ namespace myxml
         virtual std::tuple<const char *, std::size_t> base() const;
 
     public:
-        static std::shared_ptr<xml_file> open(std::string_view fpath);
+        static std::shared_ptr<xml_file> open_file(std::string_view fpath);
         // RAII
         ~xml_file();
         // always copy shared_ptr instead of XMLFile

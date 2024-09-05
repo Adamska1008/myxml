@@ -88,11 +88,6 @@ namespace myxml
         }
     }
 
-    bool text_impl::IsAllSpace() const
-    {
-        return std::all_of(this->inner.begin(), this->inner.end(), isspace);
-    }
-
     void text_impl::print(std::ostream &os) const
     {
         if (!this->_config.entity_encoding && !this->_config.platform_specific_newline)

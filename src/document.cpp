@@ -59,7 +59,7 @@ namespace myxml
 
     document document::load(std::string fileName)
     {
-        auto f = xml_file::open(fileName);
+        auto f = xml_file::open_file(fileName);
         return parser(f).parse_document();
     }
     // std::string document::ExportRaw() const
