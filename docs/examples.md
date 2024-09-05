@@ -9,13 +9,13 @@ using namespace myxml;
 // `std::string xml`
 document doc = document::parse(xml);
 // or
-document doc = document::load(path);
+doc = document::load(path);
 // get root elem
-optional<element> elem = doc.root().first_elem();
+std::optional<element> elem = doc.root().first_elem();
 // or directly query elem in root
-optional<element> elem = doc.first_elem();
+elem = doc.first_elem();
 // or query by name
-optional<element> elem = doc.first_elem("elem");
+elem = doc.first_elem("elem");
 ```
 
 ### Element

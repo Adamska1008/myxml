@@ -17,22 +17,12 @@ namespace myxml
         this->_root = root;
     }
 
-    const declaration &document::get_declaration() const
-    {
-        return this->_decl;
-    }
-
     declaration &document::get_declaration()
     {
         return this->_decl;
     }
 
-    const element &document::get_root() const
-    {
-        return this->_root;
-    }
-
-    element &document::get_root()
+    element &document::root()
     {
         return this->_root;
     }

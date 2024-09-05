@@ -36,10 +36,8 @@ namespace myxml
         void set_root(std::shared_ptr<element_impl> root);
 
         /* Query */
-        const declaration &get_declaration() const;
         declaration &get_declaration();
-        const element &get_root() const;
-        element &get_root();
+        element &root();
         element first_elem(std::string_view);
         element first_elem();
         text first_text();

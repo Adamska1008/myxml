@@ -218,7 +218,6 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
 
     SECTION("Simple File Buffer")
     {
-        std::cout << std::filesystem::current_path() << std::endl;
         auto doc = document::load("tests/data/example.xml");
     }
 }
