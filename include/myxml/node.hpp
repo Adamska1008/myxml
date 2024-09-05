@@ -18,6 +18,11 @@ namespace myxml
     class node : public std::enable_shared_from_this<node>, public printable
     {
     public:
+        virtual ~node() = default;
+        std::shared_ptr<composite_node> _parent;
+        std::shared_ptr<node> _prev;
+        std::shared_ptr<node> _next;
+
         template <typename T, typename = std::enable_if_t<std::is_base_of_v<node, T>>>
         std::shared_ptr<T> next()
         {
@@ -43,11 +48,6 @@ namespace myxml
             }
             return nullptr;
         }
-
-        virtual ~node() = default;
-        std::shared_ptr<composite_node> _parent;
-        std::shared_ptr<node> _prev;
-        std::shared_ptr<node> _next;
 
         template <typename T, typename = std::enable_if_t<std::is_base_of_v<node, T>>>
         std::shared_ptr<T> as()

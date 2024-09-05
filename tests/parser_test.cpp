@@ -30,7 +30,7 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         std::string tooEasy = R"(<root>
 </root>)";
         auto elem = element_impl::parse(tooEasy);
-        REQUIRE(elem->name == "root");
+        REQUIRE(elem->_name == "root");
     }
 
     SECTION("Text")
@@ -39,9 +39,9 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     <child>Hello, world!</child>
 </root>)";
         auto elem = element_impl::parse(withText);
-        REQUIRE(elem->name == "root");
+        REQUIRE(elem->_name == "root");
         REQUIRE(elem->first<text_impl>()->str() == "\n    ");
-        REQUIRE(elem->first<element_impl>()->name == "child");
+        REQUIRE(elem->first<element_impl>()->_name == "child");
         REQUIRE(elem->first<element_impl>()->first<text_impl>()->str() == "Hello, world!");
     }
 
@@ -53,13 +53,13 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     </parent>
 </root>)";
         auto elem = element_impl::parse(nested);
-        REQUIRE(elem->name == "root");
+        REQUIRE(elem->_name == "root");
         REQUIRE(elem->first<text_impl>()->str() == "\n    ");
         auto parent = elem->first<element_impl>();
-        REQUIRE(parent->name == "parent");
+        REQUIRE(parent->_name == "parent");
         REQUIRE(parent->first<text_impl>()->str() == "\n        ");
         auto child = parent->first<element_impl>();
-        REQUIRE(child->name == "child");
+        REQUIRE(child->_name == "child");
         REQUIRE(child->first_child() == nullptr);
     }
 
@@ -71,21 +71,21 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     <item>Third</item>
 </root>)";
         auto elem = element_impl::parse(multiLevel);
-        REQUIRE(elem->name == "root");
+        REQUIRE(elem->_name == "root");
         REQUIRE(elem->first<text_impl>()->str() == "\n    ");
 
         auto item1 = elem->first<element_impl>()->as<element_impl>();
-        REQUIRE(item1->name == "item");
+        REQUIRE(item1->_name == "item");
         REQUIRE(item1->first<text_impl>()->str() == "First");
 
         // 验证第二个 <item> 节点
         auto item2 = item1->next<element_impl>();
-        REQUIRE(item2->name == "item");
+        REQUIRE(item2->_name == "item");
         REQUIRE(item2->first<text_impl>()->str() == "Second");
 
         // 验证第三个 <item> 节点
         auto item3 = item2->next<element_impl>();
-        REQUIRE(item3->name == "item");
+        REQUIRE(item3->_name == "item");
         REQUIRE(item3->first<text_impl>()->str() == "Third");
 
         // 验证 root 节点的最后文本
@@ -98,12 +98,12 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     <empty />
 </root>)";
         auto elem = element_impl::parse(closed);
-        REQUIRE(elem->name == "root");
+        REQUIRE(elem->_name == "root");
         REQUIRE(elem->first<text_impl>()->str() == "\n    ");
 
         // 验证 <empty /> 节点
         auto emptyElement = elem->first_child()->next<element_impl>();
-        REQUIRE(emptyElement->name == "empty");
+        REQUIRE(emptyElement->_name == "empty");
         REQUIRE(emptyElement->first_child() == nullptr); // 自闭合标签没有子节点
 
         // 验证 root 节点的最后文本
@@ -117,12 +117,12 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     <child></child>
 </root>)";
         auto elem = element_impl::parse(mixed);
-        REQUIRE(elem->name == "root");
+        REQUIRE(elem->_name == "root");
         REQUIRE(elem->first<text_impl>()->str() == "\n    hello\n    ");
 
         // 验证 <child> 节点
         auto child = elem->first_child()->next<element_impl>();
-        REQUIRE(child->name == "child");
+        REQUIRE(child->_name == "child");
         REQUIRE(child->first_child() == nullptr); // <child></child> 是空的，没有文本子节点
 
         // 验证 root 节点的最后文本
@@ -133,16 +133,16 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     {
         std::string attri = R"(<root hello="world"></root>)";
         auto elem = element_impl::parse(attri);
-        REQUIRE(elem->name == "root");
-        REQUIRE(elem->attributes["hello"] == "world");
+        REQUIRE(elem->_name == "root");
+        REQUIRE(elem->_attributes["hello"] == "world");
     }
 
     SECTION("Empty With Attributes")
     {
         std::string attri = R"(<root hello="world"/>)";
         auto elem = element_impl::parse(attri);
-        REQUIRE(elem->name == "root");
-        REQUIRE(elem->attributes["hello"] == "world");
+        REQUIRE(elem->_name == "root");
+        REQUIRE(elem->_attributes["hello"] == "world");
     }
 
     SECTION("Multiple Attributes")
@@ -150,18 +150,18 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         std::string multipleAttributes = R"(<root attr1="value1" attr2="value2" attr3="value3"></root>)";
         auto elem = element_impl::parse(multipleAttributes);
 
-        REQUIRE(elem->name == "root");
-        REQUIRE(elem->attributes["attr1"] == "value1");
-        REQUIRE(elem->attributes["attr2"] == "value2");
-        REQUIRE(elem->attributes["attr3"] == "value3");
+        REQUIRE(elem->_name == "root");
+        REQUIRE(elem->_attributes["attr1"] == "value1");
+        REQUIRE(elem->_attributes["attr2"] == "value2");
+        REQUIRE(elem->_attributes["attr3"] == "value3");
     }
 
     SECTION("Empty Attributes")
     {
         std::string emptyAttribute = R"(<root attr=""></root>)";
         auto elem = element_impl::parse(emptyAttribute);
-        REQUIRE(elem->name == "root");
-        REQUIRE(elem->attributes["attr"] == "");
+        REQUIRE(elem->_name == "root");
+        REQUIRE(elem->_attributes["attr"] == "");
     }
 
     SECTION("Attributes And Children")
@@ -170,12 +170,12 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         auto elem = element_impl::parse(attributesAndChildren);
 
         // 检查根元素的名称和属性
-        REQUIRE(elem->name == "root");
-        REQUIRE(elem->attributes["attr"] == "value");
+        REQUIRE(elem->_name == "root");
+        REQUIRE(elem->_attributes["attr"] == "value");
 
         // 检查根元素的第一个子元素
         auto child = elem->first<element_impl>();
-        REQUIRE(child->name == "child");
+        REQUIRE(child->_name == "child");
 
         // 检查子元素的文本内容
         REQUIRE(child->first<text_impl>()->str() == "Text");
@@ -189,7 +189,7 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         auto elem = element_impl::parse(root);
 
         elem->entity_encoding(false);
-        REQUIRE(elem->name == "root");
+        REQUIRE(elem->_name == "root");
         REQUIRE(elem->first<text_impl>()->str() == "\n    <>\n");
 
         elem->entity_encoding(true);

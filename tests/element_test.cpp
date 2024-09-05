@@ -11,39 +11,39 @@ TEST_CASE("Element Impl", "[element]")
 
     SECTION("GetName")
     {
-        REQUIRE(root->name == "root");
+        REQUIRE(root->_name == "root");
     }
 
     SECTION("Basic Insertion")
     {
         root->push_front(child);
-        REQUIRE(root->first<element_impl>()->name == "child");
-        REQUIRE(root->last_child()->as<myxml::element_impl>()->name == "child");
+        REQUIRE(root->first<element_impl>()->_name == "child");
+        REQUIRE(root->last_child()->as<myxml::element_impl>()->_name == "child");
     }
 
     SECTION("Get child by name after insert it")
     {
         root->push_front(child);
         // Unbuffered
-        REQUIRE(root->first_elem("child")->name == "child");
+        REQUIRE(root->first_elem("child")->_name == "child");
         // Buffered
-        REQUIRE(root->first_elem("child")->name == "child");
+        REQUIRE(root->first_elem("child")->_name == "child");
     }
 
     SECTION("Multi child")
     {
         root->push_back(child);
         root->push_back(sibiling);
-        REQUIRE(root->first_elem("child")->name == "child");
-        REQUIRE(root->first_elem("child")->next<element_impl>()->name == "sibiling");
-        REQUIRE(root->first_elem("sibiling")->prev<element_impl>()->name == "child");
+        REQUIRE(root->first_elem("child")->_name == "child");
+        REQUIRE(root->first_elem("child")->next<element_impl>()->_name == "sibiling");
+        REQUIRE(root->first_elem("sibiling")->prev<element_impl>()->_name == "child");
     }
 
     SECTION("Overload []")
     {
-        root->attributes["hello"] = "world";
+        root->_attributes["hello"] = "world";
         REQUIRE((*root)["hello"] == "world");
-        REQUIRE(root->attributes["hello"] == "world");
+        REQUIRE(root->_attributes["hello"] == "world");
         (*root)["hello"] = "bar";
         REQUIRE((*root)["hello"] == "bar");
     }

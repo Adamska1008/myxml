@@ -25,17 +25,17 @@ namespace myxml
     }
 
     cdata_impl::cdata_impl(std::string_view str)
-        : inner(str)
+        : _inner(str)
     {
     }
 
     cdata_impl::cdata_impl(std::string &&str)
-        : inner(str)
+        : _inner(str)
     {
     }
 
     void cdata_impl::print(std::ostream &os) const
     {
-        os << "<![CDATA[" << this->inner << "]]>\n";
+        os << "<![CDATA[" << this->_inner << "]]>\n";
     }
 }

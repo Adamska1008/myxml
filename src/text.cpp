@@ -38,7 +38,7 @@ namespace myxml
 
     text_impl::text_impl(std::string_view input)
     {
-        if (config.entity_encoding)
+        if (_config.entity_encoding)
         {
             // entity encoding
             static std::map<std::string, char, std::less<>> entityMap = {
@@ -95,7 +95,7 @@ namespace myxml
 
     void text_impl::print(std::ostream &os) const
     {
-        if (!this->config.entity_encoding && !this->config.platform_specific_newline)
+        if (!this->_config.entity_encoding && !this->_config.platform_specific_newline)
         {
             os << this->inner;
         }
@@ -112,7 +112,7 @@ namespace myxml
             std::size_t len = this->inner.length();
             for (std::size_t i = 0; i < len; i++)
             {
-                if (this->config.entity_encoding)
+                if (this->_config.entity_encoding)
                 {
                     if (auto it = entityMap.find(this->inner[i]); it != entityMap.end())
                     {
@@ -121,7 +121,7 @@ namespace myxml
                         start = i + 1;
                     }
                 }
-                if (this->config.platform_specific_newline)
+                if (this->_config.platform_specific_newline)
                 {
                     if (this->inner[i] == '\n')
                     {

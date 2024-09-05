@@ -14,9 +14,9 @@ namespace myxml
     class buffer
     {
     private:
-        std::size_t offset = 0;
-        std::size_t line = 0;
-        std::size_t column = 0;
+        std::size_t _offset = 0;
+        std::size_t _line = 0;
+        std::size_t _column = 0;
 
         // @returns {pointer to data, data length}
         virtual std::tuple<const char *, std::size_t> base() const = 0;
@@ -40,7 +40,7 @@ namespace myxml
     class string_buffer : public buffer
     {
     private:
-        std::variant<std::string, std::string_view> inner;
+        std::variant<std::string, std::string_view> _inner;
         std::string_view view() const;
 
         /** Implement Buffer */

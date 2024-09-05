@@ -76,3 +76,16 @@ fmt::println(txt.trimmed());
 // yet it will modify. return a new text
 fmt::println(txt.trim());
 ```
+
+### CData
+
+```C++
+// similar to text
+using namespace myxml;
+// create from string
+cdata txt = "Hello";
+// or from query
+cdata txt = root.first_cdata();
+// print raw
+fmt::println(txt);
+```

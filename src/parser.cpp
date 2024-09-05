@@ -209,7 +209,7 @@ namespace myxml
     std::shared_ptr<element_impl> parser::parse_element_with_header(element_tag header)
     {
         auto elem = element_impl::_new();
-        elem->name = header.name;
+        elem->_name = header.name;
         while (auto ch = this->peek())
         {
             switch (*ch)
@@ -234,7 +234,7 @@ namespace myxml
                 case element_tag::closing_type::Closed:
                 {
                     auto child = element_impl::_new();
-                    child->name = tag->name;
+                    child->_name = tag->name;
                     if (!tag->attrs.empty())
                     {
                         child->extend_attributes(tag->attrs);
@@ -243,7 +243,7 @@ namespace myxml
                     break;
                 }
                 case element_tag::closing_type::Closing:
-                    if (tag->name != elem->name)
+                    if (tag->name != elem->_name)
                     {
                         auto [line, col] = this->cur_loc();
                         throw syntax_error(fmt::format("elem name in closing tag is mismatched with the header"), line, col);
@@ -276,7 +276,7 @@ namespace myxml
             if (tag->type == element_tag::closing_type::Closed)
             {
                 auto elem = element_impl::_new();
-                elem->name = tag->name;
+                elem->_name = tag->name;
                 if (!tag->attrs.empty())
                 {
                     elem->extend_attributes(tag->attrs);

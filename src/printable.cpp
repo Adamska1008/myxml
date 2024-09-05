@@ -18,12 +18,12 @@ namespace myxml
 
     void printable::entity_encoding(bool flag)
     {
-        this->config.entity_encoding = flag;
+        this->_config.entity_encoding = flag;
     }
 
     void printable::platform_specific_newline(bool flag)
     {
-        this->config.platform_specific_newline = flag;
+        this->_config.platform_specific_newline = flag;
     }
 
     std::string printable::str()

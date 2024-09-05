@@ -9,47 +9,47 @@ namespace myxml
 {
     void document::set_declaration(const declaration &decl)
     {
-        this->decl = decl;
+        this->_decl = decl;
     }
 
     void document::set_root(std::shared_ptr<element_impl> root)
     {
-        this->root = root;
+        this->_root = root;
     }
 
     const declaration &document::get_declaration() const
     {
-        return this->decl;
+        return this->_decl;
     }
 
     declaration &document::get_declaration()
     {
-        return this->decl;
+        return this->_decl;
     }
 
     const element &document::get_root() const
     {
-        return this->root;
+        return this->_root;
     }
 
     element &document::get_root()
     {
-        return this->root;
+        return this->_root;
     }
 
     element document::first_elem(std::string_view name)
     {
-        return this->root.first_elem(name);
+        return this->_root.first_elem(name);
     }
 
     element document::first_elem()
     {
-        return this->root.first_elem();
+        return this->_root.first_elem();
     }
 
     text document::first_text()
     {
-        return this->root.first_text();
+        return this->_root.first_text();
     }
 
     document document::parse(std::string_view input)
@@ -59,7 +59,7 @@ namespace myxml
 
     document document::load(std::string fileName)
     {
-        auto f = XMLFile::Open(fileName);
+        auto f = xml_file::open(fileName);
         return parser(f).parse_document();
     }
     // std::string document::ExportRaw() const
@@ -69,7 +69,7 @@ namespace myxml
 
     void document::print(std::ostream &os) const
     {
-        os << this->decl << this->root;
+        os << this->_decl << this->_root;
     }
     // std::string document::ExportFormatted(int indentLevel, int indentSize) const
     // {
@@ -78,12 +78,12 @@ namespace myxml
 
     void document::entity_encoding(bool flag)
     {
-        this->root.entity_encoding(flag);
+        this->_root.entity_encoding(flag);
     }
 
     void document::platform_specific_newline(bool flag)
     {
-        this->root.platform_specific_newline(flag);
+        this->_root.platform_specific_newline(flag);
     }
 
     std::optional<declaration> declaration::from_attrs(std::map<std::string, std::string> attrs)

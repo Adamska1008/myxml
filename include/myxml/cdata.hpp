@@ -8,6 +8,7 @@ namespace myxml
 
     class cdata : public printable
     {
+        friend class element;
     private:
         std::shared_ptr<cdata_impl> _impl;
 
@@ -25,7 +26,7 @@ namespace myxml
     class cdata_impl : public node
     {
     public:
-        std::string inner;
+        std::string _inner;
 
         cdata_impl() {};
         explicit cdata_impl(std::string_view);

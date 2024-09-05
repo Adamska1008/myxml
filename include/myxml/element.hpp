@@ -5,6 +5,7 @@
 #include <map>
 
 #include "myxml/text.hpp"
+#include "myxml/cdata.hpp"
 #include "myxml/printable.hpp"
 
 namespace myxml
@@ -46,6 +47,7 @@ namespace myxml
         element first_elem();
         element first_elem(std::string_view);
         text first_text();
+        cdata first_cdata();
 
         /* Implement printable */
         virtual void print(std::ostream &) const override;
@@ -56,8 +58,8 @@ namespace myxml
     struct element_impl : public composite_node // public std::enable_shared_from_this<Element>, public Node
     {
     public:
-        std::string name;
-        std::map<std::string, std::string, std::less<>> attributes;
+        std::string _name;
+        std::map<std::string, std::string, std::less<>> _attributes;
 
         /* Set initializer as private to avoid using Element without share_ptr*/
 

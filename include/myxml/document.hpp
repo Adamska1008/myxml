@@ -27,8 +27,8 @@ namespace myxml
     class document : public printable
     {
     private:
-        declaration decl;
-        element root;
+        declaration _decl;
+        element _root;
 
     public:
         /* Manipulate */

@@ -10,43 +10,43 @@
 
 namespace myxml
 {
-    XMLFile::XMLFile()
-        : offset(0)
+    xml_file::xml_file()
+        : _offset(0)
     {
     }
 
-    std::shared_ptr<XMLFile> XMLFile::Open(std::string_view fpath)
+    std::shared_ptr<xml_file> xml_file::open(std::string_view fpath)
     {
         // can't use make_shared because XMLFile() is private
-        auto xfile = std::shared_ptr<XMLFile>(new XMLFile());
-        xfile->fd = open(fpath.data(), O_RDONLY);
-        if (xfile->fd == -1)
+        auto xfile = std::shared_ptr<xml_file>(new xml_file());
+        xfile->_fd = open(fpath.data(), O_RDONLY);
+        if (xfile->_fd == -1)
         {
             throw io_error(fmt::format("failed to open file: {}", fpath));
         }
         struct stat fileInfo;
-        if (fstat(xfile->fd, &fileInfo) == -1)
+        if (fstat(xfile->_fd, &fileInfo) == -1)
         {
             throw io_error(fmt::format("failed to get info of file: {}", fpath));
         }
-        xfile->fileSize = fileInfo.st_size;
-        void *mappedRegion = mmap(nullptr, xfile->fileSize, PROT_READ, MAP_PRIVATE, xfile->fd, 0);
+        xfile->_size = fileInfo.st_size;
+        void *mappedRegion = mmap(nullptr, xfile->_size, PROT_READ, MAP_PRIVATE, xfile->_fd, 0);
         if (mappedRegion == MAP_FAILED)
         {
             throw io_error(fmt::format("failed to map memory for file: {}", fpath));
         }
-        xfile->inner = static_cast<char *>(mappedRegion);
+        xfile->_mapped = static_cast<char *>(mappedRegion);
         return xfile;
     }
 
-    XMLFile::~XMLFile()
+    xml_file::~xml_file()
     {
-        close(this->fd);
-        munmap(static_cast<void *>(this->inner), this->fileSize);
+        close(this->_fd);
+        munmap(static_cast<void *>(this->_mapped), this->_size);
     }
 
-    std::tuple<const char *, std::size_t> XMLFile::base() const
+    std::tuple<const char *, std::size_t> xml_file::base() const
     {
-        return {this->inner, this->fileSize};
+        return {this->_mapped, this->_size};
     }
 }

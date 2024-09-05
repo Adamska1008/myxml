@@ -24,7 +24,7 @@ namespace myxml
     class printable
     {
     protected:
-        print_config config;
+        print_config _config;
 
     public:
         virtual ~printable() = default;

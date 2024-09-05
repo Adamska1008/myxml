@@ -17,7 +17,7 @@ namespace myxml
 
     std::string_view element::name()
     {
-        return this->_impl->name;
+        return this->_impl->_name;
     }
 
     element element::parse(std::string_view xml)
@@ -50,6 +50,11 @@ namespace myxml
         return _impl->first<text_impl>();
     }
 
+    cdata element::first_cdata()
+    {
+        return _impl->first<cdata_impl>();
+    }
+
     void element::print(std::ostream &os) const
     {
         _impl->print(os);
@@ -66,7 +71,7 @@ namespace myxml
     }
 
     element_impl::element_impl(std::string_view name)
-        : name(name) {}
+        : _name(name) {}
 
     std::shared_ptr<element_impl> element_impl::_new(std::string_view name)
     {
@@ -85,18 +90,18 @@ namespace myxml
 
     std::shared_ptr<element_impl> element_impl::load(std::string_view path)
     {
-        auto f = XMLFile::Open(path);
+        auto f = xml_file::open(path);
         return parser(f).parse_element();
     }
 
     void element_impl::extend_attributes(std::map<std::string, std::string> attris)
     {
-        this->attributes.insert(attris.begin(), attris.end());
+        this->_attributes.insert(attris.begin(), attris.end());
     }
 
     std::string &element_impl::operator[](const std::string &key)
     {
-        return this->attributes[key];
+        return this->_attributes[key];
     }
 
     // std::string element_impl::ExportRaw() const
@@ -123,8 +128,8 @@ namespace myxml
 
     void element_impl::print(std::ostream &os) const
     {
-        os << "<" << this->name;
-        for (const auto &[key, value] : this->attributes)
+        os << "<" << this->_name;
+        for (const auto &[key, value] : this->_attributes)
         {
             os << "" << key << "=\"" << value << "\"";
         }
@@ -138,7 +143,7 @@ namespace myxml
         {
             node->print(os);
         }
-        os << "</" << this->name << ">";
+        os << "</" << this->_name << ">";
     }
 
     namespace literals
