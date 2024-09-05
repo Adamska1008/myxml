@@ -140,7 +140,7 @@ int main()
 }
 ```
 
-For more examples, read test files [here](./tests/).
+For more examples, read [examples](./docs/examples.md) and test files [here](./tests/).
 
 ## Inspiration
 
