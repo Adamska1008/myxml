@@ -61,6 +61,19 @@ std::vector<element> children = root.elems();
 std::vector<element> children = root.elems("child");
 ```
 
+#### Insertion
+
+```C++
+using namespace myxml;
+element root("root");
+element child("child");
+root.push_back(child);
+REQUIRE(root.first_elem().name() == "child");
+element next("next");
+root.push_front(next);
+REQUIRE(root.first_elem().name() == "next");
+```
+
 ### Text
 
 ```C++

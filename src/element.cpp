@@ -104,28 +104,6 @@ namespace myxml
         return this->_attributes[key];
     }
 
-    // std::string element_impl::ExportRaw() const
-    // {
-
-    //     std::string builder = "<" + std::string(this->name);
-    //     for (const auto &[key, value] : this->attributes)
-    //     {
-    //         builder += "" + key + "=\"" + value + "\"";
-    //     }
-    //     if (this->FirstChild() == nullptr)
-    //     {
-    //         builder += " />";
-    //         return builder;
-    //     }
-    //     builder += ">";
-    //     for (auto node = this->FirstChild(); node != nullptr; node = node->NextSibiling())
-    //     {
-    //         builder += node->ExportRaw();
-    //     }
-    //     builder += "</" + std::string(this->name) + ">";
-    //     return builder;
-    // }
-
     void element_impl::print(std::ostream &os) const
     {
         os << "<" << this->_name;

@@ -49,7 +49,37 @@ TEST_CASE("Element Impl", "[element]")
     }
 }
 
-TEST_CASE("Custom String Literal", "[Element]")
+TEST_CASE("Element Interface", "[element]")
+{
+    using namespace myxml;
+    using namespace myxml::literals;
+
+    element root("root");
+    element child("child");
+
+    SECTION("element::name")
+    {
+        REQUIRE(root.name() == "root");
+    }
+
+    SECTION("insertion")
+    {
+
+        root.push_back(child);
+        REQUIRE(root.first_elem().name() == "child");
+        element next("next");
+        root.push_front(next);
+        REQUIRE(root.first_elem().name() == "next");
+    }
+
+    SECTION("query by name")
+    {
+        root.push_back(child);
+        REQUIRE(root.first_elem("child").name() == "child");
+    }
+}
+
+TEST_CASE("Custom String Literal", "[element]")
 {
     using namespace myxml::literals;
     auto elem = "<root></root>"_elem;
