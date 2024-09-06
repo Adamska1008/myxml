@@ -72,6 +72,8 @@ REQUIRE(root.first_elem().name() == "child");
 element next("next");
 root.push_front(next);
 REQUIRE(root.first_elem().name() == "next");
+root.push_back(text("Hello"));
+REQUIRE(root.first_text().str() == "Hello");
 ```
 
 ### Text
@@ -84,10 +86,10 @@ text txt = "Hello";
 text txt = root.first_text();
 // print raw
 fmt::println(txt);
-// print trimmed text, it returns std::string and will not modify it
-fmt::println(txt.trimmed()); 
-// yet it will modify. return a new text
+// print trimmed string, it returns std::string and will not modify it
 fmt::println(txt.trim());
+// return a new trimmed text
+fmt::println(txt.trimmed()); 
 ```
 
 ### CData

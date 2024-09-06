@@ -15,10 +15,26 @@ namespace myxml
         _impl->inner = str;
     }
 
-    text::text(std::string_view str)
+    text::text(const std::string &str)
     {
         _impl = std::make_shared<text_impl>();
         _impl->inner = str;
+    }
+
+    std::string text::trimmed()
+    {
+        std::string trimmed;
+        auto is_space = [](char ch)
+        { return std::isspace(static_cast<char>(ch)); };
+        auto &ref = _impl->inner;
+        auto start = std::find_if_not(ref.begin(), ref.end(), is_space);
+        auto end = std::find_if_not(ref.rbegin(), ref.rend(), is_space).base();
+        return (start < end) ? std::string(start, end) : std::string();
+    }
+
+    text text::trim()
+    {
+        return this->trimmed();
     }
 
     void text::print(std::ostream &os) const

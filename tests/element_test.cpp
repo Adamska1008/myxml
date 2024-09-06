@@ -70,6 +70,8 @@ TEST_CASE("Element Interface", "[element]")
         element next("next");
         root.push_front(next);
         REQUIRE(root.first_elem().name() == "next");
+        root.push_back(text("Hello"));
+        REQUIRE(root.first_text().str() == "Hello");
     }
 
     SECTION("query by name")
