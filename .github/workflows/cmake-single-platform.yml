@@ -52,7 +52,7 @@ jobs:
         lcov --list coverage.info
     
     - name: Codecov
-      use: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v3
       with:
         token : ${{ secrets.CODECOV_TOKEN }}
         files: build/coverage.info
