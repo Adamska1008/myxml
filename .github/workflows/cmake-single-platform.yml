@@ -45,6 +45,7 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}}
     
     - name: Coverage Info
+      working-directory: ${{github.workspace}}/build/
       run: |
         lcov --directory . --capture --output-file coverage.info
         lcov --remove coverage.info '/usr/*' --output-file coverage.info
