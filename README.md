@@ -144,6 +144,10 @@ int main()
 
 For more examples, read [examples](./docs/examples.md) and test files [here](./tests/).
 
+## Code Coverage
+
+**myxml** support code coverage analysis via [Codecov](https://about.codecov.io/). Install Codecov browser extension to visualize which lines of code are covered and which are not.
+
 ## Inspiration
 
 This repo is inspired by [tinyxml2](https://github.com/leethomason/tinyxml2), [pugixml](https://github.com/zeux/pugixml) and [nlohmann/json](https://github.com/nlohmann/json).

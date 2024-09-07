@@ -6,6 +6,11 @@ function(add_custom_test test_name)
     target_compile_features(${test_name} PRIVATE cxx_std_17)
     target_compile_features(${test_name} PRIVATE cxx_std_17)
     add_test(NAME ${test_name} COMMAND ${test_name} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+    if (ENABLE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(${test_name} PRIVATE ${COVERAGE_FLAGS})
+        target_link_options(${test_name} PRIVATE ${COVERAGE_FLAGS})
+    endif()
 endfunction()
 
 add_custom_test(element_test)
