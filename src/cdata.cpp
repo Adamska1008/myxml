@@ -14,7 +14,12 @@ namespace myxml
     {
     }
 
-    cdata::cdata(std::string &&str)
+    cdata::cdata(const char *str)
+        : _impl(std::make_shared<cdata_impl>(std::string_view(str)))
+    {
+    }
+
+    cdata::cdata(std::string str)
         : _impl(std::make_shared<cdata_impl>(str))
     {
     }
