@@ -78,7 +78,7 @@ namespace myxml
     std::optional<std::string_view> buffer::take_n(int n)
     {
         auto [ptr, len] = this->base();
-        if (_offset + n >= len)
+        if (_offset + n > len)
         {
             return std::nullopt;
         }
