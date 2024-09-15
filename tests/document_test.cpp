@@ -11,8 +11,10 @@ TEST_CASE("Simple document", "[document]")
 </root>)";
         auto doc = document::parse(input);
         REQUIRE(doc.root().name() == "root");
-        REQUIRE(doc.first_elem("child").name() == "child");
-        REQUIRE(doc.first_elem("child").first_text().str() == "Value");
+        REQUIRE(doc.first_elem("child").value().name() == "child");
+        REQUIRE(doc.first_elem().value().name() == "child");
+        REQUIRE(doc.first_text().value().str() == "\n    ");
+        REQUIRE(doc.first_elem("child").value().first_text().value().str() == "Value");
     }
 
     SECTION("With decl")

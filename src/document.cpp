@@ -27,17 +27,17 @@ namespace myxml
         return this->_root;
     }
 
-    element document::first_elem(std::string_view name)
+    std::optional<element> document::first_elem(std::string_view name)
     {
         return this->_root.first_elem(name);
     }
 
-    element document::first_elem()
+    std::optional<element> document::first_elem()
     {
         return this->_root.first_elem();
     }
 
-    text document::first_text()
+    std::optional<text> document::first_text()
     {
         return this->_root.first_text();
     }
@@ -52,20 +52,11 @@ namespace myxml
         auto f = xml_file::open_file(fileName);
         return parser(f).parse_document();
     }
-    // std::string document::ExportRaw() const
-    // {
-    //     return this->decl.ExportRaw() + this->root->ExportRaw();
-    // }
 
     void document::print(std::ostream &os) const
     {
         os << this->_decl << this->_root;
     }
-    // std::string document::ExportFormatted(int indentLevel, int indentSize) const
-    // {
-    //     return this->decl.ExportFormatted(indentLevel + 1, indentSize) + this->root->ExportFormatted(indentLevel + 1, indentSize);
-    // }
-
     void document::entity_encoding(bool flag)
     {
         this->_root.entity_encoding(flag);
@@ -103,25 +94,6 @@ namespace myxml
             declaration.standalone = standalone;
         }
         return declaration;
-    }
-
-    std::string declaration::ExportRaw() const
-    {
-        std::string builder = fmt::format("<?xml version={}", this->version);
-        if (this->encoding)
-        {
-            builder += " encoding=" + (*this->encoding);
-        }
-        if (this->standalone)
-        {
-            builder += " standalone=" + (*this->standalone);
-        }
-        return builder + "?>\n";
-    }
-
-    std::string declaration::ExportFormatted(int indentLevel, int indentSize) const
-    {
-        return std::string(' ', indentLevel * indentSize) + this->ExportRaw();
     }
 
     namespace util

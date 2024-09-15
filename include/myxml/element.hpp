@@ -73,10 +73,10 @@ namespace myxml
         std::string_view name();
 
         /* Query */
-        element first_elem();
-        element first_elem(std::string_view);
-        text first_text();
-        cdata first_cdata();
+        std::optional<element> first_elem();
+        std::optional<element> first_elem(std::string_view);
+        std::optional<text> first_text();
+        std::optional<cdata> first_cdata();
 
         /* Manipulate */
         template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>

@@ -16,9 +16,7 @@ namespace myxml
         // TODO: use exception to distinguish each of bad format
         static std::optional<declaration> from_attrs(std::map<std::string, std::string> attrs);
 
-        /* Exportable */
-        virtual std::string ExportRaw() const;
-        virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const;
+        /* Printable */
         virtual void entity_encoding(bool) {};
         virtual void platform_specific_newline(bool) {};
         virtual void print(std::ostream &os) const {}
@@ -38,9 +36,9 @@ namespace myxml
         /* Query */
         declaration &get_declaration();
         element &root();
-        element first_elem(std::string_view);
-        element first_elem();
-        text first_text();
+        std::optional<element> first_elem(std::string_view);
+        std::optional<element> first_elem();
+        std::optional<text> first_text();
 
         /** Load */
         static document parse(std::string_view);

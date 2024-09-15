@@ -35,24 +35,52 @@ namespace myxml
         return (*_impl)[attr];
     }
 
-    element element::first_elem()
+    std::optional<element> element::first_elem()
     {
-        return _impl->first<element_impl>();
+        if (auto ptr = _impl->first<element_impl>())
+        {
+            return element(ptr);
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
-    element element::first_elem(std::string_view name)
+    std::optional<element> element::first_elem(std::string_view name)
     {
-        return _impl->first_elem(name);
+        if (auto ptr = _impl->first_elem(name); ptr)
+        {
+            return element(ptr);
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
-    text element::first_text()
+    std::optional<text> element::first_text()
     {
-        return _impl->first<text_impl>();
+        if (auto ptr = _impl->first<text_impl>(); ptr)
+        {
+            return text(ptr);
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
-    cdata element::first_cdata()
+    std::optional<cdata> element::first_cdata()
     {
-        return _impl->first<cdata_impl>();
+        if (auto ptr = _impl->first<cdata_impl>(); ptr)
+        {
+            return cdata(ptr);
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
     void element::print(std::ostream &os) const

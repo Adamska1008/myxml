@@ -66,18 +66,18 @@ TEST_CASE("Element Interface", "[element]")
     {
 
         root.push_back(child);
-        REQUIRE(root.first_elem().name() == "child");
+        REQUIRE(root.first_elem().value().name() == "child");
         element next("next");
         root.push_front(next);
-        REQUIRE(root.first_elem().name() == "next");
+        REQUIRE(root.first_elem().value().name() == "next");
         root.push_back(text("Hello"));
-        REQUIRE(root.first_text().str() == "Hello");
+        REQUIRE(root.first_text().value().str() == "Hello");
     }
 
     SECTION("query by name")
     {
         root.push_back(child);
-        REQUIRE(root.first_elem("child").name() == "child");
+        REQUIRE(root.first_elem("child").value().name() == "child");
     }
 }
 
