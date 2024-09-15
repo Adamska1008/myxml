@@ -35,8 +35,12 @@ namespace myxml
 
     std::optional<std::string_view> buffer::peek_n(int n) const
     {
+        if (n < 0)
+        {
+            return std::nullopt;
+        }
         auto [ptr, len] = this->base();
-        if (_offset >= len)
+        if (_offset + n >= len)
         {
             return std::nullopt;
         }
@@ -45,6 +49,10 @@ namespace myxml
 
     std::optional<char> buffer::after_n(int n) const
     {
+        if (n < 0)
+        {
+            return std::nullopt;
+        }
         auto [ptr, len] = this->base();
         if (_offset + n > len)
         {
@@ -55,6 +63,10 @@ namespace myxml
 
     std::optional<std::string_view> buffer::after_n_m(int n, int m) const
     {
+        if (n < 0 || m < 0)
+        {
+            return std::nullopt;
+        }
         auto [ptr, len] = this->base();
         if (_offset + n + m > len)
         {
@@ -77,6 +89,10 @@ namespace myxml
 
     std::optional<std::string_view> buffer::take_n(int n)
     {
+        if (n < 0)
+        {
+            return std::nullopt;
+        }
         auto [ptr, len] = this->base();
         if (_offset + n > len)
         {
