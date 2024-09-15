@@ -29,8 +29,8 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     {
         std::string tooEasy = R"(<root>
 </root>)";
-        auto elem = element_impl::parse(tooEasy);
-        REQUIRE(elem->_name == "root");
+        auto elem = element::parse(tooEasy);
+        REQUIRE(elem.name() == "root");
     }
 
     SECTION("Text")
@@ -167,18 +167,18 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     SECTION("Attributes And Children")
     {
         std::string attributesAndChildren = R"(<root attr="value"><child>Text</child></root>)";
-        auto elem = element_impl::parse(attributesAndChildren);
+        auto elem = element::parse(attributesAndChildren);
 
         // 检查根元素的名称和属性
-        REQUIRE(elem->_name == "root");
-        REQUIRE(elem->_attributes["attr"] == "value");
+        REQUIRE(elem.name() == "root");
+        REQUIRE(elem["attr"] == "value");
 
         // 检查根元素的第一个子元素
-        auto child = elem->first<element_impl>();
-        REQUIRE(child->_name == "child");
+        auto child = *elem.first_elem();
+        REQUIRE(child.name() == "child");
 
         // 检查子元素的文本内容
-        REQUIRE(child->first<text_impl>()->str() == "Text");
+        REQUIRE(child.first_text().value().str() == "Text");
     }
 
     SECTION("Decoding entity")
@@ -220,5 +220,8 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
     {
         auto doc = document::load("tests/data/example1.xml");
         auto root = doc.root();
+
+        auto elem = element::load("tests/data/example1.xml");
+        REQUIRE(elem.name() == "root");
     }
 }

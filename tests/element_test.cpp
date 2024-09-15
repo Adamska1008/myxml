@@ -74,10 +74,14 @@ TEST_CASE("Element Interface", "[element]")
         REQUIRE(root.first_text().value().str() == "Hello");
     }
 
-    SECTION("query by name")
+    SECTION("query")
     {
+        REQUIRE(root.first_elem() == std::nullopt);
         root.push_back(child);
         REQUIRE(root.first_elem("child").value().name() == "child");
+        REQUIRE(root.first_elem("sibiling") == std::nullopt);
+        REQUIRE(root.first_text() == std::nullopt);
+        REQUIRE(root.first_cdata() == std::nullopt);
     }
 }
 
