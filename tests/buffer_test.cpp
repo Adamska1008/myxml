@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include "myxml/buffer.hpp"
 #include "myxml/xmlfile.hpp"
-#include <iostream>
+#include <random>
 
 TEST_CASE("String Buffer", "[buffer]")
 {
@@ -20,6 +20,18 @@ TEST_CASE("String Buffer", "[buffer]")
         REQUIRE(sb.take_n(2) == std::nullopt);
         REQUIRE(sb.peek() == std::nullopt);
         REQUIRE(sb.peek_n(2) == std::nullopt);
+    }
+
+    SECTION("Negative test")
+    {
+        myxml::string_buffer sb = "No matter";
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(INT32_MIN, -1);
+        REQUIRE(sb.take_n(dis(gen)) == std::nullopt);
+        REQUIRE(sb.peek_n(dis(gen)) == std::nullopt);
+        REQUIRE(sb.after_n(dis(gen)) == std::nullopt);
+        REQUIRE(sb.after_n_m(dis(gen), dis(gen)) == std::nullopt);
     }
 
     SECTION("Take test")
@@ -45,5 +57,13 @@ TEST_CASE("String Buffer", "[buffer]")
         REQUIRE(sb.cur_loc() == std::make_tuple(1, 0));
         REQUIRE(sb.take_n(3) == "Lin");
         REQUIRE(sb.cur_loc() == std::make_tuple(1, 3));
+    }
+
+    SECTION("Move constructor")
+    {
+        std::string owner("Own the value");
+        myxml::string_buffer sb(std::move(owner));
+
+        REQUIRE(sb.take_n(3) == "Own");
     }
 }
