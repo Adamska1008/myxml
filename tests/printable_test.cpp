@@ -1,6 +1,7 @@
 #include <iostream>
 #include <catch2/catch_test_macros.hpp>
 #include "myxml/element.hpp"
+#include "myxml/document.hpp"
 
 TEST_CASE("Print raw", "[printable]")
 {
@@ -14,9 +15,9 @@ TEST_CASE("Print raw", "[printable]")
 TEST_CASE("Set Config", "[printable]")
 {
     using namespace myxml::literals;
-    auto root = "<root>Hell&lt;o, world!</root>"_elem;
+    auto root = "<root hello=\"world\">Hell&lt;o, world!</root>"_doc;
     root.entity_encoding(false);
-    REQUIRE(root.str() == "<root>Hell<o, world!</root>");
+    REQUIRE(root.str() == "<root hello=\"world\">Hell<o, world!</root>");
     root.entity_encoding(true);
-    REQUIRE(root.str() == "<root>Hell&lt;o, world!</root>");
+    REQUIRE(root.str() == "<root hello=\"world\">Hell&lt;o, world!</root>");
 }

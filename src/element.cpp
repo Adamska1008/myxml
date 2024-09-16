@@ -158,10 +158,15 @@ namespace myxml
     void element_impl::print(std::ostream &os) const
     {
         os << "<" << this->_name;
-        for (const auto &[key, value] : this->_attributes)
+        if (!_attributes.empty())
         {
-            os << "" << key << "=\"" << value << "\"";
+            os << " ";
+            for (const auto &[key, value] : this->_attributes)
+            {
+                os << "" << key << "=\"" << value << "\"";
+            }
         }
+
         if (this->first_child() == nullptr)
         {
             os << " />";
