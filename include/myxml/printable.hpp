@@ -29,8 +29,6 @@ namespace myxml
     public:
         virtual ~printable() = default;
         virtual void print(std::ostream &os) const = 0;
-        // virtual std::string ExportRaw() const = 0;
-        // virtual std::string ExportFormatted(int indentLevel = 0, int indentSize = 4) const = 0;
         virtual void entity_encoding(bool);
         virtual void platform_specific_newline(bool);
 
