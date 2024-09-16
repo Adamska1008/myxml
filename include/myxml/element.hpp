@@ -77,6 +77,7 @@ namespace myxml
         std::optional<element> first_elem(std::string_view);
         std::optional<text> first_text();
         std::optional<cdata> first_cdata();
+        std::optional<element> parent();
 
         /* Manipulate */
         template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
@@ -90,6 +91,14 @@ namespace myxml
         {
             _impl->push_front(child.impl());
         }
+
+        template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
+        void remove(T child)
+        {
+            _impl->unlink(child.impl());
+        }
+        // remove first element whose name is `name`
+        void remove_first(std::string name);
 
         /* Implement printable */
         virtual void print(std::ostream &) const override;

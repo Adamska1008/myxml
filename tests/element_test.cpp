@@ -74,6 +74,20 @@ TEST_CASE("Element Interface", "[element]")
         REQUIRE(root.first_text().value().str() == "Hello");
     }
 
+    SECTION("delete")
+    {
+        root.push_back(child);
+        REQUIRE(root.first_elem().value().name() == "child");
+        REQUIRE(child.parent().value().name() == "root");
+        root.remove(child);
+        REQUIRE(child.parent() == std::nullopt);
+        REQUIRE(root.first_elem() == std::nullopt);
+        root.push_back(child);
+        root.remove_first("child");
+        REQUIRE(child.parent() == std::nullopt);
+        REQUIRE(root.first_elem() == std::nullopt);
+    }
+
     SECTION("query")
     {
         REQUIRE(root.first_elem() == std::nullopt);

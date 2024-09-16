@@ -83,6 +83,29 @@ namespace myxml
         }
     }
 
+    std::optional<element> element::parent()
+    {
+        if (_impl->_parent)
+        {
+            return element(_impl->_parent->as<element_impl>());
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+
+    void element::remove_first(std::string name)
+    {
+        for (auto child = _impl->first_child(); child != nullptr; child = _impl->next_sibiling())
+        {
+            if (auto elem = child->as<element_impl>(); elem && elem->_name == name)
+            {
+                _impl->unlink(child);
+            }
+        }
+    }
+
     void element::print(std::ostream &os) const
     {
         _impl->print(os);
