@@ -17,6 +17,19 @@ TEST_CASE("Simple document", "[document]")
         REQUIRE(doc.first_elem("child").value().first_text().value().str() == "Value");
     }
 
+    SECTION("Manipulate")
+    {
+        using namespace myxml::literals;
+        auto doc = "<root/>"_doc;
+        doc.push_front("<child></child>"_elem);
+        REQUIRE(doc.first_elem().value().name() == "child");
+        doc.pop_front();
+        REQUIRE(doc.first_elem() == std::nullopt);
+        doc.push_front("<child></child>"_elem);
+        doc.remove_first_element("child");
+        REQUIRE(doc.first_elem() == std::nullopt);
+    }
+
     SECTION("With decl")
     {
         std::string input = R"(<?xml version="1.0" encoding="UTF-8"?>

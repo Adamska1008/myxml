@@ -27,21 +27,6 @@ namespace myxml
         return this->_root;
     }
 
-    std::optional<element> document::first_elem(std::string_view name)
-    {
-        return this->_root.first_elem(name);
-    }
-
-    std::optional<element> document::first_elem()
-    {
-        return this->_root.first_elem();
-    }
-
-    std::optional<text> document::first_text()
-    {
-        return this->_root.first_text();
-    }
-
     document document::parse(std::string_view input)
     {
         return parser(input).parse_document();

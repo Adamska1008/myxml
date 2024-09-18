@@ -83,7 +83,7 @@ TEST_CASE("Element Interface", "[element]")
         REQUIRE(child.parent() == std::nullopt);
         REQUIRE(root.first_elem() == std::nullopt);
         root.push_back(child);
-        root.remove_first("child");
+        root.remove_first_element("child");
         REQUIRE(child.parent() == std::nullopt);
         REQUIRE(root.first_elem() == std::nullopt);
     }

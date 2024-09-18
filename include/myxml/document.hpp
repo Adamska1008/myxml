@@ -36,9 +36,19 @@ namespace myxml
         /* Query */
         declaration &get_declaration();
         element &root();
-        std::optional<element> first_elem(std::string_view);
-        std::optional<element> first_elem();
-        std::optional<text> first_text();
+
+        /* Wrapped Element method*/
+        std::optional<element> first_elem(std::string_view name) { return _root.first_elem(name); }
+        std::optional<element> first_elem() { return _root.first_elem(); }
+        std::optional<text> first_text() { return _root.first_text(); }
+        std::optional<cdata> first_cdata() { return _root.first_cdata(); }
+        std::optional<element> parent() { return _root.parent(); }
+        template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
+        void push_front(T child) { _root.push_front(child); }
+        void pop_front() { _root.pop_front(); }
+        template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
+        void remove(T child) { _root.remove(child); }
+        void remove_first_element(std::string name) { return _root.remove_first_element(name); }
 
         /** Load */
         static document parse(std::string_view);

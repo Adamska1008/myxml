@@ -95,7 +95,7 @@ namespace myxml
         }
     }
 
-    void element::remove_first(std::string name)
+    void element::remove_first_element(std::string name)
     {
         for (auto child = _impl->first_child(); child != nullptr; child = _impl->next_sibiling())
         {
