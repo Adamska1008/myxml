@@ -3,13 +3,21 @@
 #include "myxml/element.hpp"
 #include "myxml/document.hpp"
 
-TEST_CASE("Print raw", "[printable]")
+TEST_CASE("Print compacted", "[printable]")
 {
+    using namespace myxml::literals;
     auto root = myxml::element::parse("<root />");
     REQUIRE(root.str() == "<root />");
 
     root = myxml::element::parse("<root>Hello, world!</root>");
     REQUIRE(root.str() == "<root>Hello, world!</root>");
+
+    auto doc = R"(<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <child>Value</child>
+</root>
+)"_doc;
+    REQUIRE(doc.str() == R"(<?xml version="1.0" encoding="UTF-8"?><root><child>Value</child>)</root>)");
 }
 
 TEST_CASE("Set Config", "[printable]")

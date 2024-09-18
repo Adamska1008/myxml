@@ -34,7 +34,7 @@ TEST_CASE("Simple document", "[document]")
         REQUIRE(doc.first_elem() == std::nullopt);
         auto cd = cdata("Hello");
         doc.push_back(cd);
-        REQUIRE(doc.first_cdata().value().str() == "<![CDATA[Hello]]>\n");
+        REQUIRE(doc.first_cdata().value().str() == "<![CDATA[Hello]]>");
     }
 
     SECTION("With decl")

@@ -18,6 +18,6 @@ TEST_CASE("Simple", "[cdata]")
         myxml::cdata cdata("It is a CDATA <");
         std::stringstream sstream;
         sstream << cdata;
-        REQUIRE(sstream.str() == "<![CDATA[It is a CDATA <]]>\n");
+        REQUIRE(sstream.str() == "<![CDATA[It is a CDATA <]]>");
     }
 }

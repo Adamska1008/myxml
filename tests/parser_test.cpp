@@ -201,7 +201,7 @@ TEST_CASE("Parsing simple xml elements", "[parser]")
         std::string cdata = "<root><![CDATA[Hello!]]></root>";
         auto elem = element_impl::parse(cdata);
 
-        REQUIRE(elem->first_child()->as<myxml::cdata_impl>()->str() == "<![CDATA[Hello!]]>\n");
+        REQUIRE(elem->first_child()->as<myxml::cdata_impl>()->str() == "<![CDATA[Hello!]]>");
     }
 
     SECTION("Newline Normalization")

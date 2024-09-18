@@ -172,6 +172,7 @@ namespace myxml
         if (auto f = std::get_if<formatted>(&_print_config.style))
         {
             // TODO: implement it
+            return;
         }
         else if (std::holds_alternative<compacted>(_print_config.style))
         {
@@ -196,6 +197,7 @@ namespace myxml
                 node->print(os);
             }
             os << "</" << this->_name << ">";
+            return;
         }
         throw std::logic_error("should never execute code in file element.cpp, line " + __LINE__);
     }
