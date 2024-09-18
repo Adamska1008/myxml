@@ -6,12 +6,12 @@ namespace myxml
 {
     void node::entity_encoding(bool flag)
     {
-        this->_config.entity_encoding = flag;
+        this->_print_config.entity_encoding = flag;
     }
 
     void node::platform_specific_newline(bool flag)
     {
-        this->_config.platform_specific_newline = flag;
+        this->_print_config.platform_specific_newline = flag;
     }
 
     std::shared_ptr<node> node::next_sibiling()
@@ -140,7 +140,7 @@ namespace myxml
 
     void composite_node::entity_encoding(bool flag)
     {
-        this->_config.entity_encoding = flag;
+        this->_print_config.entity_encoding = flag;
         for (auto it = this->first_child(); it != nullptr; it = it->_next)
         {
             it->entity_encoding(flag);
@@ -149,7 +149,7 @@ namespace myxml
 
     void composite_node::platform_specific_newline(bool flag)
     {
-        this->_config.platform_specific_newline = flag;
+        this->_print_config.platform_specific_newline = flag;
         for (auto it = this->first_child(); it != nullptr; it = it->_next)
         {
             it->platform_specific_newline(flag);

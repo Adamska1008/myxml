@@ -1,30 +1,37 @@
 #pragma once
 #include <string>
 #include <optional>
+#include <variant>
 
 namespace myxml
 {
-    struct format_config
+    struct compacted
     {
-        std::size_t indent_level;
-        std::size_t indent_size;
-
-        format_config deeper() { return {indent_level + 1, indent_size}; }
     };
+
+    struct formatted
+    {
+        int indent_size;
+        int indent_level;
+
+        formatted deeper() { return {indent_size, indent_level + 1}; }
+    };
+
+    using print_style = std::variant<compacted, formatted>;
 
     struct print_config
     {
     public:
         bool entity_encoding;
         bool platform_specific_newline;
-        std::optional<format_config> fconfig;
+        print_style style;
         print_config();
     };
 
     class printable
     {
     protected:
-        print_config _config;
+        print_config _print_config;
 
     public:
         virtual ~printable() = default;

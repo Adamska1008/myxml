@@ -169,27 +169,35 @@ namespace myxml
 
     void element_impl::print(std::ostream &os) const
     {
-        os << "<" << this->_name;
-        if (!_attributes.empty())
+        if (auto f = std::get_if<formatted>(&_print_config.style))
         {
-            os << " ";
-            for (const auto &[key, value] : this->_attributes)
+            // TODO: implement it
+        }
+        else if (std::holds_alternative<compacted>(_print_config.style))
+        {
+            os << "<" << this->_name;
+            if (!_attributes.empty())
             {
-                os << "" << key << "=\"" << value << "\"";
+                os << " ";
+                for (const auto &[key, value] : this->_attributes)
+                {
+                    os << "" << key << "=\"" << value << "\"";
+                }
             }
-        }
 
-        if (this->first_child() == nullptr)
-        {
-            os << " />";
-            return;
+            if (this->first_child() == nullptr)
+            {
+                os << " />";
+                return;
+            }
+            os << ">";
+            for (auto node = this->first_child(); node != nullptr; node = node->next_sibiling())
+            {
+                node->print(os);
+            }
+            os << "</" << this->_name << ">";
         }
-        os << ">";
-        for (auto node = this->first_child(); node != nullptr; node = node->next_sibiling())
-        {
-            node->print(os);
-        }
-        os << "</" << this->_name << ">";
+        throw std::logic_error("should never execute code in file element.cpp, line " + __LINE__);
     }
 
     namespace literals

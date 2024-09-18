@@ -54,7 +54,7 @@ namespace myxml
 
     text_impl::text_impl(std::string_view input)
     {
-        if (_config.entity_encoding)
+        if (_print_config.entity_encoding)
         {
             // entity encoding
             static std::map<std::string, char, std::less<>> entityMap = {
@@ -106,7 +106,7 @@ namespace myxml
 
     void text_impl::print(std::ostream &os) const
     {
-        if (!this->_config.entity_encoding && !this->_config.platform_specific_newline)
+        if (!this->_print_config.entity_encoding && !this->_print_config.platform_specific_newline)
         {
             os << this->inner;
         }
@@ -121,9 +121,13 @@ namespace myxml
             };
             std::size_t start = 0; // start of current segement
             std::size_t len = this->inner.length();
+            if (auto f = std::get_if<formatted>(&_print_config.style); f)
+            {
+                // TODO: implement it
+            }
             for (std::size_t i = 0; i < len; i++)
             {
-                if (this->_config.entity_encoding)
+                if (this->_print_config.entity_encoding)
                 {
                     if (auto it = entityMap.find(this->inner[i]); it != entityMap.end())
                     {
@@ -132,7 +136,7 @@ namespace myxml
                         start = i + 1;
                     }
                 }
-                if (this->_config.platform_specific_newline)
+                if (this->_print_config.platform_specific_newline)
                 {
                     if (this->inner[i] == '\n')
                     {
@@ -143,6 +147,10 @@ namespace myxml
                 }
             }
             os << this->inner.substr(start, len - start);
+            if (std::holds_alternative<formatted>(_print_config.style))
+            {
+                // TODO: implement it
+            }
         }
     }
 

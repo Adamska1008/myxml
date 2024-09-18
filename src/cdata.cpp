@@ -41,6 +41,14 @@ namespace myxml
 
     void cdata_impl::print(std::ostream &os) const
     {
-        os << "<![CDATA[" << _inner << "]]>\n";
+        if (auto f = std::get_if<formatted>(&_print_config.style))
+        {
+            // TODO: implement it
+        }
+        else
+        {
+            os << "<![CDATA[" << _inner << "]]>";
+            return;
+        }
     }
 }

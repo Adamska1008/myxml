@@ -6,7 +6,7 @@ namespace myxml
     print_config::print_config()
         : entity_encoding(true),
           platform_specific_newline(false),
-          fconfig(std::nullopt)
+          style(compacted{})
     {
     }
 
@@ -18,12 +18,12 @@ namespace myxml
 
     void printable::entity_encoding(bool flag)
     {
-        this->_config.entity_encoding = flag;
+        this->_print_config.entity_encoding = flag;
     }
 
     void printable::platform_specific_newline(bool flag)
     {
-        this->_config.platform_specific_newline = flag;
+        this->_print_config.platform_specific_newline = flag;
     }
 
     std::string printable::str()

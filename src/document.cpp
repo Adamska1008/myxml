@@ -40,7 +40,15 @@ namespace myxml
 
     void document::print(std::ostream &os) const
     {
-        os << this->_decl << this->_root;
+        if (auto f = std::get_if<formatted>(&_print_config.style))
+        {
+            // TODO: implement it
+        }
+        else
+        {
+            os << this->_decl << this->_root;
+            return;
+        }
     }
     void document::entity_encoding(bool flag)
     {
