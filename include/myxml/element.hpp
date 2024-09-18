@@ -85,24 +85,19 @@ namespace myxml
         {
             _impl->push_back(child.impl());
         }
-
         template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
         void push_front(T child)
         {
             _impl->push_front(child.impl());
         }
-
-        void pop_front()
-        {
-            auto first = _impl->first_child();
-            _impl->unlink(first);
-        }
-
+        void pop_front();
+        void pop_back();
         template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
         void remove(T child)
         {
             _impl->unlink(child.impl());
         }
+
         // remove first element whose name is `name`
         void remove_first_element(std::string name);
 

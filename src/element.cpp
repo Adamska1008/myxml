@@ -95,6 +95,18 @@ namespace myxml
         }
     }
 
+    void element::pop_front()
+    {
+        auto first = _impl->first_child();
+        _impl->unlink(first);
+    }
+
+    void element::pop_back()
+    {
+        auto last = _impl->last_child();
+        _impl->unlink(last);
+    }
+
     void element::remove_first_element(std::string name)
     {
         for (auto child = _impl->first_child(); child != nullptr; child = _impl->next_sibiling())

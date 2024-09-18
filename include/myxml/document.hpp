@@ -45,7 +45,10 @@ namespace myxml
         std::optional<element> parent() { return _root.parent(); }
         template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
         void push_front(T child) { _root.push_front(child); }
+        template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
+        void push_back(T child) { _root.push_back(child); }
         void pop_front() { _root.pop_front(); }
+        void pop_back() { _root.pop_back(); }
         template <typename T, typename SFINAE = std::enable_if_t<std::is_base_of_v<interface, T>>>
         void remove(T child) { _root.remove(child); }
         void remove_first_element(std::string name) { return _root.remove_first_element(name); }

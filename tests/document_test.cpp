@@ -21,13 +21,20 @@ TEST_CASE("Simple document", "[document]")
     {
         using namespace myxml::literals;
         auto doc = "<root/>"_doc;
-        doc.push_front("<child></child>"_elem);
+        auto child = "<child></child>"_elem;
+        doc.push_front(child);
         REQUIRE(doc.first_elem().value().name() == "child");
         doc.pop_front();
         REQUIRE(doc.first_elem() == std::nullopt);
-        doc.push_front("<child></child>"_elem);
+        doc.push_front(child);
         doc.remove_first_element("child");
         REQUIRE(doc.first_elem() == std::nullopt);
+        doc.push_front(child);
+        doc.pop_back();
+        REQUIRE(doc.first_elem() == std::nullopt);
+        auto cd = cdata("Hello");
+        doc.push_back(cd);
+        REQUIRE(doc.first_cdata().value().str() == "<![CDATA[Hello]]>\n");
     }
 
     SECTION("With decl")
