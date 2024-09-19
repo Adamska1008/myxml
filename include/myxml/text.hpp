@@ -35,6 +35,9 @@ namespace myxml
         std::string trimmed();
         text trim();
 
+        // return true if it's all blank chars
+        bool is_blank() const;
+
         /* Implement printable */
         virtual void print(std::ostream &) const override;
         virtual void entity_encoding(bool) override;

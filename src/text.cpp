@@ -37,9 +37,26 @@ namespace myxml
         return this->trimmed();
     }
 
+    bool text::is_blank() const
+    {
+        return std::all_of(_impl->inner.begin(), _impl->inner.end(), [](unsigned char c)
+                           { return std::isspace(c); });
+    }
+
     void text::print(std::ostream &os) const
     {
-        this->_impl->print(os);
+        if (std::holds_alternative<compacted>(_print_config.style))
+        {
+            if (this->is_blank())
+            {
+                return;
+            }
+            _impl->print(os);
+        }
+        else
+        {
+            // TODO: implement it
+        }
     }
 
     void text::entity_encoding(bool flag)

@@ -17,15 +17,13 @@ namespace myxml
         static std::optional<declaration> from_attrs(std::map<std::string, std::string> attrs);
 
         /* Printable */
-        virtual void entity_encoding(bool) {};
-        virtual void platform_specific_newline(bool) {};
-        virtual void print(std::ostream &os) const {}
+        virtual void print(std::ostream &os) const;
     };
 
     class document : public printable
     {
     private:
-        declaration _decl;
+        std::optional<declaration> _decl;
         element _root;
 
     public:
@@ -34,10 +32,10 @@ namespace myxml
         void set_root(std::shared_ptr<element_impl> root);
 
         /* Query */
-        declaration &get_declaration();
+        std::optional<declaration> get_declaration();
         element &root();
 
-        /* Wrapped Element method*/
+        /* Forwarding element method*/
         std::optional<element> first_elem(std::string_view name) { return _root.first_elem(name); }
         std::optional<element> first_elem() { return _root.first_elem(); }
         std::optional<text> first_text() { return _root.first_text(); }

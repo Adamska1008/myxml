@@ -11,4 +11,10 @@ TEST_CASE("text interface", "[text]")
         REQUIRE(text.trimmed() == "Hello");
         REQUIRE(text.trim().str() == "Hello");
     }
+
+    SECTION("All blank")
+    {
+        text t("\n\t  \n   \t");
+        REQUIRE(t.is_blank() == true);
+    }
 }

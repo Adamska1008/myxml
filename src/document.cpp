@@ -17,7 +17,27 @@ namespace myxml
         this->_root = root;
     }
 
-    declaration &document::get_declaration()
+    void declaration::print(std::ostream &os) const
+    {
+        if (auto f = std::get_if<formatted>(&_print_config.style); f)
+        {
+        }
+        else
+        {
+            os << "<?xml version=\"" << this->version << "\"";
+            if (this->encoding)
+            {
+                os << " encoding=\"" << *this->encoding << "\"";
+            }
+            if (this->standalone)
+            {
+                os << " standalone=\"" + *this->standalone << "\"";
+            }
+            os << "?>";
+        }
+    }
+
+    std::optional<declaration> document::get_declaration()
     {
         return this->_decl;
     }
@@ -46,7 +66,11 @@ namespace myxml
         }
         else
         {
-            os << this->_decl << this->_root;
+            if (this->_decl)
+            {
+                os << *this->_decl;
+            }
+            os << this->_root;
             return;
         }
     }

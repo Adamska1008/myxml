@@ -13,7 +13,7 @@ TEST_CASE("Simple document", "[document]")
         REQUIRE(doc.root().name() == "root");
         REQUIRE(doc.first_elem("child").value().name() == "child");
         REQUIRE(doc.first_elem().value().name() == "child");
-        REQUIRE(doc.first_text().value().str() == "\n    ");
+        REQUIRE(doc.first_text().value().str() == "");
         REQUIRE(doc.first_elem("child").value().first_text().value().str() == "Value");
     }
 
@@ -45,8 +45,8 @@ TEST_CASE("Simple document", "[document]")
 </root>
 )";
         auto doc = document::parse(input);
-        REQUIRE(doc.get_declaration().version == "1.0");
-        REQUIRE(doc.get_declaration().encoding == "UTF-8");
+        REQUIRE(doc.get_declaration().value().version == "1.0");
+        REQUIRE(doc.get_declaration().value().encoding == "UTF-8");
     }
 }
 
