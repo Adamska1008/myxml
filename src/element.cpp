@@ -181,7 +181,14 @@ namespace myxml
 
         if (this->first_child() == nullptr)
         {
-            os << " />";
+            if (this->_is_self_closing)
+            {
+                os << " />";
+            }
+            else
+            {
+                os << "></" << this->_name << ">";
+            }
             return;
         }
         os << ">";
