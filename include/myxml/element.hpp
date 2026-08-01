@@ -18,6 +18,7 @@ namespace myxml
     public:
         std::string _name;
         std::map<std::string, std::string, std::less<>> _attributes;
+        bool _is_self_closing = false;
 
         /* Set initializer as private to avoid using Element without share_ptr*/
 
